@@ -21,7 +21,7 @@ let
     '';
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
-    outputHash = "1mkd03hwaviqzrs6gfaq6axnqbdv23i2jaclqr0nn5m7230g53im";
+    outputHash = "sha256-xAPNmXAqNvolRw2qeypid2B30PEJzVeqPxpWNt+V/0s=";
   };
 in mkDerivation rec {
   pname = "mvn2nix";
@@ -54,7 +54,7 @@ in mkDerivation rec {
           --set JAVA_HOME ${jdk}
   '';
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description =
       "Easily package your Java applications for the Nix package manager.";
     homepage = "https://github.com/fzakaria/mvn2nix";
