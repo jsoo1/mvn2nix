@@ -1,0 +1,43 @@
+package com.fzakaria.mvn2nix.model.nix;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class Attrs extends Expr implements Write {
+    public final TreeMap<String, Expr> attrs;
+
+    public Attrs(Stream<Map.Entry<String, Expr>> s) {
+        attrs = s.collect(Collectors.toMap(
+            Map.Entry::getKey, Map.Entry::getValue, Expr::snd, TreeMap::new
+        ));
+    }
+
+    public Attrs(List<Map.Entry<String, Expr>> as) {
+        attrs = as.stream().collect(Collectors.toMap(
+            Map.Entry::getKey, Map.Entry::getValue, Expr::snd, TreeMap::new
+        ));
+    }
+
+    @Override
+    public void write(int ind, BufferedWriter w) throws IOException {
+        boolean written = false;
+
+        for (Map.Entry<String, Expr> e: attrs.entrySet()) {
+            if (!written) {
+                written = true;
+
+                w.write("\n"); indent(ind, w); w.write("{ ");
+            } else {
+                w.write("\n"); indent(ind, w); w.write(", ");
+            }
+            writeNameValue(ind, w, e.getKey(), e.getValue());
+        }
+        w.write("\n"); indent(ind, w); w.write("}");
+    }
+}

@@ -1,14 +1,18 @@
 package com.fzakaria.mvn2nix.cmd;
 
 import com.fzakaria.mvn2nix.maven.Artifact;
+import com.fzakaria.mvn2nix.maven.Graph;
 import com.fzakaria.mvn2nix.maven.Maven;
 import com.fzakaria.mvn2nix.model.MavenArtifact;
 import com.fzakaria.mvn2nix.model.MavenNixInformation;
 import com.fzakaria.mvn2nix.model.URLAdapter;
+import com.fzakaria.mvn2nix.model.NixPackageSet;
+import com.fzakaria.mvn2nix.model.nix.Expr;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import org.apache.maven.model.Dependency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -18,14 +22,17 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Spec;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -62,7 +69,7 @@ public class Maven2nix implements Callable<Integer> {
             description = "The JDK to use when running Maven",
             defaultValue = "${java.home}")
     private File javaHome;
-    
+
     public Maven2nix() {
     }
 
@@ -95,9 +102,15 @@ public class Maven2nix implements Callable<Integer> {
                             }
                         ));
 
+        Expr pkgs = NixPackageSet.ofAttrsAndHashes(maven.packageSet(file), dependencies);
 
-        final MavenNixInformation information = new MavenNixInformation(dependencies);
-        spec.commandLine().getOut().println(toPrettyJson(information));
+        try {
+            BufferedWriter w = new BufferedWriter(spec.commandLine().getOut());
+
+            pkgs.write(0, w);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
 
         return 0;
     }

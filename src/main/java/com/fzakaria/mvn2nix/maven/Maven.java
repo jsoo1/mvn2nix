@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.io.IoBuilder;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationRequest;
@@ -15,11 +16,14 @@ import org.apache.maven.shared.invoker.PrintStreamHandler;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -163,4 +167,25 @@ public class Maven {
         }
     }
 
+    /*
+      Walk the dependency tree and the local repository to get a
+      "package set". For us that means an attrset of functions that
+      can be called by `callPackage` of a new attrset made by
+      `makeScope`.
+
+      Ideally all these would get accumulated into one giant package
+      set in nixpkgs or somewhere like all-hackage-packages, but for
+      now this allows users to import and contribute them easily.
+
+      Inspired by importers in `guix`.
+     */
+    public Map<String, List<Dependency>> packageSet(File pomfile) {
+        try {
+            return Graph.read(localRepository, pomfile);
+        } catch (FileNotFoundException e) {
+            throw new UncheckedIOException(e);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 }
