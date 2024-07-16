@@ -505,6 +505,16 @@
       "sha256": "a7842d002fbc7d2a84217106be909bc85ea35aa47031e410ab8afbb3b3364e2d",
       "url": "https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-resources-plugin/2.6/maven-resources-plugin-2.6.pom"
     },
+    "org.apache.maven.plugins:maven-resources-plugin:jar:3.3.1": {
+      "layout": "org/apache/maven/plugins/maven-resources-plugin/3.3.1/maven-resources-plugin-3.3.1.jar",
+      "sha256": "sha256-60Bpx/5QoxOz9SlczSFPMEAvY5ccJvRD9/PnmL6Mwqc=",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.3.1/maven-resources-plugin-3.3.1.jar"
+    },
+    "org.apache.maven.plugins:maven-resources-plugin:pom:3.3.1": {
+      "layout": "org/apache/maven/plugins/maven-resources-plugin/3.3.1/maven-resources-plugin-3.3.1.pom",
+      "sha256": "sha256-MmnQpuPNYUopSG9X/IZIiw8eRYoRvrxh+UCP1sfPha4=",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.3.1/maven-resources-plugin-3.3.1.pom"
+    },
     "org.apache.maven.plugins:maven-surefire-plugin:jar:3.0.0-M5": {
       "layout": "org/apache/maven/plugins/maven-surefire-plugin/3.0.0-M5/maven-surefire-plugin-3.0.0-M5.jar",
       "sha256": "598b82718ed905e5d67d4a70d191a7f5a1f2e3dd42207d1b8f808a27086f4f17",
