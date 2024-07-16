@@ -19,9 +19,7 @@
     };
   in utils.lib.eachSystem utils.lib.defaultSystems (system: rec {
     legacyPackages = pkgsForSystem system;
-    packages = utils.lib.flattenTree {
-      inherit (legacyPackages) mvn2nix mvn2nix-bootstrap buildMavenRepository buildMavenRepositoryFromLockFile;
-    };
+    packages = legacyPackages;
     defaultPackage = packages.mvn2nix;
     apps.mvn2nix = utils.lib.mkApp { drv = packages.mvn2nix; };
   }) // {
