@@ -135,6 +135,14 @@
             <version>6.2</version>
             <scope>test</scope>
         </dependency>
+        <!-- even more specific workarounds? -->
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.3.1</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- end even more specific workarounds? -->
         <!-- end workaround for missing plugin deps -->
     </dependencies>
 
