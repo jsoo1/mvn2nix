@@ -17,6 +17,7 @@
         <maven-version>3.9.8</maven-version>
         <maven-failsafe-plugin-version>3.0.0-M5</maven-failsafe-plugin-version>
         <picocli-version>4.5.0</picocli-version>
+        <sisu-version>0.3.5</sisu-version>
     </properties>
 
     <dependencies>
@@ -47,30 +48,18 @@
             <artifactId>guava</artifactId>
             <version>30.0-jre</version>
         </dependency>
-        <!-- PLEXUS START -->
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-xml</artifactId>
-            <version>4.0.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-            <version>2.1.1</version>
-        </dependency>
+        <!-- SISU START -->
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <version>5.1.0</version>
-            <exclusions>
-                <!-- MNG-7068 Active dependency management for Google Guice / Google Guava. Excludes of Guava are managed in parent POM -->
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>5.0.1</version>
         </dependency>
-        <!-- PLEXUS END -->
+        <dependency>
+            <groupId>org.eclipse.sisu</groupId>
+            <artifactId>org.eclipse.sisu.inject</artifactId>
+            <version>${sisu-version}</version>
+        </dependency>
+        <!-- SISU END -->
         <!-- LOGGING START -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -173,9 +162,17 @@
                 <version>${maven-failsafe-plugin-version}</version>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-component-metadata</artifactId>
-                <version>2.2.0</version>
+                <groupId>org.eclipse.sisu</groupId>
+                <artifactId>sisu-maven-plugin</artifactId>
+                <version>${sisu-version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-index</id>
+                        <goals>
+                            <goal>main-index</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

@@ -1,6 +1,7 @@
 package com.fzakaria.mvn2nix.cmd;
 
 import com.fzakaria.mvn2nix.util.Resources;
+import javax.inject.Inject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;
@@ -23,8 +24,8 @@ public class Maven2NixIT {
     }
 
     @Test
-    public void simpleTest() throws Exception {
-        Maven2nix app = new Maven2nix();
+    @Inject
+    public void simpleTest(Maven2nix app) throws Exception {
         CommandLine cmd = new CommandLine(app);
         StringWriter sw = new StringWriter();
         cmd.setOut(new PrintWriter(sw));

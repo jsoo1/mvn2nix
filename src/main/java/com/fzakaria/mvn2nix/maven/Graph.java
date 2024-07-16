@@ -1,14 +1,12 @@
 package com.fzakaria.mvn2nix.maven;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +17,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.FileNotFoundException;
 import java.lang.Thread;
+import java.util.Arrays;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,34 +26,32 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 
+@Named
 public class Graph {
     private static final Logger LOGGER = LoggerFactory.getLogger(Graph.class);
 
-    public static final PlexusContainer container;
+    public ProjectBuilder projectBuilder;
 
-    static {
-        try {
-          container = new DefaultPlexusContainer();
-        } catch (PlexusContainerException e) {
-            throw new UncheckedIOException(new IOException(e.getMessage(), (Throwable) e));
-        }
+    @Inject
+    public Graph(ProjectBuilder b) {
+        projectBuilder = b;
     }
 
-    public static Map<String, List<Dependency>> read(File localRepository, final File pomfile) throws FileNotFoundException, IOException {
+    public Map<String, List<Dependency>> read(File localRepository, final File pomfile) throws FileNotFoundException, IOException {
         MavenProject pom = readPOMFile(pomfile);
 
         Map<String, List<Dependency>> attrs = new HashMap<>();
 
         List<Dependency> deps = pom.getDependencies();
 
-        attrs.put(Graph.topKey(pom), deps);
+        attrs.put(topKey(pom), deps);
 
         walkDependencies(localRepository, attrs, deps);
 
         return attrs;
     }
 
-    public static MavenProject readPOM(File indir, Dependency dep) throws FileNotFoundException, IOException {
+    public MavenProject readPOM(File indir, Dependency dep) throws FileNotFoundException, IOException {
         File file = indir.toPath().resolve(layoutPOM(dep)).toFile();
 
         if (!file.exists()) {
@@ -64,21 +61,15 @@ public class Graph {
         return readPOMFile(file);
     }
 
-    public static MavenProject readPOMFile(File pom) throws IOException {
+    public MavenProject readPOMFile(File pom) throws IOException {
         try {
-            ProjectBuilder projectBuilder = container.lookup(ProjectBuilder.class);
-
-            DefaultProjectBuildingRequest req = new DefaultProjectBuildingRequest();
-
-            return projectBuilder.build(pom, req).getProject();
+            return projectBuilder.build(pom, new DefaultProjectBuildingRequest()).getProject();
         } catch (ProjectBuildingException e) {
-            throw new IOException(e.getMessage(), (Throwable) e);
-        } catch (ComponentLookupException e) {
             throw new IOException(e.getMessage(), (Throwable) e);
         }
     }
 
-    public static void walkDependencies(File indir, Map<String, List<Dependency>> walk, final List<Dependency> deps) throws FileNotFoundException, IOException {
+    public void walkDependencies(File indir, Map<String, List<Dependency>> walk, final List<Dependency> deps) throws FileNotFoundException, IOException {
         Queue<Dependency> todos = new ArrayDeque(deps);
 
         while (!todos.isEmpty()) {
@@ -104,7 +95,7 @@ public class Graph {
         }
     }
 
-    public static String topKey(MavenProject pom) {
+    public String topKey(MavenProject pom) {
         return Artifact.builder()
             .setGroup(Optional.ofNullable(pom.getGroupId()).orElse(""))
             .setName(Optional.ofNullable(pom.getArtifactId()).orElse(""))
@@ -112,7 +103,7 @@ public class Graph {
             .build()
             .getCanonicalName();
     }
-    public static String layoutPOM(Dependency dep) {
+    public String layoutPOM(Dependency dep) {
         return Artifact.builder()
             .setGroup(Optional.ofNullable(dep.getGroupId()).orElse(""))
             .setName(Optional.ofNullable(dep.getArtifactId()).orElse(""))
@@ -122,7 +113,7 @@ public class Graph {
             .build()
             .getLayout();
     }
-    public static String canonicalName(Dependency dep) {
+    public String canonicalName(Dependency dep) {
         return Artifact.builder()
             .setGroup(Optional.ofNullable(dep.getGroupId()).orElse(""))
             .setName(Optional.ofNullable(dep.getArtifactId()).orElse(""))

@@ -12,6 +12,7 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import javax.inject.Inject;
 import org.apache.maven.model.Dependency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,12 +71,18 @@ public class Maven2nix implements Callable<Integer> {
             defaultValue = "${java.home}")
     private File javaHome;
 
-    public Maven2nix() {
+    public Graph graph;
+
+    @Inject
+    public Maven2nix(Graph g) {
+        graph = g;
     }
 
     @Override
     public Integer call() throws Exception {
         LOGGER.info("Reading {}", file);
+
+        graph.readPOMFile(file);
 
         final Maven maven = Maven.withTemporaryLocalRepository();
         maven.executeGoals(file, javaHome, goals);
@@ -102,7 +109,7 @@ public class Maven2nix implements Callable<Integer> {
                             }
                         ));
 
-        Expr pkgs = NixPackageSet.ofAttrsAndHashes(maven.packageSet(file), dependencies);
+        Expr pkgs = NixPackageSet.ofAttrsAndHashes(maven.packageSet(graph, file), dependencies);
 
         try {
             BufferedWriter w = new BufferedWriter(spec.commandLine().getOut());

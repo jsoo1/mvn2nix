@@ -12,8 +12,6 @@ let
         while mvn package -Dmaven.repo.local=$out -Dmaven.wagon.rto=5000; [ $? = 1 ]; do
           echo "timeout, restart maven to continue downloading"
         done
-
-        mvn plexus-component-metadata:generate-metadata
       '';
       # keep only *.{pom,jar,sha1,nbm} and delete all ephemeral files with lastModified timestamps inside
       installPhase = ''

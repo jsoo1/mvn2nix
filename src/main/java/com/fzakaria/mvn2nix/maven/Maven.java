@@ -179,9 +179,9 @@ public class Maven {
 
       Inspired by importers in `guix`.
      */
-    public Map<String, List<Dependency>> packageSet(File pomfile) {
+    public Map<String, List<Dependency>> packageSet(Graph g, File pomfile) {
         try {
-            return Graph.read(localRepository, pomfile);
+            return g.read(localRepository, pomfile);
         } catch (FileNotFoundException e) {
             throw new UncheckedIOException(e);
         } catch (IOException e) {
