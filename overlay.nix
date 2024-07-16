@@ -1,11 +1,11 @@
 self: super: {
   mvn2nix = self.callPackage ./derivation.nix {
-    jdk = super.jdk11_headless;
+    jdk = super.jdk16_headless;
   };
 
   mvn2nix-bootstrap = self.callPackage ./derivation.nix {
     bootstrap = true;
-    jdk = super.jdk11_headless;
+    jdk = super.jdk16_headless;
   };
 
   buildMavenRepository =
