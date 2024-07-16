@@ -20,7 +20,7 @@
         <!-- MAVEN START -->
         <dependency>
             <groupId>org.apache.maven</groupId>
-            <artifactId>maven-model-builder</artifactId>
+            <artifactId>maven-core</artifactId>
             <version>3.9.8</version>
         </dependency>
         <dependency>
@@ -49,6 +49,23 @@
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-xml</artifactId>
             <version>4.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>5.1.0</version>
+            <exclusions>
+                <!-- MNG-7068 Active dependency management for Google Guice / Google Guava. Excludes of Guava are managed in parent POM -->
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- PLEXUS END -->
         <!-- LOGGING START -->
@@ -151,6 +168,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M5</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-component-metadata</artifactId>
+                <version>2.2.0</version>
             </plugin>
         </plugins>
     </build>
