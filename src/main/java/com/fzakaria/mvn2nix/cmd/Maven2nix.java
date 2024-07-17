@@ -14,6 +14,7 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import javax.inject.Inject;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.building.ModelBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;

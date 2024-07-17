@@ -3,18 +3,18 @@ package com.fzakaria.mvn2nix.maven;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
-import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.building.ModelBuilder;
+import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingException;
+import org.apache.maven.model.building.DefaultModelBuildingRequest;
+import org.apache.maven.model.resolution.ModelResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.io.FileNotFoundException;
 import java.lang.Thread;
 import java.util.Arrays;
@@ -30,15 +30,18 @@ import java.util.Queue;
 public class Graph {
     private static final Logger LOGGER = LoggerFactory.getLogger(Graph.class);
 
-    public ProjectBuilder projectBuilder;
+    public ModelBuilder modelBuilder;
+
+    public ModelResolver resolver;
 
     @Inject
-    public Graph(ProjectBuilder b) {
-        projectBuilder = b;
+    public Graph(ModelBuilder b, ModelResolver r) {
+        modelBuilder = b;
+        resolver = r;
     }
 
-    public Map<String, List<Dependency>> read(File localRepository, final File pomfile) throws FileNotFoundException, IOException {
-        MavenProject pom = readPOMFile(pomfile);
+    public Map<String, List<Dependency>> read(File localRepository, final File pomfile) throws IOException {
+        Model pom = readPOMFile(pomfile);
 
         Map<String, List<Dependency>> attrs = new HashMap<>();
 
@@ -51,7 +54,7 @@ public class Graph {
         return attrs;
     }
 
-    public MavenProject readPOM(File indir, Dependency dep) throws FileNotFoundException, IOException {
+    public Model readPOM(File indir, Dependency dep) throws IOException {
         File file = indir.toPath().resolve(layoutPOM(dep)).toFile();
 
         if (!file.exists()) {
@@ -61,15 +64,17 @@ public class Graph {
         return readPOMFile(file);
     }
 
-    public MavenProject readPOMFile(File pom) throws IOException {
+    public Model readPOMFile(File pom) throws IOException {
         try {
-            return projectBuilder.build(pom, new DefaultProjectBuildingRequest()).getProject();
-        } catch (ProjectBuildingException e) {
-            throw new IOException(e.getMessage(), (Throwable) e);
+            ModelBuildingRequest req = new DefaultModelBuildingRequest();
+
+            return modelBuilder.build(req.setPomFile(pom).setModelResolver(resolver)).getEffectiveModel();
+        } catch (ModelBuildingException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public void walkDependencies(File indir, Map<String, List<Dependency>> walk, final List<Dependency> deps) throws FileNotFoundException, IOException {
+    public void walkDependencies(File indir, Map<String, List<Dependency>> walk, final List<Dependency> deps) throws IOException {
         Queue<Dependency> todos = new ArrayDeque(deps);
 
         while (!todos.isEmpty()) {
@@ -85,7 +90,7 @@ public class Graph {
 
             LOGGER.info("Walking POM for {}", cn);
 
-            MavenProject pom = readPOM(indir, todo);
+            Model pom = readPOM(indir, todo);
 
             List<Dependency> these = pom.getDependencies();
 
@@ -95,7 +100,7 @@ public class Graph {
         }
     }
 
-    public String topKey(MavenProject pom) {
+    public String topKey(Model pom) {
         return Artifact.builder()
             .setGroup(Optional.ofNullable(pom.getGroupId()).orElse(""))
             .setName(Optional.ofNullable(pom.getArtifactId()).orElse(""))
