@@ -72,4 +72,5 @@ in stdenv.mkDerivation rec {
     platforms = platforms.all;
     mainProgram = "mvn2nix";
   };
+  passthru.repository = repository;
 }
