@@ -36,7 +36,7 @@ import java.util.stream.StreamSupport;
 public class Maven {
 
     private final Invoker invoker;
-    private final File localRepository;
+    public final File localRepository;
 
     /**
      * Constructor.
