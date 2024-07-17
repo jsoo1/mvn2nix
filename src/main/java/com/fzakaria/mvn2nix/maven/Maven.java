@@ -166,26 +166,4 @@ public class Maven {
             throw new UncheckedIOException(e);
         }
     }
-
-    /*
-      Walk the dependency tree and the local repository to get a
-      "package set". For us that means an attrset of functions that
-      can be called by `callPackage` of a new attrset made by
-      `makeScope`.
-
-      Ideally all these would get accumulated into one giant package
-      set in nixpkgs or somewhere like all-hackage-packages, but for
-      now this allows users to import and contribute them easily.
-
-      Inspired by importers in `guix`.
-     */
-    public Map<String, List<Dependency>> packageSet(Graph g, File pomfile) {
-        try {
-            return g.read(localRepository, pomfile);
-        } catch (FileNotFoundException e) {
-            throw new UncheckedIOException(e);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
 }

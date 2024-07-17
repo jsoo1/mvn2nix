@@ -1,7 +1,7 @@
 package com.fzakaria.mvn2nix;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import eu.maveniverse.maven.mima.context.ContextOverrides;
+import eu.maveniverse.maven.mima.context.Runtimes;
 import com.fzakaria.mvn2nix.cmd.LoggingMixin;
 import com.fzakaria.mvn2nix.cmd.Maven2nix;
 import com.fzakaria.mvn2nix.cmd.PrintExceptionMessageHandler;
@@ -20,11 +20,14 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Injector injector = Guice.createInjector(
-            new WireModule(new SpaceModule(new URLClassSpace(Main.class.getClassLoader())))
-        );
+        ContextOverrides overrides = ContextOverrides
+            .create()
+            .withUserSettings(true)
+            .build();
 
-        CommandLine cmd = new CommandLine(injector.getInstance(Maven2nix.class));
+        CommandLine cmd = new CommandLine(new Maven2nix(
+           Runtimes.INSTANCE.getRuntime().create(overrides)
+        ));
 
         System.exit(cmd
             .setExecutionExceptionHandler(new PrintExceptionMessageHandler())

@@ -1,20 +1,26 @@
 package com.fzakaria.mvn2nix.cmd;
 
+import org.apache.maven.model.building.DefaultModelBuilderFactory;
+import org.eclipse.aether.impl.RemoteRepositoryManager;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectModelResolver;
 import com.fzakaria.mvn2nix.maven.Artifact;
 import com.fzakaria.mvn2nix.maven.Graph;
 import com.fzakaria.mvn2nix.maven.Maven;
-import com.fzakaria.mvn2nix.model.MavenArtifact;
 import com.fzakaria.mvn2nix.model.MavenNixInformation;
-import com.fzakaria.mvn2nix.model.URLAdapter;
+import com.fzakaria.mvn2nix.model.MavenArtifact;
 import com.fzakaria.mvn2nix.model.NixPackageSet;
+import com.fzakaria.mvn2nix.model.URLAdapter;
 import com.fzakaria.mvn2nix.model.nix.Expr;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import javax.inject.Inject;
+import eu.maveniverse.maven.mima.context.Context;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.building.ModelBuilder;
+import org.apache.maven.project.PublicReactorModelPool;
+import org.eclipse.aether.RequestTrace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -27,7 +33,6 @@ import picocli.CommandLine.Spec;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -72,52 +77,73 @@ public class Maven2nix implements Callable<Integer> {
             defaultValue = "${java.home}")
     private File javaHome;
 
-    public Graph graph;
+    @Option(names = "--output",
+            description = "Output type",
+            defaultValue = "JSON")
+    private OutputType output;
 
-    @Inject
-    public Maven2nix(Graph g) {
-        graph = g;
+    public Context ctx;
+
+    public Maven2nix(Context c) {
+        ctx = c;
     }
 
     @Override
     public Integer call() throws Exception {
         LOGGER.info("Reading {}", file);
 
-        graph.readPOMFile(file);
+        switch (output) {
+        case JSON:
+            final Maven maven = Maven.withTemporaryLocalRepository();
+            maven.executeGoals(file, javaHome, goals);
 
-        final Maven maven = Maven.withTemporaryLocalRepository();
-        maven.executeGoals(file, javaHome, goals);
+            Collection<Artifact> artifacts = maven.collectAllArtifactsInLocalRepository();
+            Map<String, MavenArtifact> dependencies = artifacts.parallelStream()
+                    .collect(Collectors.toMap(
+                                Artifact::getCanonicalName,
+                                artifact -> {
+                                    for (String repository : repositories) {
+                                        URL url = getRepositoryArtifactUrl(artifact, repository);
+                                        if (!doesUrlExist(url)) {
+                                            LOGGER.info("URL does not exist: {}", url);
+                                            continue;
+                                        }
 
-        Collection<Artifact> artifacts = maven.collectAllArtifactsInLocalRepository();
-        Map<String, MavenArtifact> dependencies = artifacts.parallelStream()
-                .collect(Collectors.toMap(
-                            Artifact::getCanonicalName,
-                            artifact -> {
-                                for (String repository : repositories) {
-                                    URL url = getRepositoryArtifactUrl(artifact, repository);
-                                    if (!doesUrlExist(url)) {
-                                        LOGGER.info("URL does not exist: {}", url);
-                                        continue;
+                                        File localArtifact = maven.findArtifactInLocalRepository(artifact)
+                                                .orElseThrow(() -> new IllegalStateException("Should never happen"));
+
+                                        String sha256 = calculateSha256OfFile(localArtifact);
+                                        return new MavenArtifact(url, artifact.getLayout(), sha256);
                                     }
-
-                                    File localArtifact = maven.findArtifactInLocalRepository(artifact)
-                                            .orElseThrow(() -> new IllegalStateException("Should never happen"));
-
-                                    String sha256 = calculateSha256OfFile(localArtifact);
-                                    return new MavenArtifact(url, artifact.getLayout(), sha256);
+                                    throw new RuntimeException(String.format("Could not find artifact %s in any repository", artifact));
                                 }
-                                throw new RuntimeException(String.format("Could not find artifact %s in any repository", artifact));
-                            }
-                        ));
+                            ));
 
-        Expr pkgs = NixPackageSet.ofAttrsAndHashes(maven.packageSet(graph, file), dependencies);
+            final MavenNixInformation information = new MavenNixInformation(dependencies);
+            spec.commandLine().getOut().println(toPrettyJson(information));
+            break;
 
-        try {
+        case NIX:
+            RemoteRepositoryManager remoteRepositoryManager = ctx.lookup()
+                .lookup(RemoteRepositoryManager.class)
+                .orElseThrow(() -> new IllegalStateException("component not found"));
+
+            ProjectModelResolver resolver = new ProjectModelResolver(
+                ctx.repositorySystemSession(),
+                new RequestTrace(null),
+                ctx.repositorySystem(),
+                remoteRepositoryManager,
+                ctx.remoteRepositories(),
+                ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
+                new PublicReactorModelPool()
+            );
+
+            Expr pkgs = NixPackageSet.collect(Graph.read(ctx, resolver, file));
+
             BufferedWriter w = new BufferedWriter(spec.commandLine().getOut());
 
             pkgs.write(0, w);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            break;
         }
 
         return 0;
@@ -187,4 +213,5 @@ public class Maven2nix implements Callable<Integer> {
         return false;
     }
 
+    public enum OutputType { JSON, NIX }
 }

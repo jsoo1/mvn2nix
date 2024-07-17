@@ -1,131 +1,167 @@
 package com.fzakaria.mvn2nix.maven;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import org.apache.maven.model.Dependency;
+import com.fzakaria.mvn2nix.maven.MaybeResolvedArtifact;
+import eu.maveniverse.maven.mima.context.Context;
+import eu.maveniverse.maven.mima.context.Runtime;
+import eu.maveniverse.maven.mima.context.Runtimes;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.ModelBuilder;
-import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelBuildingException;
+import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
-import org.apache.maven.model.resolution.ModelResolver;
+import org.apache.maven.model.building.ModelBuildingException;
+import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.project.ProjectModelResolver;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.graph.Exclusion;
+import org.eclipse.aether.impl.RemoteRepositoryManager;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.Thread;
-import java.util.Arrays;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
-@Named
+/*
+  Walk the dependency tree and the local repository to get a "package
+  set". For us that means an attrset of functions that can be called
+  by `callPackage` of a new attrset made by `makeScope`.
+
+  Ideally all these would get accumulated into one giant package set
+  in nixpkgs or somewhere like all-hackage-packages, but for now this
+  allows users to import and contribute them easily.
+
+  Inspired by importers in `guix`.
+*/
+
 public class Graph {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Graph.class);
+    private static DefaultModelBuilderFactory factory = new DefaultModelBuilderFactory();
 
-    public ModelBuilder modelBuilder;
+    private static Logger LOGGER = LoggerFactory.getLogger(Graph.class.getClass());
 
-    public ModelResolver resolver;
+    public static Map<Dependency, List<Dependency>> read(Context ctx, ProjectModelResolver resolver, final Path pomfile) throws IOException {
+        Model pom = readPOM(resolver, pomfile);
 
-    @Inject
-    public Graph(ModelBuilder b, ModelResolver r) {
-        modelBuilder = b;
-        resolver = r;
+        return collect(ctx, pom);
     }
 
-    public Map<String, List<Dependency>> read(File localRepository, final File pomfile) throws IOException {
-        Model pom = readPOMFile(pomfile);
+    public static Model readPOM(ProjectModelResolver resolver, Path pom) throws IOException {
+        ModelBuildingRequest req = new DefaultModelBuildingRequest();
 
-        Map<String, List<Dependency>> attrs = new HashMap<>();
+        req.setPomFile(pom.toFile()).setModelResolver(resolver);
 
-        List<Dependency> deps = pom.getDependencies();
-
-        attrs.put(topKey(pom), deps);
-
-        walkDependencies(localRepository, attrs, deps);
-
-        return attrs;
+        try {
+            return factory.newInstance().build(req).getEffectiveModel();
+        } catch (ModelBuildingException e) {
+            throw new IOException(e.getMessage(), (Throwable) e);
+        }
     }
 
-    public Model readPOM(File indir, Dependency dep) throws IOException {
-        File file = indir.toPath().resolve(layoutPOM(dep)).toFile();
+    public static Map<Dependency, List<Dependency>> collect(Context ctx, Model pom) {
+        Dependency root = new Dependency(new DefaultArtifact(pom.getId()), "test");
 
-        if (!file.exists()) {
-            throw new FileNotFoundException(file.toString());
+        Map<Dependency, List<Dependency>> walk = new HashMap<>();
+
+        List<Dependency> deps = pom
+            .getDependencies()
+            .stream()
+            .map(Graph::toAether)
+            .collect(Collectors.toList());
+
+        walk.put(root, deps);
+
+        Queue<Dependency> todos = new ArrayDeque<>(deps);
+
+        while (!todos.isEmpty()) {
+            Dependency d = todos.remove();
+
+            if (walk.containsKey(d)) {
+                continue;
+            }
+
+            LOGGER.debug("Walking dependency {}", canonName(d));
+
+            List<Dependency> these = collect(ctx, d).getDependencies(true);
+
+            walk.put(d, these);
+
+            todos.addAll(these);
         }
 
-        return readPOMFile(file);
+        return walk;
     }
 
-    public Model readPOMFile(File pom) throws IOException {
+    public static PreorderNodeListGenerator collect(Context ctx, Dependency dep) {
         try {
-            ModelBuildingRequest req = new DefaultModelBuildingRequest();
+            CollectRequest collectRequest = new CollectRequest();
 
-            return modelBuilder.build(req.setPomFile(pom).setModelResolver(resolver)).getEffectiveModel();
-        } catch (ModelBuildingException e) {
+            collectRequest.setRoot(dep);
+
+            collectRequest.setRepositories(ctx.remoteRepositories());
+
+            DependencyRequest dependencyRequest = new DependencyRequest();
+
+            dependencyRequest.setCollectRequest(collectRequest);
+
+            DependencyNode root = ctx.repositorySystem()
+                .resolveDependencies(ctx.repositorySystemSession(), dependencyRequest)
+                .getRoot();
+
+            PreorderNodeListGenerator pnl = new PreorderNodeListGenerator();
+
+            root.accept(pnl);
+
+            return pnl;
+        } catch (DependencyResolutionException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void walkDependencies(File indir, Map<String, List<Dependency>> walk, final List<Dependency> deps) throws IOException {
-        Queue<Dependency> todos = new ArrayDeque(deps);
+    public static String canonName(Dependency d) {
+        Artifact a = d.getArtifact();
 
-        while (!todos.isEmpty()) {
-            Dependency todo = todos.remove();
-
-            String cn = canonicalName(todo);
-
-            if (walk.containsKey(cn)) {
-                LOGGER.debug("Skipping {}", cn);
-
-                continue;
-            }
-
-            LOGGER.info("Walking POM for {}", cn);
-
-            Model pom = readPOM(indir, todo);
-
-            List<Dependency> these = pom.getDependencies();
-
-            walk.put(cn, these);
-
-            todos.addAll(these);
-        }
+        return Stream.of(
+            a.getGroupId(),
+            a.getArtifactId(),
+            a.getVersion(),
+            a.getExtension()
+        ).collect(Collectors.joining(":"));
     }
 
-    public String topKey(Model pom) {
-        return Artifact.builder()
-            .setGroup(Optional.ofNullable(pom.getGroupId()).orElse(""))
-            .setName(Optional.ofNullable(pom.getArtifactId()).orElse(""))
-            .setVersion(Optional.ofNullable(pom.getVersion()).orElse(""))
-            .build()
-            .getCanonicalName();
+    public static Dependency toAether(org.apache.maven.model.Dependency d) {
+        return new Dependency(
+            new DefaultArtifact(
+                d.getGroupId(),
+                d.getArtifactId(),
+                d.getClassifier(),
+                d.getType(),
+                d.getVersion()
+            ),
+            d.getScope(),
+            d.isOptional(),
+            d.getExclusions().stream().map(Graph::toAether).collect(Collectors.toList())
+        );
     }
-    public String layoutPOM(Dependency dep) {
-        return Artifact.builder()
-            .setGroup(Optional.ofNullable(dep.getGroupId()).orElse(""))
-            .setName(Optional.ofNullable(dep.getArtifactId()).orElse(""))
-            .setClassifier(Optional.ofNullable(dep.getClassifier()).orElse(""))
-            .setVersion(Optional.ofNullable(dep.getVersion()).orElse(""))
-            .setExtension("pom")
-            .build()
-            .getLayout();
-    }
-    public String canonicalName(Dependency dep) {
-        return Artifact.builder()
-            .setGroup(Optional.ofNullable(dep.getGroupId()).orElse(""))
-            .setName(Optional.ofNullable(dep.getArtifactId()).orElse(""))
-            .setClassifier(Optional.ofNullable(dep.getClassifier()).orElse(""))
-            .setVersion(Optional.ofNullable(dep.getVersion()).orElse(""))
-            .setExtension(Optional.ofNullable(dep.getType()).orElse(""))
-            .build()
-            .getLayout();
+
+    public static Exclusion toAether(org.apache.maven.model.Exclusion e) {
+        return new Exclusion(e.getGroupId(), e.getArtifactId(), null, null);
     }
 }

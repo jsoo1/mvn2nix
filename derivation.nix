@@ -1,4 +1,4 @@
-{ lib, writeText, stdenv, jdk, maven, makeWrapper, nix-gitignore
+{ lib, stdenv, jdk, maven, makeWrapper, rlwrap, nix-gitignore, java-language-server
 , bootstrap ? false, buildMavenRepositoryFromLockFile }:
 let
   repository = (if bootstrap then
@@ -27,7 +27,7 @@ let
 
       outputHashAlgo = "sha256";
       outputHashMode = "recursive";
-      outputHash = "09jx8kpj0wsi7rshczfpkp77dpfhybdrfkazf1i3s48s3kckz32r";
+      outputHash = "sha256-CGMsd9N+U3Y/uuB+xqPvLC9/up5rakiQmJ2i0cQLjgQ=";
     }
   else
     buildMavenRepositoryFromLockFile { file = ./mvn2nix-lock.json; });
@@ -36,7 +36,7 @@ in stdenv.mkDerivation rec {
   version = "0.1";
   name = "${pname}-${version}";
   src = nix-gitignore.gitignoreSource [] ./.;
-  buildInputs = [ jdk maven makeWrapper ];
+  nativeBuildInputs = [ jdk maven makeWrapper rlwrap java-language-server ];
   buildPhase = ''
     echo "Using repository ${repository}"
     # 'maven.repo.local' must be writable so copy it out of nix store
@@ -58,6 +58,7 @@ in stdenv.mkDerivation rec {
     # create a wrapper that will automatically set the classpath
     # this should be the paths from the dependency derivation
     makeWrapper ${jdk}/bin/java $out/bin/${pname} \
+          --add-flags "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:3030" \
           --add-flags "-jar $out/${name}.jar" \
           --set M2_HOME ${maven} \
           --set JAVA_HOME ${jdk}
