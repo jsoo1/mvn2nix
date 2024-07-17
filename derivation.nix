@@ -70,5 +70,6 @@ in stdenv.mkDerivation rec {
     license = licenses.mit;
     maintainers = [ "farid.m.zakaria@gmail.com" ];
     platforms = platforms.all;
+    mainProgram = "mvn2nix";
   };
 }
