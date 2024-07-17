@@ -2,26 +2,44 @@ package com.fzakaria.mvn2nix.maven;
 
 import com.google.common.base.Strings;
 
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Artifact {
 
-    public final Optional<String> group;
-    public final Optional<String> name;
-    public final Optional<String> version;
-    public final Optional<String> classifier;
-    public final Optional<String> extension;
+    private final String group;
+    private final String name;
+    private final String version;
+    private final String classifier;
+    private final String extension;
 
     public Artifact(String group, String name, String version, String classifier, String extension) {
-        this.group = Optional.ofNullable(group);
-        this.name = Optional.ofNullable(name);
-        this.version = Optional.ofNullable(version);
-        this.classifier = Optional.ofNullable(classifier);
-        this.extension = Optional.ofNullable(extension);
+        this.group = group;
+        this.name = name;
+        this.version = version;
+        this.classifier = classifier;
+        this.extension = extension;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public String getClassifier() {
+        return classifier;
+    }
+
+    public String getExtension() {
+        return extension;
     }
 
     @Override
@@ -41,17 +59,16 @@ public class Artifact {
          * @return
      */
     public String getLayout() {
-        String basename = Stream.of(name, version, classifier)
-            .flatMap(Optional::stream)
-            .collect(Collectors.joining("-"));
-
-        String filename = basename + extension.map(e -> "." + e).orElse("");
-
-        return Stream.concat(
-            Arrays.stream(group.orElse("").split("\\.")),
-            Stream.of(name, version, Optional.of(filename)).flatMap(Optional::stream)
-        )
-            .collect(Collectors.joining("/"));
+        return group.replaceAll("\\.", "/")
+                + "/"
+                + name
+                + "/"
+                + version
+                + "/"
+                + name + "-" + version
+                + (classifier.isBlank() ? "" : "-" + classifier)
+                + "."
+                + extension;
     }
 
     /**
@@ -59,11 +76,13 @@ public class Artifact {
      * ex. org.apache.commons:commons-parent:pom:22
      */
     public String getCanonicalName() {
-        return Stream.of(group, name, extension, classifier, version)
-            .flatMap(Optional::stream)
-            .map(Strings::emptyToNull)
-            .filter(Objects::nonNull)
-            .collect(Collectors.joining(":"));
+        final String[] parts = new String[] {
+          group, name, extension, classifier, version
+        };
+        return Stream.of(parts)
+                .map(Strings::emptyToNull)
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(":"));
     }
 
     @Override
