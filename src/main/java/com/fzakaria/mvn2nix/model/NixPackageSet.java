@@ -37,22 +37,47 @@ public class NixPackageSet {
 
     public static String LIB = "lib";
     public static String NEW_SCOPE = "newScope";
-    public static String FETCHURL = "fetchurl";
+    public static String PKGS = "pkgs";
     public static String BUILDER = "patchMavenJar";
 
     public static String[] packageSetParams = new String[]{LIB, NEW_SCOPE};
 
-    public static String[] packageParams = new String[]{LIB, FETCHURL, BUILDER};
+    public static String[] packageParams = new String[]{LIB, PKGS, BUILDER};
 
     public static Expr collect(Path localRepository, Map<Dependency, List<Dependency>> attrs) {
+        return packageSet(new Attrs(calledPackages(localRepository, attrs)));
+    }
+
+    public static OutputDir collectDir(Path localRepository, Map<Dependency, List<Dependency>> attrs) {
+        Expr defaultNix = packageSet(new Attrs(attrs.keySet().stream().map(d -> {
+            String attrName = attrName(d);
+
+            return pair(attrName, new App(
+                new Var("self.callPackage"), new App(new Var("./" + attrName), new Attrs(Stream.empty()))
+            ));
+        })));
+
+        Map<Path, Expr> pkgs = calledPackages(localRepository, attrs).collect(Collectors.toMap(
+            (Map.Entry<String, Expr> e) -> new File(e.getKey()).toPath(),
+            (Map.Entry<String, Expr> e) -> e.getValue(),
+            (Expr e1, Expr e2) -> e2
+        ));
+
+        return new OutputDir(defaultNix, pkgs);
+    }
+
+    public static Expr packageSet(Expr body) {
         String args = "args";
-        Expr body = new Attrs(attrs.entrySet().stream().map(e -> NixPackageSet.callPackage(localRepository, e)));
 
         return new Fn(new AtBind(args, new AttrPattern(packageSetParams)),
-            new App(new Var(LIB + ".makeScope"), new App(new Var(NEW_SCOPE), new Paren(new Fn(
-                new Symbol("self"),
-                new App(new Var(args), new App(new Var("//"), body))
-        )))));
+            new App(new Var(LIB + ".makeScope"), new App(new Var(NEW_SCOPE), new Paren(
+                new Fn(new Symbol("self"),
+                    new App(new Var(args), new App(new Var("//"), body)))
+        ))));
+    }
+
+    public static Stream<Map.Entry<String, Expr>> calledPackages(Path localRepository, Map<Dependency, List<Dependency>> attrs) {
+        return attrs.entrySet().stream().map(e -> NixPackageSet.callPackage(localRepository, e));
     }
 
     public static Map.Entry<String, Expr> callPackage(Path localRepository, Map.Entry<Dependency, List<Dependency>> entry) {
@@ -91,7 +116,7 @@ public class NixPackageSet {
         return new App(new Var(BUILDER), new Attrs(args
             .add(pair("name", new LitS(attrName(d))))
             .add(pair("version", new LitS(artifact.getVersion())))
-            .add(pair("src", new App(new Var(FETCHURL), new Attrs(src
+            .add(pair("src", new App(new Var(PKGS + ".fetchurl"), new Attrs(src
                 .add(pair("url", url))
                 .add(pair("sha256", sha256))
                 .build()

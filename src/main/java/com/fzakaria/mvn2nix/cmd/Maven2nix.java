@@ -24,6 +24,7 @@ import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.ITypeConverter;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
@@ -44,6 +45,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -77,10 +79,14 @@ public class Maven2nix implements Callable<Integer> {
             defaultValue = "${java.home}")
     private Path javaHome;
 
-    @Option(names = "--output",
-            description = "Output type",
+    @Option(names = "--output-type",
+            description = "Output type, one of NIX or JSON",
             defaultValue = "JSON")
-    private OutputType output;
+    private OutputType outType;
+
+    @Option(names = "--output-dir",
+            description = "With NIX output type, the directory to write to, otherwise stdout")
+    private Path outDir;
 
     public Context ctx;
 
@@ -92,7 +98,7 @@ public class Maven2nix implements Callable<Integer> {
     public Integer call() throws Exception {
         LOGGER.debug("Reading {}", file);
 
-        switch (output) {
+        switch (outType) {
         case JSON:
             final Maven maven = Maven.withTemporaryLocalRepository();
             maven.executeGoals(file.toFile(), javaHome.toFile(), goals);
@@ -140,13 +146,18 @@ public class Maven2nix implements Callable<Integer> {
 
             Path localRepository = ctx.repositorySystemSession().getLocalRepository().getBasedir().toPath();
 
-            Expr pkgs = NixPackageSet.collect(localRepository, Graph.read(ctx, resolver, file));
+            if (outDir != null) {
+                NixPackageSet.collectDir(localRepository, Graph.read(ctx, resolver, file)).write(outDir);
+            } else {
+                Expr pkgs = NixPackageSet.collect(localRepository, Graph.read(ctx, resolver, file));
 
-            BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
+                BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 
-            pkgs.write(0, w);
+                pkgs.write(0, w);
 
-            w.flush();
+                w.flush();
+            }
+
             break;
         }
 
