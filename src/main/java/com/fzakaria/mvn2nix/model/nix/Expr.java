@@ -17,10 +17,6 @@ import java.util.stream.Stream;
 public abstract class Expr implements Write {
     public static int INDENT_WIDTH = 2;
 
-    public static void writeNameValue(int ind, BufferedWriter w, String name, Expr value) throws IOException {
-        w.write(name); w.write(" = "); value.write(ind + INDENT_WIDTH, w); w.write(";");
-    }
-
     public static <T> T snd(T x1, T x2) {
         return x2;
     }
