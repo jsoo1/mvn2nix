@@ -116,7 +116,7 @@ public class NixPackageSet {
             .add(pair("testDependencies", new LitL(scopedDeps(deps, "test"))))
             .add(pair("systemDependencies", new LitL(scopedDeps(deps, "system"))))
             .add(pair("providedDependencies", new LitL(scopedDeps(deps, "provided"))))
-            .add(pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryByteCode")})))
+            .add(pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryBytecode")})))
             .build()
         ));
     }
