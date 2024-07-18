@@ -7,9 +7,9 @@ public class Fn extends Expr implements Write {
     Param param;
     Expr body;
 
-    public Fn(Param params, Expr body) {
-        param = param;
-        body = body;
+    public Fn(Param p, Expr b) {
+        param = p;
+        body = b;
     }
 
     @Override

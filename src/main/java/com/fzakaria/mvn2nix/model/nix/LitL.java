@@ -13,12 +13,18 @@ public class LitL extends Expr implements Write {
 
     @Override
     public void write(int ind, BufferedWriter w) throws IOException {
-        w.write("[ ");
+        w.write("[");
 
         for (Expr v: vals) {
-            w.write("("); v.write(ind, w); w.write(")");
+            w.write("\n"); indent(ind + INDENT_WIDTH, w); v.write(ind, w);
         }
 
-        w.write(" ]");
+        if (vals.length != 0) {
+            w.write("\n"); indent(ind, w);
+        } else {
+            w.write(" ");
+        }
+
+        w.write("]");
     }
 }

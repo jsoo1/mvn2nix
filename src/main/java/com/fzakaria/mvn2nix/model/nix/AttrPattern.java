@@ -6,8 +6,8 @@ import java.io.IOException;
 public class AttrPattern extends Param implements Write {
     String[] attrNames;
 
-    public AttrPattern(String[] attrNames) {
-        attrNames = attrNames;
+    public AttrPattern(String[] as) {
+        attrNames = as;
     }
 
     @Override
@@ -15,6 +15,8 @@ public class AttrPattern extends Param implements Write {
         boolean written = false;
         for (String name: attrNames) {
             if (!written) {
+                written = true;
+
                 w.write("\n"); indent(ind, w); w.write("{ "); w.write(name);
             } else {
                 w.write("\n"); indent(ind, w); w.write(", "); w.write(name);

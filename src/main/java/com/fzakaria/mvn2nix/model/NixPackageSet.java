@@ -105,7 +105,7 @@ public class NixPackageSet {
             Optional.of(a.getVersion())
         )
            .flatMap(Optional::stream)
-            .map(s -> s.replaceAll(".", "_"))
+            .map(s -> s.replaceAll("\\.", "_"))
            .collect(Collectors.joining("__"));
     }
 
