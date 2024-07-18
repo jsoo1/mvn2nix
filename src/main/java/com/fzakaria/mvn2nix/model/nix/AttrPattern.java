@@ -26,6 +26,12 @@ public class AttrPattern extends Param implements Write {
             }
         }
 
-        indent(ind, w); w.write("}");
+        if (attrNames.length == 0) {
+            w.write(" ");
+        } else {
+            indent(ind, w);
+        }
+
+        w.write("}");
     }
 }
