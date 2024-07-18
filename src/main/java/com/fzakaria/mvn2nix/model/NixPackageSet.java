@@ -9,6 +9,7 @@ import com.fzakaria.mvn2nix.model.nix.LitL;
 import com.fzakaria.mvn2nix.model.nix.LitS;
 import com.fzakaria.mvn2nix.model.nix.Null;
 import com.fzakaria.mvn2nix.model.nix.Param;
+import com.fzakaria.mvn2nix.model.nix.Paren;
 import com.fzakaria.mvn2nix.model.nix.Var;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
@@ -33,33 +34,38 @@ public class NixPackageSet {
     private static Logger LOGGER = LoggerFactory.getLogger(NixPackageSet.class.getClass());
 
     public static String LIB = "lib";
+    public static String CALL_PACKAGE = "callPackage";
     public static String FETCHER = "fetchurl";
     public static String BUILDER = "patchMavenJar";
 
-    public static String[] packageSetParams = new String[]{LIB, FETCHER, BUILDER};
+    public static String[] packageSetParams = new String[]{LIB, CALL_PACKAGE, FETCHER, BUILDER};
+
+    public static String[] packageParams = new String[]{LIB, FETCHER, BUILDER};
 
     public static Expr collect(Path localRepository, Map<Dependency, List<Dependency>> attrs) {
         Param param = new AttrPattern(packageSetParams);
 
-        Expr body = new Attrs(attrs.entrySet().stream().map(e -> NixPackageSet.callPackageFn(localRepository, e)));
+        Expr body = new Attrs(attrs.entrySet().stream().map(e -> NixPackageSet.callPackage(localRepository, e)));
 
         return new Fn(param, body);
     }
 
-    public static Map.Entry<String, Expr> callPackageFn(Path localRepository, Map.Entry<Dependency, List<Dependency>> entry) {
+    public static Map.Entry<String, Expr> callPackage(Path localRepository, Map.Entry<Dependency, List<Dependency>> entry) {
         Dependency d = entry.getKey();
 
         List<Dependency> deps = entry.getValue().stream()
             .filter(d_ -> !d.equals(d_))
             .collect(Collectors.toList());
 
-        Expr expr = new Fn(param(deps), body(localRepository, d, deps));
+        Expr expr = new App(new App(new Var(CALL_PACKAGE), new Paren(new Fn(
+            param(deps), body(localRepository, d, deps)
+        ))), new Attrs(Stream.empty()));
 
         return pair(attrName(d), expr);
     }
 
     public static Param param(List<Dependency> deps) {
-        Stream<String> otherParams = Arrays.stream(packageSetParams);
+        Stream<String> otherParams = Arrays.stream(packageParams);
 
         return new AttrPattern(Stream.concat(otherParams, deps.stream().map(NixPackageSet::attrName)).toArray(String[]::new));
     }
@@ -79,6 +85,7 @@ public class NixPackageSet {
 
         return new App(new Var(BUILDER), new Attrs(args
             .add(pair("name", new LitS(attrName(d))))
+            .add(pair("version", new LitS(artifact.getVersion())))
             .add(pair("src", new App(new Var(FETCHER), new Attrs(src
                 .add(pair("url", url))
                 .add(pair("sha256", sha256))
