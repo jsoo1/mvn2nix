@@ -53,9 +53,6 @@ public class Maven2nix implements Callable<Integer> {
     @Spec
     CommandSpec spec;
 
-    @Mixin
-    LoggingMixin loggingMixin;
-
     @Parameters(index = "0", paramLabel = "FILE", description = "The pom file to traverse.", defaultValue = "pom.xml")
     private File file = null;
 

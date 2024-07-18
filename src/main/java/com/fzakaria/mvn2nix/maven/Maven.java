@@ -3,9 +3,8 @@ package com.fzakaria.mvn2nix.maven;
 import com.fzakaria.mvn2nix.util.Resources;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.io.IoBuilder;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.shared.invoker.PrintStreamLogger;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationRequest;
@@ -48,16 +47,7 @@ public class Maven {
         this.localRepository = localRepository;
         this.invoker = new DefaultInvoker();
         this.invoker.setLocalRepositoryDirectory(localRepository);
-        this.invoker.setLogger(new Log4j2Logger());
-
-        // send all of maven's output to log4j2 which goes to STDERR
-        PrintStreamHandler handler = new PrintStreamHandler(
-                IoBuilder.forLogger("maven-invoker").setLevel(Level.INFO).setAutoFlush(true).buildPrintStream(),
-                true
-        );
-
-        this.invoker.setOutputHandler(handler);
-        this.invoker.setErrorHandler(handler);
+        this.invoker.setLogger(new PrintStreamLogger(System.err, 0));
     }
 
     /**
