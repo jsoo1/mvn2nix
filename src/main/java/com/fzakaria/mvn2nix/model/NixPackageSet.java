@@ -80,7 +80,7 @@ public class NixPackageSet {
         Dependency d = e.getKey();
 
         List<Dependency> deps = e.getValue().stream()
-            .filter(d_ -> !d.equals(d_))
+            .filter(d_ -> !Graph.canonName(d).equals(Graph.canonName(d_)))
             .collect(Collectors.toList());
 
         return new Fn(param(deps), body(localRepository, d, deps));
