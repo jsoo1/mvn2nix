@@ -37,12 +37,13 @@ public class NixPackageSet {
 
     public static String LIB = "lib";
     public static String NEW_SCOPE = "newScope";
+    public static String EMPTY_DIRECTORY = "emptyDirectory";
     public static String PKGS = "pkgs";
     public static String BUILDER = "patchMavenJar";
 
     public static String[] packageSetParams = new String[]{LIB, NEW_SCOPE};
 
-    public static String[] packageParams = new String[]{LIB, PKGS, BUILDER};
+    public static String[] packageParams = new String[]{LIB, PKGS, EMPTY_DIRECTORY, BUILDER};
 
     public static Expr collect(Path localRepository, Map<Dependency, List<Dependency>> attrs) {
         return packageSet(new Attrs(attrs.entrySet().stream().map(e -> callPackage(localRepository, e))));
@@ -105,8 +106,13 @@ public class NixPackageSet {
 
         return new App(new Var(BUILDER), new Attrs(args
             .add(pair("name", new LitS(attrName(d))))
+            .add(pair("groupId", new LitS(artifact.getGroupId())))
+            .add(pair("artifactId", new LitS(artifact.getArtifactId())))
+            .add(pair("classifier", new LitS(artifact.getClassifier())))
+            .add(pair("extension", new LitS(artifact.getExtension())))
             .add(pair("version", new LitS(artifact.getVersion())))
-            .add(pair("src", new App(new Var(PKGS + ".fetchurl"), new Attrs(src
+            .add(pair("src", new Var(EMPTY_DIRECTORY)))
+            .add(pair("raw", new App(new Var(PKGS + ".fetchurl"), new Attrs(src
                 .add(pair("url", url))
                 .add(pair("sha256", sha256))
                 .build()
