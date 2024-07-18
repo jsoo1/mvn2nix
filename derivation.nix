@@ -58,7 +58,6 @@ in stdenv.mkDerivation rec {
     # create a wrapper that will automatically set the classpath
     # this should be the paths from the dependency derivation
     makeWrapper ${jdk}/bin/java $out/bin/${pname} \
-          --add-flags "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:3030" \
           --add-flags "-jar $out/${name}.jar" \
           --set M2_HOME ${maven} \
           --set JAVA_HOME ${jdk}
