@@ -45,25 +45,15 @@ public class NixPackageSet {
     public static String[] packageParams = new String[]{LIB, PKGS, BUILDER};
 
     public static Expr collect(Path localRepository, Map<Dependency, List<Dependency>> attrs) {
-        return packageSet(new Attrs(calledPackages(localRepository, attrs)));
+        return packageSet(new Attrs(attrs.entrySet().stream().map(e -> callPackage(localRepository, e))));
     }
 
     public static OutputDir collectDir(Path localRepository, Map<Dependency, List<Dependency>> attrs) {
-        Expr defaultNix = packageSet(new Attrs(attrs.keySet().stream().map(d -> {
-            String attrName = attrName(d);
-
-            return pair(attrName, new App(
-                new Var("self.callPackage"), new App(new Var("./" + attrName), new Attrs(Stream.empty()))
-            ));
-        })));
-
-        Map<Path, Expr> pkgs = calledPackages(localRepository, attrs).collect(Collectors.toMap(
-            (Map.Entry<String, Expr> e) -> new File(e.getKey()).toPath(),
-            (Map.Entry<String, Expr> e) -> e.getValue(),
+        return new OutputDir(attrs.entrySet().stream().collect(Collectors.toMap(
+            (Map.Entry<Dependency, List<Dependency>> e) -> new File(attrName(e.getKey())).toPath(),
+            (Map.Entry<Dependency, List<Dependency>> e) -> callPackageFn(localRepository, e),
             (Expr e1, Expr e2) -> e2
-        ));
-
-        return new OutputDir(defaultNix, pkgs);
+        )));
     }
 
     public static Expr packageSet(Expr body) {
@@ -76,22 +66,22 @@ public class NixPackageSet {
         ))));
     }
 
-    public static Stream<Map.Entry<String, Expr>> calledPackages(Path localRepository, Map<Dependency, List<Dependency>> attrs) {
-        return attrs.entrySet().stream().map(e -> NixPackageSet.callPackage(localRepository, e));
+    public static Map.Entry<String, Expr> callPackage(Path localRepository, Map.Entry<Dependency, List<Dependency>> entry) {
+        Expr expr = new App(new App(new Var("self.callPackage"), new Paren(
+            callPackageFn(localRepository, entry)
+        )), new Attrs(Stream.empty()));
+
+        return pair(attrName(entry.getKey()), expr);
     }
 
-    public static Map.Entry<String, Expr> callPackage(Path localRepository, Map.Entry<Dependency, List<Dependency>> entry) {
-        Dependency d = entry.getKey();
+    public static Expr callPackageFn(Path localRepository, Map.Entry<Dependency, List<Dependency>> e) {
+        Dependency d = e.getKey();
 
-        List<Dependency> deps = entry.getValue().stream()
+        List<Dependency> deps = e.getValue().stream()
             .filter(d_ -> !d.equals(d_))
             .collect(Collectors.toList());
 
-        Expr expr = new App(new App(new Var("self.callPackage"), new Paren(new Fn(
-            param(deps), body(localRepository, d, deps)
-        ))), new Attrs(Stream.empty()));
-
-        return pair(attrName(d), expr);
+        return new Fn(param(deps), body(localRepository, d, deps));
     }
 
     public static Param param(List<Dependency> deps) {
