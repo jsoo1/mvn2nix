@@ -33,7 +33,9 @@ import picocli.CommandLine.Spec;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -140,9 +142,11 @@ public class Maven2nix implements Callable<Integer> {
 
             Expr pkgs = NixPackageSet.collect(localRepository, Graph.read(ctx, resolver, file));
 
-            BufferedWriter w = new BufferedWriter(spec.commandLine().getOut());
+            BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 
             pkgs.write(0, w);
+
+            w.flush();
             break;
         }
 
