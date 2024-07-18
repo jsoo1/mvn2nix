@@ -37,12 +37,12 @@ public class NixPackageSet {
 
     public static String LIB = "lib";
     public static String NEW_SCOPE = "newScope";
-    public static String FETCHER = "fetchurl";
+    public static String FETCHURL = "fetchurl";
     public static String BUILDER = "patchMavenJar";
 
     public static String[] packageSetParams = new String[]{LIB, NEW_SCOPE};
 
-    public static String[] packageParams = new String[]{LIB, FETCHER, BUILDER};
+    public static String[] packageParams = new String[]{LIB, FETCHURL, BUILDER};
 
     public static Expr collect(Path localRepository, Map<Dependency, List<Dependency>> attrs) {
         String args = "args";
@@ -91,7 +91,7 @@ public class NixPackageSet {
         return new App(new Var(BUILDER), new Attrs(args
             .add(pair("name", new LitS(attrName(d))))
             .add(pair("version", new LitS(artifact.getVersion())))
-            .add(pair("src", new App(new Var(FETCHER), new Attrs(src
+            .add(pair("src", new App(new Var(FETCHURL), new Attrs(src
                 .add(pair("url", url))
                 .add(pair("sha256", sha256))
                 .build()
