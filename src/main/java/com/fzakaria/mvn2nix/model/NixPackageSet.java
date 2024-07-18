@@ -21,6 +21,7 @@ import org.eclipse.aether.graph.Dependency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.function.Predicate;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.file.Path;
@@ -108,7 +109,10 @@ public class NixPackageSet {
             .add(pair("name", new LitS(Graph.canonName(d))))
             .add(pair("groupId", new LitS(artifact.getGroupId())))
             .add(pair("artifactId", new LitS(artifact.getArtifactId())))
-            .add(pair("classifier", new LitS(artifact.getClassifier())))
+            .add(pair("classifier", Optional.ofNullable(artifact.getClassifier())
+                      .filter(Predicate.not(String::isEmpty))
+                      .map(s -> (Expr) new LitS(s))
+                      .orElse(new Null())))
             .add(pair("extension", new LitS(artifact.getExtension())))
             .add(pair("version", new LitS(artifact.getVersion())))
             .add(pair("raw", new App(new Var(PKGS + ".fetchurl"), new Attrs(src
