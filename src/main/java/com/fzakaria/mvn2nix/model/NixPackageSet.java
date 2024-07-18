@@ -1,6 +1,7 @@
 package com.fzakaria.mvn2nix.model;
 
 import com.fzakaria.mvn2nix.model.nix.App;
+import com.fzakaria.mvn2nix.model.nix.AtBind;
 import com.fzakaria.mvn2nix.model.nix.AttrPattern;
 import com.fzakaria.mvn2nix.model.nix.Attrs;
 import com.fzakaria.mvn2nix.model.nix.Expr;
@@ -10,6 +11,7 @@ import com.fzakaria.mvn2nix.model.nix.LitS;
 import com.fzakaria.mvn2nix.model.nix.Null;
 import com.fzakaria.mvn2nix.model.nix.Param;
 import com.fzakaria.mvn2nix.model.nix.Paren;
+import com.fzakaria.mvn2nix.model.nix.Symbol;
 import com.fzakaria.mvn2nix.model.nix.Var;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
@@ -34,20 +36,23 @@ public class NixPackageSet {
     private static Logger LOGGER = LoggerFactory.getLogger(NixPackageSet.class.getClass());
 
     public static String LIB = "lib";
-    public static String CALL_PACKAGE = "callPackage";
+    public static String NEW_SCOPE = "newScope";
     public static String FETCHER = "fetchurl";
     public static String BUILDER = "patchMavenJar";
 
-    public static String[] packageSetParams = new String[]{LIB, CALL_PACKAGE, FETCHER, BUILDER};
+    public static String[] packageSetParams = new String[]{LIB, NEW_SCOPE};
 
     public static String[] packageParams = new String[]{LIB, FETCHER, BUILDER};
 
     public static Expr collect(Path localRepository, Map<Dependency, List<Dependency>> attrs) {
-        Param param = new AttrPattern(packageSetParams);
-
+        String args = "args";
         Expr body = new Attrs(attrs.entrySet().stream().map(e -> NixPackageSet.callPackage(localRepository, e)));
 
-        return new Fn(param, body);
+        return new Fn(new AtBind(args, new AttrPattern(packageSetParams)),
+            new App(new Var(LIB + ".makeScope"), new App(new Var(NEW_SCOPE), new Paren(new Fn(
+                new Symbol("self"),
+                new App(new Var(args), new App(new Var("//"), body))
+        )))));
     }
 
     public static Map.Entry<String, Expr> callPackage(Path localRepository, Map.Entry<Dependency, List<Dependency>> entry) {
@@ -57,7 +62,7 @@ public class NixPackageSet {
             .filter(d_ -> !d.equals(d_))
             .collect(Collectors.toList());
 
-        Expr expr = new App(new App(new Var(CALL_PACKAGE), new Paren(new Fn(
+        Expr expr = new App(new App(new Var("self.callPackage"), new Paren(new Fn(
             param(deps), body(localRepository, d, deps)
         ))), new Attrs(Stream.empty()));
 

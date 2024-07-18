@@ -4,10 +4,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 public class Symbol extends Param implements Write {
-    String symbol;
+    public final String symbol;
 
-    public Symbol(String symbol) {
-        symbol = symbol;
+    public Symbol(String s) {
+        symbol = s;
     }
 
     @Override
