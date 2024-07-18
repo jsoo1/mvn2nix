@@ -16,11 +16,11 @@ public class LitL extends Expr implements Write {
         w.write("[");
 
         for (Expr v: vals) {
-            w.write("\n"); indent(ind + INDENT_WIDTH, w); v.write(ind, w);
+            w.newLine(); indent(ind + INDENT_WIDTH, w); v.write(ind, w);
         }
 
         if (vals.length != 0) {
-            w.write("\n"); indent(ind, w);
+            w.newLine(); indent(ind, w);
         } else {
             w.write(" ");
         }

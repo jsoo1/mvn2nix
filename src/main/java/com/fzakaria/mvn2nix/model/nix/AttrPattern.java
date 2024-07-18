@@ -17,11 +17,11 @@ public class AttrPattern extends Param implements Write {
             if (!written) {
                 written = true;
 
-                w.write("\n"); indent(ind, w); w.write("{ "); w.write(name);
+                w.newLine(); indent(ind, w); w.write("{ "); w.write(name);
             } else {
-                w.write("\n"); indent(ind, w); w.write(", "); w.write(name);
+                w.newLine(); indent(ind, w); w.write(", "); w.write(name);
             }
         }
-        w.write("\n"); indent(ind, w); w.write("}");
+        w.newLine(); indent(ind, w); w.write("}");
     }
 }

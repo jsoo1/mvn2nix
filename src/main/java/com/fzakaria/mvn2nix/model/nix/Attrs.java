@@ -32,13 +32,13 @@ public class Attrs extends Expr implements Write {
             if (!written) {
                 written = true;
 
-                w.write("{\n"); indent(ind + INDENT_WIDTH, w);
+                w.write("{"); w.newLine(); indent(ind + INDENT_WIDTH, w);
             } else {
-                w.write("\n"); indent(ind + INDENT_WIDTH, w);
+                w.newLine(); indent(ind + INDENT_WIDTH, w);
             }
             writeNameValue(ind, w, e.getKey(), e.getValue());
         }
-        w.write("\n"); indent(ind, w); w.write("}");
+        w.newLine(); indent(ind, w); w.write("}");
     }
 
     public static void writeNameValue(int ind, BufferedWriter w, String name, Expr value) throws IOException {
