@@ -26,19 +26,14 @@ public class Attrs extends Expr implements Write {
 
     @Override
     public void write(int ind, BufferedWriter w) throws IOException {
-        boolean written = false;
+        w.write("{");
 
         for (Map.Entry<String, Expr> e: attrs.entrySet()) {
-            if (!written) {
-                written = true;
+            indent(ind + INDENT_WIDTH, w);
 
-                w.write("{"); w.newLine(); indent(ind + INDENT_WIDTH, w);
-            } else {
-                w.newLine(); indent(ind + INDENT_WIDTH, w);
-            }
             writeNameValue(ind, w, e.getKey(), e.getValue());
         }
-        w.newLine(); indent(ind, w); w.write("}");
+        indent(ind, w); w.write("}");
     }
 
     public static void writeNameValue(int ind, BufferedWriter w, String name, Expr value) throws IOException {

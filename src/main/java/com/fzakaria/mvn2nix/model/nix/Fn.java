@@ -14,6 +14,6 @@ public class Fn extends Expr implements Write {
 
     @Override
     public void write(int ind, BufferedWriter w) throws IOException {
-        param.write(ind, w); w.write(":"); w.newLine(); indent(ind, w); body.write(ind, w);
+        param.write(ind, w); w.write(":"); indent(ind, w); body.write(ind, w);
     }
 }

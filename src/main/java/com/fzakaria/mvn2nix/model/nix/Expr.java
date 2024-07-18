@@ -22,6 +22,8 @@ public abstract class Expr implements Write {
     }
 
     public static void indent(int ind, BufferedWriter w) throws IOException {
+        w.newLine();
+
         for (int i = 0; i < ind; i++) {
             w.write(' ');
         }

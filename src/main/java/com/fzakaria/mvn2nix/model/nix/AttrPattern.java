@@ -13,15 +13,19 @@ public class AttrPattern extends Param implements Write {
     @Override
     public void write(int ind, BufferedWriter w) throws IOException {
         boolean written = false;
+
+        w.write("{");
+
         for (String name: attrNames) {
             if (!written) {
                 written = true;
 
-                w.newLine(); indent(ind, w); w.write("{ "); w.write(name);
+                indent(ind, w); w.write(name);
             } else {
-                w.newLine(); indent(ind, w); w.write(", "); w.write(name);
+                indent(ind, w); w.write(", "); w.write(name);
             }
         }
-        w.newLine(); indent(ind, w); w.write("}");
+
+        indent(ind, w); w.write("}");
     }
 }
