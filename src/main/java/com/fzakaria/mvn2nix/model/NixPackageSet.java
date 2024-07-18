@@ -1,5 +1,6 @@
 package com.fzakaria.mvn2nix.model;
 
+import com.fzakaria.mvn2nix.maven.Graph;
 import com.fzakaria.mvn2nix.model.nix.App;
 import com.fzakaria.mvn2nix.model.nix.AtBind;
 import com.fzakaria.mvn2nix.model.nix.AttrPattern;
@@ -105,7 +106,7 @@ public class NixPackageSet {
         Stream.Builder<Map.Entry<String, Expr>> src = Stream.builder();
 
         return new App(new Var(BUILDER), new Attrs(args
-            .add(pair("name", new LitS(attrName(d))))
+            .add(pair("name", new LitS(Graph.canonName(d))))
             .add(pair("groupId", new LitS(artifact.getGroupId())))
             .add(pair("artifactId", new LitS(artifact.getArtifactId())))
             .add(pair("classifier", new LitS(artifact.getClassifier())))
@@ -141,9 +142,9 @@ public class NixPackageSet {
             Optional.ofNullable(a.getClassifier()),
             Optional.of(a.getVersion())
         )
-           .flatMap(Optional::stream)
+            .flatMap(Optional::stream)
             .map(s -> s.replaceAll("\\.", "_"))
-           .collect(Collectors.joining("__"));
+            .collect(Collectors.joining("__"));
     }
 
     public static Expr[] scopedDeps(List<Dependency> deps, String scope) {
