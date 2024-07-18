@@ -1,7 +1,5 @@
 package com.fzakaria.mvn2nix.model;
 
-import com.google.common.io.Files;
-import com.google.common.hash.Hashing;
 import com.fzakaria.mvn2nix.model.nix.App;
 import com.fzakaria.mvn2nix.model.nix.AttrPattern;
 import com.fzakaria.mvn2nix.model.nix.Attrs;
@@ -12,13 +10,17 @@ import com.fzakaria.mvn2nix.model.nix.LitS;
 import com.fzakaria.mvn2nix.model.nix.Null;
 import com.fzakaria.mvn2nix.model.nix.Param;
 import com.fzakaria.mvn2nix.model.nix.Var;
+import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.Dependency;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
@@ -28,28 +30,30 @@ import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
 public class NixPackageSet {
+    private static Logger LOGGER = LoggerFactory.getLogger(NixPackageSet.class.getClass());
+
     public static String LIB = "lib";
     public static String FETCHER = "fetchurl";
     public static String BUILDER = "patchMavenJar";
 
     public static String[] packageSetParams = new String[]{LIB, FETCHER, BUILDER};
 
-    public static Expr collect(Map<Dependency, List<Dependency>> attrs) {
+    public static Expr collect(Path localRepository, Map<Dependency, List<Dependency>> attrs) {
         Param param = new AttrPattern(packageSetParams);
 
-        Expr body = new Attrs(attrs.entrySet().stream().map(e -> NixPackageSet.callPackageFn(e)));
+        Expr body = new Attrs(attrs.entrySet().stream().map(e -> NixPackageSet.callPackageFn(localRepository, e)));
 
         return new Fn(param, body);
     }
 
-    public static Map.Entry<String, Expr> callPackageFn(Map.Entry<Dependency, List<Dependency>> entry) {
+    public static Map.Entry<String, Expr> callPackageFn(Path localRepository, Map.Entry<Dependency, List<Dependency>> entry) {
         Dependency d = entry.getKey();
 
         List<Dependency> deps = entry.getValue().stream()
             .filter(d_ -> !d.equals(d_))
             .collect(Collectors.toList());
 
-        Expr expr = new Fn(param(deps), body(d, deps));
+        Expr expr = new Fn(param(deps), body(localRepository, d, deps));
 
         return pair(attrName(d), expr);
     }
@@ -60,14 +64,14 @@ public class NixPackageSet {
         return new AttrPattern(Stream.concat(otherParams, deps.stream().map(NixPackageSet::attrName)).toArray(String[]::new));
     }
 
-    public static Expr body(Dependency d, List<Dependency> deps) {
+    public static Expr body(Path localRepository, Dependency d, List<Dependency> deps) {
         Artifact artifact = d.getArtifact();
 
         Expr sha256 = Optional.ofNullable(artifact.getFile())
             .map(f -> (Expr) new LitS(sha256(f)))
             .orElse((Expr) new Null());
 
-        Expr url = new LitS(url(artifact));
+        Expr url = url(localRepository, artifact);
 
         Stream.Builder<Map.Entry<String, Expr>> args = Stream.builder();
 
@@ -110,11 +114,18 @@ public class NixPackageSet {
     }
 
     public static Expr[] scopedDeps(List<Dependency> deps, String scope) {
-        return deps.stream().filter(d -> d.getScope().equals(scope)).map(d -> new Var(NixPackageSet.attrName(d))).toArray(Expr[]::new);
+        return deps.stream()
+            .filter(d -> d.getScope().equals(scope))
+            .map(d -> new Var(NixPackageSet.attrName(d)))
+            .toArray(Expr[]::new);
     }
 
-    public static String url(Artifact a) {
-        return "";
+    public static Expr url(Path localRepository, Artifact a) {
+        LOGGER.debug("relativizing artifact {}", a.getFile());
+
+        return Optional.ofNullable(a.getFile())
+            .map(f -> (Expr) new LitS("https://repo.maven.apache.org/maven2/" + localRepository.relativize(f.toPath()).toString()))
+            .orElse((Expr) new Null());
     }
 
     public static String sha256(File f) {

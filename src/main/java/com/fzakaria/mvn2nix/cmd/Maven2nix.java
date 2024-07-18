@@ -1,14 +1,10 @@
 package com.fzakaria.mvn2nix.cmd;
 
-import org.apache.maven.model.building.DefaultModelBuilderFactory;
-import org.eclipse.aether.impl.RemoteRepositoryManager;
-import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.project.ProjectModelResolver;
 import com.fzakaria.mvn2nix.maven.Artifact;
 import com.fzakaria.mvn2nix.maven.Graph;
 import com.fzakaria.mvn2nix.maven.Maven;
-import com.fzakaria.mvn2nix.model.MavenNixInformation;
 import com.fzakaria.mvn2nix.model.MavenArtifact;
+import com.fzakaria.mvn2nix.model.MavenNixInformation;
 import com.fzakaria.mvn2nix.model.NixPackageSet;
 import com.fzakaria.mvn2nix.model.URLAdapter;
 import com.fzakaria.mvn2nix.model.nix.Expr;
@@ -18,9 +14,13 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import eu.maveniverse.maven.mima.context.Context;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.ModelBuilder;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectModelResolver;
 import org.apache.maven.project.PublicReactorModelPool;
 import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -38,6 +38,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class Maven2nix implements Callable<Integer> {
     CommandSpec spec;
 
     @Parameters(index = "0", paramLabel = "FILE", description = "The pom file to traverse.", defaultValue = "pom.xml")
-    private File file = null;
+    private Path file = null;
 
     @Option(names = "--goals",
             arity = "0..*",
@@ -72,7 +73,7 @@ public class Maven2nix implements Callable<Integer> {
             arity = "0..*",
             description = "The JDK to use when running Maven",
             defaultValue = "${java.home}")
-    private File javaHome;
+    private Path javaHome;
 
     @Option(names = "--output",
             description = "Output type",
@@ -92,7 +93,7 @@ public class Maven2nix implements Callable<Integer> {
         switch (output) {
         case JSON:
             final Maven maven = Maven.withTemporaryLocalRepository();
-            maven.executeGoals(file, javaHome, goals);
+            maven.executeGoals(file.toFile(), javaHome.toFile(), goals);
 
             Collection<Artifact> artifacts = maven.collectAllArtifactsInLocalRepository();
             Map<String, MavenArtifact> dependencies = artifacts.parallelStream()
@@ -135,7 +136,9 @@ public class Maven2nix implements Callable<Integer> {
                 new PublicReactorModelPool()
             );
 
-            Expr pkgs = NixPackageSet.collect(Graph.read(ctx, resolver, file));
+            Path localRepository = ctx.repositorySystemSession().getLocalRepository().getBasedir().toPath();
+
+            Expr pkgs = NixPackageSet.collect(localRepository, Graph.read(ctx, resolver, file));
 
             BufferedWriter w = new BufferedWriter(spec.commandLine().getOut());
 
