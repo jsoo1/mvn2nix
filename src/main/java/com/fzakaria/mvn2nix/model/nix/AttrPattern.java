@@ -20,7 +20,7 @@ public class AttrPattern extends Param implements Write {
             if (!written) {
                 written = true;
 
-                indent(ind, w); w.write(name);
+                indent(ind, w); w.write("  "); w.write(name);
             } else {
                 indent(ind, w); w.write(", "); w.write(name);
             }
