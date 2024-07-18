@@ -90,7 +90,7 @@ public class Maven2nix implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        LOGGER.info("Reading {}", file);
+        LOGGER.debug("Reading {}", file);
 
         switch (output) {
         case JSON:
