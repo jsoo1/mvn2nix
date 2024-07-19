@@ -3,12 +3,18 @@ package com.fzakaria.mvn2nix.model.nix;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 public class LitL extends Expr implements Write {
-    public final Expr[] vals;
+    public final List<Expr> vals;
+
+    public LitL(Stream<Expr> vs) {
+        vals = vs.collect(Collectors.toList());
+    }
 
     public LitL(Expr[] vs) {
-        vals = vs;
+        vals = java.util.Arrays.asList(vs);
     }
 
     @Override
@@ -19,7 +25,7 @@ public class LitL extends Expr implements Write {
             indent(ind + INDENT_WIDTH, w); v.write(ind, w);
         }
 
-        if (vals.length != 0) {
+        if (vals.size() != 0) {
             indent(ind, w);
         } else {
             w.write(" ");

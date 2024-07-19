@@ -1,4 +1,4 @@
-{ lib, stdenv, jdk, maven, makeWrapper, rlwrap, nix-gitignore, java-language-server
+{ lib, stdenv, jdk, maven, makeWrapper, rlwrap, nix-gitignore, java-language-server, metals
 , bootstrap ? false, buildMavenRepositoryFromLockFile }:
 let
   repository = (if bootstrap then
@@ -9,7 +9,7 @@ let
       buildPhase = ''
         mkdir $out
 
-        while mvn package -Dmaven.repo.local=$out -Dmaven.wagon.rto=5000; [ $? = 1 ]; do
+        while mvn package -Duser.home=`pwd` -Dmaven.repo.local=$out -Dmaven.wagon.rto=5000; [ $? = 1 ]; do
           echo "timeout, restart maven to continue downloading"
         done
       '';
@@ -27,7 +27,7 @@ let
 
       outputHashAlgo = "sha256";
       outputHashMode = "recursive";
-      outputHash = "sha256-87AQ25B0XH6slozi/q68zWyYsgXQ80Mx0Ga80lg5YXQ=";
+      outputHash = "sha256-vWrIVzmw/xLt1T3KPSktYQL16ItPpG2jrhdn/KRQfek=";
     }
   else
     buildMavenRepositoryFromLockFile { file = ./mvn2nix-lock.json; });
@@ -36,11 +36,11 @@ in stdenv.mkDerivation rec {
   version = "0.1";
   name = "${pname}-${version}";
   src = nix-gitignore.gitignoreSource [] ./.;
-  nativeBuildInputs = [ jdk maven makeWrapper rlwrap java-language-server ];
+  nativeBuildInputs = [ jdk maven makeWrapper rlwrap java-language-server metals ];
   buildPhase = ''
     echo "Using repository ${repository}"
     # 'maven.repo.local' must be writable so copy it out of nix store
-    mvn package --offline -Dmaven.repo.local=${repository}
+    mvn package --offline -Duser.home=`pwd` -Dmaven.repo.local=${repository}
   '';
 
   installPhase = ''

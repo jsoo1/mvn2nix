@@ -1,25 +1,14 @@
 package com.fzakaria.mvn2nix.model;
 
+import coursier.util.Artifact;
+import coursier.core.Dependency;
 import com.fzakaria.mvn2nix.maven.Graph;
-import com.fzakaria.mvn2nix.model.nix.App;
-import com.fzakaria.mvn2nix.model.nix.AtBind;
-import com.fzakaria.mvn2nix.model.nix.AttrPattern;
-import com.fzakaria.mvn2nix.model.nix.Attrs;
-import com.fzakaria.mvn2nix.model.nix.Expr;
-import com.fzakaria.mvn2nix.model.nix.Fn;
-import com.fzakaria.mvn2nix.model.nix.LitL;
-import com.fzakaria.mvn2nix.model.nix.LitS;
-import com.fzakaria.mvn2nix.model.nix.Null;
-import com.fzakaria.mvn2nix.model.nix.Param;
-import com.fzakaria.mvn2nix.model.nix.Paren;
-import com.fzakaria.mvn2nix.model.nix.Symbol;
-import com.fzakaria.mvn2nix.model.nix.Var;
+import com.fzakaria.mvn2nix.model.nix.*;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.graph.Dependency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.util.function.Predicate;
 import java.io.BufferedWriter;
@@ -34,6 +23,17 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
+/*
+  Walk the dependency tree and the local repository to get a "package
+  set". For us that means an attrset of functions that can be called
+  by `callPackage` of a new attrset made by `makeScope`.
+
+  Ideally all these would get accumulated into one giant package set
+  in nixpkgs or somewhere like all-hackage-packages, but for now this
+  allows users to import and contribute them easily.
+
+  Inspired by importers in `guix`.
+*/
 public class NixPackageSet {
     private static Logger LOGGER = LoggerFactory.getLogger(NixPackageSet.class.getClass());
 
@@ -46,14 +46,14 @@ public class NixPackageSet {
 
     public static String[] packageParams = new String[]{LIB, PKGS, BUILDER};
 
-    public static Expr collect(Path localRepository, Map<Dependency, List<Dependency>> attrs) {
-        return packageSet(new Attrs(attrs.entrySet().stream().map(e -> callPackage(localRepository, e))));
+    public static Expr collect(Map<Dependency, Graph.Res> resolved) {
+        return packageSet(new Attrs(resolved.entrySet().stream().map(e -> callPackage(e))));
     }
 
-    public static OutputDir collectDir(Path localRepository, Map<Dependency, List<Dependency>> attrs) {
-        return new OutputDir(attrs.entrySet().stream().collect(Collectors.toMap(
-            (Map.Entry<Dependency, List<Dependency>> e) -> new File(attrName(e.getKey())).toPath(),
-            (Map.Entry<Dependency, List<Dependency>> e) -> callPackageFn(localRepository, e),
+    public static OutputDir collectDir(Map<Dependency, Graph.Res> resolved) {
+        return new OutputDir(resolved.entrySet().stream().collect(Collectors.toMap(
+            (Map.Entry<Dependency, Graph.Res> e) -> new File(attrName(e.getKey())).toPath(),
+            (Map.Entry<Dependency, Graph.Res> e) -> callPackageFn(e),
             (Expr e1, Expr e2) -> e2
         )));
     }
@@ -68,22 +68,24 @@ public class NixPackageSet {
         ))));
     }
 
-    public static Map.Entry<String, Expr> callPackage(Path localRepository, Map.Entry<Dependency, List<Dependency>> entry) {
+    public static Map.Entry<String, Expr> callPackage(Map.Entry<Dependency, Graph.Res> entry) {
         Expr expr = new App(new App(new Var("self.callPackage"), new Paren(
-            callPackageFn(localRepository, entry)
+            callPackageFn(entry)
         )), new Attrs(Stream.empty()));
 
         return pair(attrName(entry.getKey()), expr);
     }
 
-    public static Expr callPackageFn(Path localRepository, Map.Entry<Dependency, List<Dependency>> e) {
+    public static Expr callPackageFn(Map.Entry<Dependency, Graph.Res> e) {
         Dependency d = e.getKey();
 
-        List<Dependency> deps = e.getValue().stream()
-            .filter(d_ -> !Graph.canonName(d).equals(Graph.canonName(d_)))
+        Graph.Res r = e.getValue();
+
+        List<Dependency> deps = r.dependencies.stream()
+            .filter(d_ -> !d.equals(d_)) // FIXME(jsoo1): Need to filter on canonical name
             .collect(Collectors.toList());
 
-        return new Fn(param(deps), body(localRepository, d, deps));
+        return new Fn(param(deps), body(d, deps, r.artifacts));
     }
 
     public static Param param(List<Dependency> deps) {
@@ -92,41 +94,41 @@ public class NixPackageSet {
         return new AttrPattern(Stream.concat(otherParams, deps.stream().map(NixPackageSet::attrName)).toArray(String[]::new));
     }
 
-    public static Expr body(Path localRepository, Dependency d, List<Dependency> deps) {
-        Artifact artifact = d.getArtifact();
-
-        Expr sha256 = Optional.ofNullable(artifact.getFile())
-            .map(f -> (Expr) new LitS(sha256(f)))
-            .orElse((Expr) new Null());
-
-        Expr url = url(localRepository, artifact);
-
+    public static Expr body(Dependency d, List<Dependency> deps, List<Tuple2<Artifact, Optional<File>>> artifacts) {
         Stream.Builder<Map.Entry<String, Expr>> args = Stream.builder();
 
-        Stream.Builder<Map.Entry<String, Expr>> src = Stream.builder();
-
-        return new App(new Var(BUILDER), new Attrs(args
-            .add(pair("name", new LitS(Graph.canonName(d))))
-            .add(pair("groupId", new LitS(artifact.getGroupId())))
-            .add(pair("artifactId", new LitS(artifact.getArtifactId())))
-            .add(pair("classifier", Optional.ofNullable(artifact.getClassifier())
+        return new App(new Var(BUILDER), new Attrs(Stream.of(
+            pair("name", new LitS(canonName(d))),
+            pair("version", new LitS(d.version())),
+            pair("module", new Attrs(Stream.of(
+                pair("organization", new LitS(d.module().organization())),
+                pair("name", new LitS(d.module().name()))
+            ))),
+            pair("classifier", Optional.ofNullable(d.publication().classifier())
                       .filter(Predicate.not(String::isEmpty))
                       .map(s -> (Expr) new LitS(s))
-                      .orElse(new Null())))
-            .add(pair("extension", new LitS(artifact.getExtension())))
-            .add(pair("version", new LitS(artifact.getVersion())))
-            .add(pair("raw", new App(new Var(PKGS + ".fetchurl"), new Attrs(src
-                .add(pair("url", url))
-                .add(pair("sha256", sha256))
-                .build()
-            ))))
-            .add(pair("compileDependencies", new LitL(scopedDeps(deps, "compile"))))
-            .add(pair("runtimeDependencies", new LitL(scopedDeps(deps, "runtime"))))
-            .add(pair("testDependencies", new LitL(scopedDeps(deps, "test"))))
-            .add(pair("systemDependencies", new LitL(scopedDeps(deps, "system"))))
-            .add(pair("providedDependencies", new LitL(scopedDeps(deps, "provided"))))
-            .add(pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryBytecode")})))
-            .build()
+                      .orElse(new Null())),
+            pair("extension", new LitS(d.publication().ext())),
+            pair("type", new LitS(d.publication().type())),
+            pair("raw", new LitL(artifacts.stream().map(a -> new Paren(artifact(a._1, a._2))))),
+            pair("dependencies", new LitL(deps.stream().map(NixPackageSet::dep))),
+            pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryBytecode")}))
+        )));
+    }
+
+    public static Expr dep(Dependency d) {
+        return new Attrs(Stream.of(
+            pair("drv", new Var(attrName(d))),
+            pair("configuration", new LitS(d.configuration()))
+        ));
+    }
+
+    public static Expr artifact(Artifact a, Optional<File> file) {
+        return new App(new Var(PKGS + ".fetchurl"), new Attrs(Stream.of(
+            pair("url", new LitS(a.url())),
+            pair("sha256", file
+                 .map(f -> (Expr) new LitS(sha256(f)))
+                 .orElse((Expr) new Null())))
         ));
     }
 
@@ -135,14 +137,9 @@ public class NixPackageSet {
     }
 
     public static String attrName(Dependency dep) {
-        Artifact a = dep.getArtifact();
-
         return Stream.of(
-            Optional.of(a.getGroupId()),
-            Optional.of(a.getArtifactId()),
-            Optional.ofNullable(a.getExtension()),
-            Optional.ofNullable(a.getClassifier()),
-            Optional.of(a.getVersion())
+            Optional.of(dep.mavenPrefix()),
+            Optional.of(dep.version())
         )
             .flatMap(Optional::stream)
             .filter(Predicate.not(String::isEmpty))
@@ -152,17 +149,13 @@ public class NixPackageSet {
 
     public static Expr[] scopedDeps(List<Dependency> deps, String scope) {
         return deps.stream()
-            .filter(d -> d.getScope().equals(scope))
+            .filter(d -> d.configuration().equals(scope))
             .map(d -> new Var(NixPackageSet.attrName(d)))
             .toArray(Expr[]::new);
     }
 
-    public static Expr url(Path localRepository, Artifact a) {
-        LOGGER.debug("relativizing artifact {}", a.getFile());
-
-        return Optional.ofNullable(a.getFile())
-            .map(f -> (Expr) new LitS("https://repo.maven.apache.org/maven2/" + localRepository.relativize(f.toPath()).toString()))
-            .orElse((Expr) new Null());
+    public static String canonName(Dependency d) {
+        return d.mavenPrefix() + ":" + d.version();
     }
 
     public static String sha256(File f) {

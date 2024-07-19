@@ -25,10 +25,30 @@
       "sha256": "d75b2ced6059f81ad23e021c554259b906b6c4f2991cb772409827569ead4c1a",
       "url": "https://repo.maven.apache.org/maven2/com/github/luben/zstd-jni/1.5.5-11/zstd-jni-1.5.5-11.jar"
     },
+    "com.github.luben:zstd-jni:pom:1.5.5-10": {
+      "layout": "com/github/luben/zstd-jni/1.5.5-10/zstd-jni-1.5.5-10.pom",
+      "sha256": "a2422a1ec89e3cdbaf2d07fdb144cc22bd59d3ceb5819318d4ea46d38885196c",
+      "url": "https://repo.maven.apache.org/maven2/com/github/luben/zstd-jni/1.5.5-10/zstd-jni-1.5.5-10.pom"
+    },
     "com.github.luben:zstd-jni:pom:1.5.5-11": {
       "layout": "com/github/luben/zstd-jni/1.5.5-11/zstd-jni-1.5.5-11.pom",
       "sha256": "a0152b1897c4a6e7dd36e5f686f0e631c3839b5db208b38daa11a4f6dc9b25ff",
       "url": "https://repo.maven.apache.org/maven2/com/github/luben/zstd-jni/1.5.5-11/zstd-jni-1.5.5-11.pom"
+    },
+    "com.github.plokhotnyuk.jsoniter-scala:jsoniter-scala-core_2.12:jar:2.13.5": {
+      "layout": "com/github/plokhotnyuk/jsoniter-scala/jsoniter-scala-core_2.12/2.13.5/jsoniter-scala-core_2.12-2.13.5.jar",
+      "sha256": "6b7a8149f1d8eb379b236ce0a593f8eedcca341bf1d2e1a42ff2ad5d445aa4a3",
+      "url": "https://repo.maven.apache.org/maven2/com/github/plokhotnyuk/jsoniter-scala/jsoniter-scala-core_2.12/2.13.5/jsoniter-scala-core_2.12-2.13.5.jar"
+    },
+    "com.github.plokhotnyuk.jsoniter-scala:jsoniter-scala-core_2.12:pom:2.13.5": {
+      "layout": "com/github/plokhotnyuk/jsoniter-scala/jsoniter-scala-core_2.12/2.13.5/jsoniter-scala-core_2.12-2.13.5.pom",
+      "sha256": "237f6a260f8b26591df661679bd5ffa0ccc2634f8f78a5170fbb1bf523ab8e2d",
+      "url": "https://repo.maven.apache.org/maven2/com/github/plokhotnyuk/jsoniter-scala/jsoniter-scala-core_2.12/2.13.5/jsoniter-scala-core_2.12-2.13.5.pom"
+    },
+    "com.github.plokhotnyuk.jsoniter-scala:jsoniter-scala-core_2.12:pom:2.13.5.2": {
+      "layout": "com/github/plokhotnyuk/jsoniter-scala/jsoniter-scala-core_2.12/2.13.5.2/jsoniter-scala-core_2.12-2.13.5.2.pom",
+      "sha256": "7cb5513032999f0a2a8061ad2a5c0f3c1dd341272d0a8acc4696c700a82f5f21",
+      "url": "https://repo.maven.apache.org/maven2/com/github/plokhotnyuk/jsoniter-scala/jsoniter-scala-core_2.12/2.13.5.2/jsoniter-scala-core_2.12-2.13.5.2.pom"
     },
     "com.google.code.findbugs:jsr305:pom:2.0.1": {
       "layout": "com/google/code/findbugs/jsr305/2.0.1/jsr305-2.0.1.pom",
@@ -260,6 +280,11 @@
       "sha256": "2e016fd7e3244b5f2c20acad834d93aa4790486ee1e4564641361a3e831eef59",
       "url": "https://repo.maven.apache.org/maven2/commons-io/commons-io/2.11.0/commons-io-2.11.0.pom"
     },
+    "commons-io:commons-io:pom:2.15.0": {
+      "layout": "commons-io/commons-io/2.15.0/commons-io-2.15.0.pom",
+      "sha256": "297e85b6157de74bd6550b1af5f4696535b2ea76d805e9eb2300cf06dcc4fb9c",
+      "url": "https://repo.maven.apache.org/maven2/commons-io/commons-io/2.15.0/commons-io-2.15.0.pom"
+    },
     "commons-io:commons-io:pom:2.15.1": {
       "layout": "commons-io/commons-io/2.15.1/commons-io-2.15.1.pom",
       "sha256": "171a1af82b6759eb5740b3b8809aca80113deaf1153036f2f4445901dfd3f91d",
@@ -385,6 +410,86 @@
       "sha256": "1a934b0302eaf46f2fedac08c11267301d2fc4cdf6abc8d932258b976723662d",
       "url": "https://repo.maven.apache.org/maven2/info/picocli/picocli/4.5.0/picocli-4.5.0.pom"
     },
+    "io.get-coursier.jniutils:windows-jni-utils:jar:0.3.3": {
+      "layout": "io/get-coursier/jniutils/windows-jni-utils/0.3.3/windows-jni-utils-0.3.3.jar",
+      "sha256": "ab68efcf162355e20007b238d8108b7ffec0c06b467ee44cbb44ec3f8ac3a7e6",
+      "url": "https://repo.maven.apache.org/maven2/io/get-coursier/jniutils/windows-jni-utils/0.3.3/windows-jni-utils-0.3.3.jar"
+    },
+    "io.get-coursier.jniutils:windows-jni-utils:pom:0.3.3": {
+      "layout": "io/get-coursier/jniutils/windows-jni-utils/0.3.3/windows-jni-utils-0.3.3.pom",
+      "sha256": "ad53900f92683f3714be442ecb464421a5f8fa2890c1a91b1fbe3e0ecd62914b",
+      "url": "https://repo.maven.apache.org/maven2/io/get-coursier/jniutils/windows-jni-utils/0.3.3/windows-jni-utils-0.3.3.pom"
+    },
+    "io.get-coursier:coursier-cache_2.12:jar:2.1.10": {
+      "layout": "io/get-coursier/coursier-cache_2.12/2.1.10/coursier-cache_2.12-2.1.10.jar",
+      "sha256": "e349890ec49c580ee7f2a2c9302b3e95983a39cf0daa4483605b91e89fd9f1bb",
+      "url": "https://repo.maven.apache.org/maven2/io/get-coursier/coursier-cache_2.12/2.1.10/coursier-cache_2.12-2.1.10.jar"
+    },
+    "io.get-coursier:coursier-cache_2.12:pom:2.1.10": {
+      "layout": "io/get-coursier/coursier-cache_2.12/2.1.10/coursier-cache_2.12-2.1.10.pom",
+      "sha256": "135b73f4921d7a685a6a554a25bd1348ab2fa75d06aa375575bed0cc7d8ac29b",
+      "url": "https://repo.maven.apache.org/maven2/io/get-coursier/coursier-cache_2.12/2.1.10/coursier-cache_2.12-2.1.10.pom"
+    },
+    "io.get-coursier:coursier-core_2.12:jar:2.1.10": {
+      "layout": "io/get-coursier/coursier-core_2.12/2.1.10/coursier-core_2.12-2.1.10.jar",
+      "sha256": "b345715ae6534cdcabf47fcbcdf64b3cb5df6bc26083392a7231f198a3e4062e",
+      "url": "https://repo.maven.apache.org/maven2/io/get-coursier/coursier-core_2.12/2.1.10/coursier-core_2.12-2.1.10.jar"
+    },
+    "io.get-coursier:coursier-core_2.12:pom:2.1.10": {
+      "layout": "io/get-coursier/coursier-core_2.12/2.1.10/coursier-core_2.12-2.1.10.pom",
+      "sha256": "b712b6b33ea2f18da3642a957eaaedf41807f8abd446f14b1b93c47f7035f815",
+      "url": "https://repo.maven.apache.org/maven2/io/get-coursier/coursier-core_2.12/2.1.10/coursier-core_2.12-2.1.10.pom"
+    },
+    "io.get-coursier:coursier-proxy-setup:jar:2.1.10": {
+      "layout": "io/get-coursier/coursier-proxy-setup/2.1.10/coursier-proxy-setup-2.1.10.jar",
+      "sha256": "e440c6dc9f5e695f27853ec72c081d495b5ac9c12d66635ff58439d4f7ac8494",
+      "url": "https://repo.maven.apache.org/maven2/io/get-coursier/coursier-proxy-setup/2.1.10/coursier-proxy-setup-2.1.10.jar"
+    },
+    "io.get-coursier:coursier-proxy-setup:pom:2.1.10": {
+      "layout": "io/get-coursier/coursier-proxy-setup/2.1.10/coursier-proxy-setup-2.1.10.pom",
+      "sha256": "b189def7b4e9487e980518dd70aaaff4ab950b3de66943ebe32252a9740a2811",
+      "url": "https://repo.maven.apache.org/maven2/io/get-coursier/coursier-proxy-setup/2.1.10/coursier-proxy-setup-2.1.10.pom"
+    },
+    "io.get-coursier:coursier-util_2.12:jar:2.1.10": {
+      "layout": "io/get-coursier/coursier-util_2.12/2.1.10/coursier-util_2.12-2.1.10.jar",
+      "sha256": "2c24e9e4875da355f9e2160b24c3750be4ca0e12c2d4c8b9d16ecad59422d02e",
+      "url": "https://repo.maven.apache.org/maven2/io/get-coursier/coursier-util_2.12/2.1.10/coursier-util_2.12-2.1.10.jar"
+    },
+    "io.get-coursier:coursier-util_2.12:pom:2.1.10": {
+      "layout": "io/get-coursier/coursier-util_2.12/2.1.10/coursier-util_2.12-2.1.10.pom",
+      "sha256": "538a5a060104a0831449e8106a75d31ad30de7279c718aadc7fd2ca41fc0c140",
+      "url": "https://repo.maven.apache.org/maven2/io/get-coursier/coursier-util_2.12/2.1.10/coursier-util_2.12-2.1.10.pom"
+    },
+    "io.get-coursier:coursier_2.12:jar:2.1.10": {
+      "layout": "io/get-coursier/coursier_2.12/2.1.10/coursier_2.12-2.1.10.jar",
+      "sha256": "a2a4a0a355b63b384d8634eff5aa1d5151b7739e82af801804b44b7f3c5b1b87",
+      "url": "https://repo.maven.apache.org/maven2/io/get-coursier/coursier_2.12/2.1.10/coursier_2.12-2.1.10.jar"
+    },
+    "io.get-coursier:coursier_2.12:pom:2.1.10": {
+      "layout": "io/get-coursier/coursier_2.12/2.1.10/coursier_2.12-2.1.10.pom",
+      "sha256": "73c677372cf8757b5e075248c73d880512eb27226b834717008f58dde94765d5",
+      "url": "https://repo.maven.apache.org/maven2/io/get-coursier/coursier_2.12/2.1.10/coursier_2.12-2.1.10.pom"
+    },
+    "io.github.alexarchambault.windows-ansi:windows-ansi:jar:0.0.5": {
+      "layout": "io/github/alexarchambault/windows-ansi/windows-ansi/0.0.5/windows-ansi-0.0.5.jar",
+      "sha256": "f9acb082199470d4ca9165b36a4544ee9402ba09964476ba9710cd9ca4c41f69",
+      "url": "https://repo.maven.apache.org/maven2/io/github/alexarchambault/windows-ansi/windows-ansi/0.0.5/windows-ansi-0.0.5.jar"
+    },
+    "io.github.alexarchambault.windows-ansi:windows-ansi:pom:0.0.5": {
+      "layout": "io/github/alexarchambault/windows-ansi/windows-ansi/0.0.5/windows-ansi-0.0.5.pom",
+      "sha256": "fcb67aff7c280058529e66216a630b633b201ebb911602c8edbdc08012492482",
+      "url": "https://repo.maven.apache.org/maven2/io/github/alexarchambault/windows-ansi/windows-ansi/0.0.5/windows-ansi-0.0.5.pom"
+    },
+    "io.github.alexarchambault:concurrent-reference-hash-map:jar:1.1.0": {
+      "layout": "io/github/alexarchambault/concurrent-reference-hash-map/1.1.0/concurrent-reference-hash-map-1.1.0.jar",
+      "sha256": "552707982209afb9feffdccb2e73cc4681a1353e34a47df1bf643d1d2e0a2f61",
+      "url": "https://repo.maven.apache.org/maven2/io/github/alexarchambault/concurrent-reference-hash-map/1.1.0/concurrent-reference-hash-map-1.1.0.jar"
+    },
+    "io.github.alexarchambault:concurrent-reference-hash-map:pom:1.1.0": {
+      "layout": "io/github/alexarchambault/concurrent-reference-hash-map/1.1.0/concurrent-reference-hash-map-1.1.0.pom",
+      "sha256": "21096686f9964694db1b8f16f471c3b9b8fb278e390950fac683760c4a6f0816",
+      "url": "https://repo.maven.apache.org/maven2/io/github/alexarchambault/concurrent-reference-hash-map/1.1.0/concurrent-reference-hash-map-1.1.0.pom"
+    },
     "javax.inject:javax.inject:jar:1": {
       "layout": "javax/inject/javax.inject/1/javax.inject-1.jar",
       "sha256": "91c77044a50c481636c32d916fd89c9118a72195390452c81065080f957de7ff",
@@ -449,6 +554,11 @@
       "layout": "org/apache/commons/commons-compress/1.19/commons-compress-1.19.pom",
       "sha256": "9d5a690d1dea6a747e0dd8e74e64447167f395cb8f148010b8241334f58b525b",
       "url": "https://repo.maven.apache.org/maven2/org/apache/commons/commons-compress/1.19/commons-compress-1.19.pom"
+    },
+    "org.apache.commons:commons-compress:pom:1.24.0": {
+      "layout": "org/apache/commons/commons-compress/1.24.0/commons-compress-1.24.0.pom",
+      "sha256": "835aa66532c7aa5ec6e85f85289d8d3faada0c698b98b9b1a410b8a5499c30c5",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/commons/commons-compress/1.24.0/commons-compress-1.24.0.pom"
     },
     "org.apache.commons:commons-compress:pom:1.26.1": {
       "layout": "org/apache/commons/commons-compress/1.26.1/commons-compress-1.26.1.pom",
@@ -520,6 +630,11 @@
       "sha256": "75dbe8f34e98e4c3ff42daae4a2f9eb4cbcd3b5f1047d54460ace906dbb4502e",
       "url": "https://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/52/commons-parent-52.pom"
     },
+    "org.apache.commons:commons-parent:pom:61": {
+      "layout": "org/apache/commons/commons-parent/61/commons-parent-61.pom",
+      "sha256": "d3ec2d358481fe51260c135bb60fa5211c2f5e185a14ea7f78d03a16bd9098d7",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/61/commons-parent-61.pom"
+    },
     "org.apache.commons:commons-parent:pom:64": {
       "layout": "org/apache/commons/commons-parent/64/commons-parent-64.pom",
       "sha256": "6f19638994e8357b4ed734696f992057efaafa1235673998133299798e2ccddb",
@@ -554,6 +669,21 @@
       "layout": "org/apache/commons/commons-text/1.3/commons-text-1.3.pom",
       "sha256": "deeb2ba9701e495dc31d32633eb86b94b24b0a96e0dc67fb87e7062f153027aa",
       "url": "https://repo.maven.apache.org/maven2/org/apache/commons/commons-text/1.3/commons-text-1.3.pom"
+    },
+    "org.apache.geronimo.genesis:genesis-default-flava:pom:2.0": {
+      "layout": "org/apache/geronimo/genesis/genesis-default-flava/2.0/genesis-default-flava-2.0.pom",
+      "sha256": "08e6e146f4e245266dff9dd800b12875dd2367d3f67a34ab660a126c811215f8",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/geronimo/genesis/genesis-default-flava/2.0/genesis-default-flava-2.0.pom"
+    },
+    "org.apache.geronimo.genesis:genesis-java5-flava:pom:2.0": {
+      "layout": "org/apache/geronimo/genesis/genesis-java5-flava/2.0/genesis-java5-flava-2.0.pom",
+      "sha256": "e7c5358bbbbc27daa5b327f63bc12650a75ddc9f9ac6d4bfa12789be1f2c29db",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/geronimo/genesis/genesis-java5-flava/2.0/genesis-java5-flava-2.0.pom"
+    },
+    "org.apache.geronimo.genesis:genesis:pom:2.0": {
+      "layout": "org/apache/geronimo/genesis/genesis/2.0/genesis-2.0.pom",
+      "sha256": "b9ed2f9dd434631158d77308ee5648622c229ccece1722c5e377a4296923dae6",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/geronimo/genesis/genesis/2.0/genesis-2.0.pom"
     },
     "org.apache.httpcomponents:httpclient:jar:4.5.13": {
       "layout": "org/apache/httpcomponents/httpclient/4.5.13/httpclient-4.5.13.jar",
@@ -1685,6 +1815,21 @@
       "sha256": "a3f97ceab5f073ed93ef8fe6304e35252d83ecf2442c83fe0492b8b73da3b40b",
       "url": "https://repo.maven.apache.org/maven2/org/apache/velocity/velocity/1.7/velocity-1.7.pom"
     },
+    "org.apache.xbean:xbean-reflect:jar:3.7": {
+      "layout": "org/apache/xbean/xbean-reflect/3.7/xbean-reflect-3.7.jar",
+      "sha256": "104e5e9bb5a669f86722f32281960700f7ec8e3209ef51b23eb9b6d23d1629cb",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/xbean/xbean-reflect/3.7/xbean-reflect-3.7.jar"
+    },
+    "org.apache.xbean:xbean-reflect:pom:3.7": {
+      "layout": "org/apache/xbean/xbean-reflect/3.7/xbean-reflect-3.7.pom",
+      "sha256": "9795c15322c5d19af336eebd9e164fa7d5897c4b004a7d66e21635a173e748a9",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/xbean/xbean-reflect/3.7/xbean-reflect-3.7.pom"
+    },
+    "org.apache.xbean:xbean:pom:3.7": {
+      "layout": "org/apache/xbean/xbean/3.7/xbean-3.7.pom",
+      "sha256": "ea717132de8404b62fc9097a1f3215c705d525d457be9a5f12653adc68c33ab7",
+      "url": "https://repo.maven.apache.org/maven2/org/apache/xbean/xbean/3.7/xbean-3.7.pom"
+    },
     "org.apache:apache:pom:11": {
       "layout": "org/apache/apache/11/apache-11.pom",
       "sha256": "9a4fb5addb41d8116b6441e9e3c48764d9cc562243d5608652bea6db0509297b",
@@ -1845,6 +1990,11 @@
       "sha256": "2b1aa2adef45630f4668144c7c22f829bf6d1f7d96aaeae178096c9dfcd05204",
       "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-archiver/4.2.1/plexus-archiver-4.2.1.pom"
     },
+    "org.codehaus.plexus:plexus-archiver:pom:4.9.0": {
+      "layout": "org/codehaus/plexus/plexus-archiver/4.9.0/plexus-archiver-4.9.0.pom",
+      "sha256": "ff107a37846c05b6f947ac64f930059221d411bb8196e0cd74973f1719fe4a00",
+      "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-archiver/4.9.0/plexus-archiver-4.9.0.pom"
+    },
     "org.codehaus.plexus:plexus-archiver:pom:4.9.2": {
       "layout": "org/codehaus/plexus/plexus-archiver/4.9.2/plexus-archiver-4.9.2.pom",
       "sha256": "7b4a569c92f60c859ae69594f8935d11bcbb940d86c518742c30f0925a48ba9f",
@@ -1980,6 +2130,16 @@
       "sha256": "1a5c0f95f65ed3e98edcf4f3b27c21cbcb14567384d9e4cf07f83a49675347ed",
       "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-components/4.0/plexus-components-4.0.pom"
     },
+    "org.codehaus.plexus:plexus-container-default:jar:2.1.1": {
+      "layout": "org/codehaus/plexus/plexus-container-default/2.1.1/plexus-container-default-2.1.1.jar",
+      "sha256": "8b65840e41ca669a1a69ec1daedb3426304e560b24172cc93bb02e8c199e1ce7",
+      "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-container-default/2.1.1/plexus-container-default-2.1.1.jar"
+    },
+    "org.codehaus.plexus:plexus-container-default:pom:2.1.1": {
+      "layout": "org/codehaus/plexus/plexus-container-default/2.1.1/plexus-container-default-2.1.1.pom",
+      "sha256": "0f5c6e592459262fc34942c2f4df370230ec2765dd4b707f54c269fdf5c5a7e3",
+      "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-container-default/2.1.1/plexus-container-default-2.1.1.pom"
+    },
     "org.codehaus.plexus:plexus-containers:pom:1.5.4": {
       "layout": "org/codehaus/plexus/plexus-containers/1.5.4/plexus-containers-1.5.4.pom",
       "sha256": "18b4a1b0a65c0d6b7cf9cd48ee9f3467b6deb8ace4c1309522c184f94c4cfa2e",
@@ -2004,6 +2164,11 @@
       "layout": "org/codehaus/plexus/plexus-containers/2.1.0/plexus-containers-2.1.0.pom",
       "sha256": "94d5aedb3c46023265396527cf8ce7fc944b7bd79e4ebab907386418eb5a08d7",
       "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-containers/2.1.0/plexus-containers-2.1.0.pom"
+    },
+    "org.codehaus.plexus:plexus-containers:pom:2.1.1": {
+      "layout": "org/codehaus/plexus/plexus-containers/2.1.1/plexus-containers-2.1.1.pom",
+      "sha256": "c129ae94bc6de8ba2596fcdad4b3fcfe4f67640a4cb6d76a5540182214aa833c",
+      "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-containers/2.1.1/plexus-containers-2.1.1.pom"
     },
     "org.codehaus.plexus:plexus-i18n:jar:1.0-beta-10": {
       "layout": "org/codehaus/plexus/plexus-i18n/1.0-beta-10/plexus-i18n-1.0-beta-10.jar",
@@ -2069,6 +2234,11 @@
       "layout": "org/codehaus/plexus/plexus-io/3.2.0/plexus-io-3.2.0.pom",
       "sha256": "726b07803e7aea9e03cc1da166b7c5d90d681b5b0c292f57a93cf5b07eaf7f80",
       "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-io/3.2.0/plexus-io-3.2.0.pom"
+    },
+    "org.codehaus.plexus:plexus-io:pom:3.4.1": {
+      "layout": "org/codehaus/plexus/plexus-io/3.4.1/plexus-io-3.4.1.pom",
+      "sha256": "7cd6047a0beec84b4d0d4c1a8ff4c9adb10c3f18e4fe18622f6ee7d4592b9a87",
+      "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-io/3.4.1/plexus-io-3.4.1.pom"
     },
     "org.codehaus.plexus:plexus-io:pom:3.4.2": {
       "layout": "org/codehaus/plexus/plexus-io/3.4.2/plexus-io-3.4.2.pom",
@@ -2175,6 +2345,11 @@
       "sha256": "f20db219a9c2ebbfea479a1c58a252d795689b8627d43442748d8a21e0052f57",
       "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/3.0.22/plexus-utils-3.0.22.pom"
     },
+    "org.codehaus.plexus:plexus-utils:pom:3.1.1": {
+      "layout": "org/codehaus/plexus/plexus-utils/3.1.1/plexus-utils-3.1.1.pom",
+      "sha256": "6e9ef6a42b78c418176d07882762f53664bc39bac88135be8cb56337c050e6dd",
+      "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/3.1.1/plexus-utils-3.1.1.pom"
+    },
     "org.codehaus.plexus:plexus-utils:pom:3.3.0": {
       "layout": "org/codehaus/plexus/plexus-utils/3.3.0/plexus-utils-3.3.0.pom",
       "sha256": "79c9792073fdee3cdbebd61a76ba8c2dd11624a9f85d128bae56bda19e20475c",
@@ -2250,6 +2425,11 @@
       "sha256": "575945dc08966c66eb03d5bae9135bd22ca3920a1865bb99d3ecd93bef55abd3",
       "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/13/plexus-13.pom"
     },
+    "org.codehaus.plexus:plexus:pom:15": {
+      "layout": "org/codehaus/plexus/plexus/15/plexus-15.pom",
+      "sha256": "96dc0fbe73664a0f05c6770910473c1a12e1c112cb648364fca867daa689c21d",
+      "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/15/plexus-15.pom"
+    },
     "org.codehaus.plexus:plexus:pom:16": {
       "layout": "org/codehaus/plexus/plexus/16/plexus-16.pom",
       "sha256": "68d4eed65a3dbbc342ed80dd138fbe9c67cb7fb4c2abc4f5201cdb5b9f645868",
@@ -2300,6 +2480,11 @@
       "sha256": "193be48e6ac6f88bef63e0c87b2ebd5691eb26330372331ed8fb03c5ae585147",
       "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/6.2/plexus-6.2.pom"
     },
+    "org.codehaus.plexus:plexus:pom:6.5": {
+      "layout": "org/codehaus/plexus/plexus/6.5/plexus-6.5.pom",
+      "sha256": "737ff2200498dd54c920712404caa4426d38639d05014ff3ef1b3e7c5bd91397",
+      "url": "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/6.5/plexus-6.5.pom"
+    },
     "org.codehaus.plexus:plexus:pom:8": {
       "layout": "org/codehaus/plexus/plexus/8/plexus-8.pom",
       "sha256": "ffa349db04e7abf65885bdc5a2062f4197c0ff9d3f1f4e2aa5720b77233f742c",
@@ -2344,6 +2529,26 @@
       "layout": "org/eclipse/sisu/sisu-inject/0.9.0.M3/sisu-inject-0.9.0.M3.pom",
       "sha256": "2e436563d5caea351bce5f0863ebc6376405cb65a6f664b255faad9e72e3b854",
       "url": "https://repo.maven.apache.org/maven2/org/eclipse/sisu/sisu-inject/0.9.0.M3/sisu-inject-0.9.0.M3.pom"
+    },
+    "org.fusesource.jansi:jansi-project:pom:1.18": {
+      "layout": "org/fusesource/jansi/jansi-project/1.18/jansi-project-1.18.pom",
+      "sha256": "02c836893cfd1f5459925a21635a5d2c41075442fb9673ad3cdaed573b9e800d",
+      "url": "https://repo.maven.apache.org/maven2/org/fusesource/jansi/jansi-project/1.18/jansi-project-1.18.pom"
+    },
+    "org.fusesource.jansi:jansi:jar:1.18": {
+      "layout": "org/fusesource/jansi/jansi/1.18/jansi-1.18.jar",
+      "sha256": "109e64fc65767c7a1a3bd654709d76f107b0a3b39db32cbf11139e13a6f5229b",
+      "url": "https://repo.maven.apache.org/maven2/org/fusesource/jansi/jansi/1.18/jansi-1.18.jar"
+    },
+    "org.fusesource.jansi:jansi:pom:1.18": {
+      "layout": "org/fusesource/jansi/jansi/1.18/jansi-1.18.pom",
+      "sha256": "dd8f619c2c2a4d7b6f81589428db770514528e59ce0532f0718fee33a265fb4b",
+      "url": "https://repo.maven.apache.org/maven2/org/fusesource/jansi/jansi/1.18/jansi-1.18.pom"
+    },
+    "org.fusesource:fusesource-pom:pom:1.11": {
+      "layout": "org/fusesource/fusesource-pom/1.11/fusesource-pom-1.11.pom",
+      "sha256": "695db8335e33de3d403b3d1f0425970f3710a9db4a528ec460199055ef1e8ab8",
+      "url": "https://repo.maven.apache.org/maven2/org/fusesource/fusesource-pom/1.11/fusesource-pom-1.11.pom"
     },
     "org.hamcrest:hamcrest-core:pom:1.3": {
       "layout": "org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.pom",
@@ -2599,6 +2804,56 @@
       "layout": "org/powermock/powermock-reflect/2.0.5/powermock-reflect-2.0.5.pom",
       "sha256": "fc7a3c1313033a5542401b9b77fff12a7949d1cc2c808c8b746dbef8b6159760",
       "url": "https://repo.maven.apache.org/maven2/org/powermock/powermock-reflect/2.0.5/powermock-reflect-2.0.5.pom"
+    },
+    "org.scala-lang.modules:scala-collection-compat_2.12:jar:2.12.0": {
+      "layout": "org/scala-lang/modules/scala-collection-compat_2.12/2.12.0/scala-collection-compat_2.12-2.12.0.jar",
+      "sha256": "1619c5e4399e1e4793667970aae232652db0549e795c90abf91e44c55ec37cb3",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/modules/scala-collection-compat_2.12/2.12.0/scala-collection-compat_2.12-2.12.0.jar"
+    },
+    "org.scala-lang.modules:scala-collection-compat_2.12:pom:2.12.0": {
+      "layout": "org/scala-lang/modules/scala-collection-compat_2.12/2.12.0/scala-collection-compat_2.12-2.12.0.pom",
+      "sha256": "02c3511378c3a0568f4b1b150a385637af86bcf5f8cab642f28b71622bf9ed4b",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/modules/scala-collection-compat_2.12/2.12.0/scala-collection-compat_2.12-2.12.0.pom"
+    },
+    "org.scala-lang.modules:scala-collection-compat_2.12:pom:2.9.0": {
+      "layout": "org/scala-lang/modules/scala-collection-compat_2.12/2.9.0/scala-collection-compat_2.12-2.9.0.pom",
+      "sha256": "121c56a0ab0ebcd82269b94b66a330a892b8fbfa91073549e9cf9695d5fb0d48",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/modules/scala-collection-compat_2.12/2.9.0/scala-collection-compat_2.12-2.9.0.pom"
+    },
+    "org.scala-lang.modules:scala-xml_2.12:jar:2.3.0": {
+      "layout": "org/scala-lang/modules/scala-xml_2.12/2.3.0/scala-xml_2.12-2.3.0.jar",
+      "sha256": "4932c56a2d5aae77ae8d7ac6bed1f21d48268fdbac8b4e5f3ca5196ad10fd93e",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/modules/scala-xml_2.12/2.3.0/scala-xml_2.12-2.3.0.jar"
+    },
+    "org.scala-lang.modules:scala-xml_2.12:pom:2.3.0": {
+      "layout": "org/scala-lang/modules/scala-xml_2.12/2.3.0/scala-xml_2.12-2.3.0.pom",
+      "sha256": "45bc645f881f34e6338b478007c6dd93d17389a4f4138616ae7efa854baaaa46",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/modules/scala-xml_2.12/2.3.0/scala-xml_2.12-2.3.0.pom"
+    },
+    "org.scala-lang:scala-library:jar:2.12.18": {
+      "layout": "org/scala-lang/scala-library/2.12.18/scala-library-2.12.18.jar",
+      "sha256": "e51e6636c003359e106bea4ad99def70e613c290190c8c84f10f9560dd5b00ae",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.12.18/scala-library-2.12.18.jar"
+    },
+    "org.scala-lang:scala-library:pom:2.12.15": {
+      "layout": "org/scala-lang/scala-library/2.12.15/scala-library-2.12.15.pom",
+      "sha256": "4f3aae4c7f93bbe5afcdbed7b6ab560cec3aa3b465095f318534e11597901e89",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.12.15/scala-library-2.12.15.pom"
+    },
+    "org.scala-lang:scala-library:pom:2.12.17": {
+      "layout": "org/scala-lang/scala-library/2.12.17/scala-library-2.12.17.pom",
+      "sha256": "0dede34fd83e05fe15d226000d209d57249bb9d280b00c8735e783fcceecdbb5",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.12.17/scala-library-2.12.17.pom"
+    },
+    "org.scala-lang:scala-library:pom:2.12.18": {
+      "layout": "org/scala-lang/scala-library/2.12.18/scala-library-2.12.18.pom",
+      "sha256": "c7bcae55eb71211dcb3305fd5eaff1add551c53a8b6173c1c02d800c6eacf097",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.12.18/scala-library-2.12.18.pom"
+    },
+    "org.scala-lang:scala-library:pom:2.12.19": {
+      "layout": "org/scala-lang/scala-library/2.12.19/scala-library-2.12.19.pom",
+      "sha256": "c5646bbd1a8ee70a49db017312ecdc1af2b5602ec0106c43f8b8a9714cfacb54",
+      "url": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.12.19/scala-library-2.12.19.pom"
     },
     "org.slf4j:jcl-over-slf4j:pom:1.5.6": {
       "layout": "org/slf4j/jcl-over-slf4j/1.5.6/jcl-over-slf4j-1.5.6.pom",
@@ -2879,6 +3134,16 @@
       "layout": "org/tukaani/xz/1.9/xz-1.9.pom",
       "sha256": "093be1b03331bce2932d6825c37e98272d7621e6a9e9fb93289a002518b8dd5a",
       "url": "https://repo.maven.apache.org/maven2/org/tukaani/xz/1.9/xz-1.9.pom"
+    },
+    "org.virtuslab.scala-cli:config_2.12:jar:0.2.1": {
+      "layout": "org/virtuslab/scala-cli/config_2.12/0.2.1/config_2.12-0.2.1.jar",
+      "sha256": "6aa0a6b3450664fd77e82b19f557fd8842381c94da027f701f7c98a78db353bc",
+      "url": "https://repo.maven.apache.org/maven2/org/virtuslab/scala-cli/config_2.12/0.2.1/config_2.12-0.2.1.jar"
+    },
+    "org.virtuslab.scala-cli:config_2.12:pom:0.2.1": {
+      "layout": "org/virtuslab/scala-cli/config_2.12/0.2.1/config_2.12-0.2.1.pom",
+      "sha256": "1cf4d349c9f6b53fefe4db23b4a89e8b40384640cc484e718027d14373e6bfd2",
+      "url": "https://repo.maven.apache.org/maven2/org/virtuslab/scala-cli/config_2.12/0.2.1/config_2.12-0.2.1.pom"
     },
     "oro:oro:jar:2.0.8": {
       "layout": "oro/oro/2.0.8/oro-2.0.8.jar",

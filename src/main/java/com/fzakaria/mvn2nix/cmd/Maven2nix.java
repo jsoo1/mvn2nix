@@ -12,19 +12,6 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import eu.maveniverse.maven.mima.context.Context;
-import eu.maveniverse.maven.mima.context.ContextOverrides;
-import eu.maveniverse.maven.mima.context.Runtimes;
-import eu.maveniverse.maven.mima.context.ContextOverrides.AddRepositoriesOp;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.building.DefaultModelBuilderFactory;
-import org.apache.maven.model.building.ModelBuilder;
-import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.project.ProjectModelResolver;
-import org.apache.maven.project.PublicReactorModelPool;
-import org.eclipse.aether.RequestTrace;
-import org.eclipse.aether.impl.RemoteRepositoryManager;
-import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -132,37 +119,10 @@ public class Maven2nix implements Callable<Integer> {
             break;
 
         case NIX:
-            List<RemoteRepository> repos = Arrays.asList(repositories).stream()
-                .map(url -> new RemoteRepository.Builder(null, null, url).build())
-                .collect(Collectors.toList());
-
-            ContextOverrides overrides = ContextOverrides.create()
-                .repositories(repos)
-                .withUserSettings(true)
-                .build();
-
-            Context ctx = Runtimes.INSTANCE.getRuntime().create(overrides);
-
-            RemoteRepositoryManager remoteRepositoryManager = ctx.lookup()
-                .lookup(RemoteRepositoryManager.class)
-                .orElseThrow(() -> new IllegalStateException("component not found"));
-
-            ProjectModelResolver resolver = new ProjectModelResolver(
-                ctx.repositorySystemSession(),
-                new RequestTrace(null),
-                ctx.repositorySystem(),
-                remoteRepositoryManager,
-                ctx.remoteRepositories(),
-                ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
-                new PublicReactorModelPool()
-            );
-
-            Path localRepository = ctx.repositorySystemSession().getLocalRepository().getBasedir().toPath();
-
             if (outDir != null) {
-                NixPackageSet.collectDir(localRepository, Graph.read(ctx, resolver, file)).write(outDir);
+                NixPackageSet.collectDir(Graph.resolve(file)).write(outDir);
             } else {
-                Expr pkgs = NixPackageSet.collect(localRepository, Graph.read(ctx, resolver, file));
+                Expr pkgs = NixPackageSet.collect(Graph.resolve(file));
 
                 BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 
