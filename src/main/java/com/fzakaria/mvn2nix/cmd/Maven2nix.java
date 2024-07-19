@@ -13,6 +13,9 @@ import com.google.common.io.Files;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import eu.maveniverse.maven.mima.context.Context;
+import eu.maveniverse.maven.mima.context.ContextOverrides;
+import eu.maveniverse.maven.mima.context.Runtimes;
+import eu.maveniverse.maven.mima.context.ContextOverrides.AddRepositoriesOp;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.ModelBuilder;
@@ -21,6 +24,7 @@ import org.apache.maven.project.ProjectModelResolver;
 import org.apache.maven.project.PublicReactorModelPool;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -42,6 +46,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -88,10 +93,7 @@ public class Maven2nix implements Callable<Integer> {
             description = "With NIX output type, the directory to write to, otherwise stdout")
     private Path outDir;
 
-    public Context ctx;
-
-    public Maven2nix(Context c) {
-        ctx = c;
+    public Maven2nix() {
     }
 
     @Override
@@ -130,6 +132,17 @@ public class Maven2nix implements Callable<Integer> {
             break;
 
         case NIX:
+            List<RemoteRepository> repos = Arrays.asList(repositories).stream()
+                .map(url -> new RemoteRepository.Builder(null, null, url).build())
+                .collect(Collectors.toList());
+
+            ContextOverrides overrides = ContextOverrides.create()
+                .repositories(repos)
+                .withUserSettings(true)
+                .build();
+
+            Context ctx = Runtimes.INSTANCE.getRuntime().create(overrides);
+
             RemoteRepositoryManager remoteRepositoryManager = ctx.lookup()
                 .lookup(RemoteRepositoryManager.class)
                 .orElseThrow(() -> new IllegalStateException("component not found"));
