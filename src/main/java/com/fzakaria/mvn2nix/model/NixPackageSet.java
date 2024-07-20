@@ -35,8 +35,6 @@ import java.util.stream.Collectors;
   Inspired by importers in `guix`.
 */
 public class NixPackageSet {
-    private static Logger LOGGER = LoggerFactory.getLogger(NixPackageSet.class.getClass());
-
     public static String LIB = "lib";
     public static String NEW_SCOPE = "newScope";
     public static String PKGS = "pkgs";
@@ -82,22 +80,15 @@ public class NixPackageSet {
         Graph.Res r = e.getValue();
 
         List<Dependency> deps = r.dependencies.stream()
-            .filter(d_ -> !d.equals(d_)) // FIXME(jsoo1): Need to filter on canonical name
+            .filter(d_ -> !d.equals(d_))
             .collect(Collectors.toList());
 
-        return new Fn(param(deps), body(d, deps, r.artifacts));
-    }
+        Param params = new AttrPattern(Stream.concat(
+            Arrays.stream(packageParams),
+            deps.stream().map(NixPackageSet::attrName)
+        ).toArray(String[]::new));
 
-    public static Param param(List<Dependency> deps) {
-        Stream<String> otherParams = Arrays.stream(packageParams);
-
-        return new AttrPattern(Stream.concat(otherParams, deps.stream().map(NixPackageSet::attrName)).toArray(String[]::new));
-    }
-
-    public static Expr body(Dependency d, List<Dependency> deps, List<Tuple2<Artifact, Optional<File>>> artifacts) {
-        Stream.Builder<Map.Entry<String, Expr>> args = Stream.builder();
-
-        return new App(new Var(BUILDER), new Attrs(Stream.of(
+        Expr args = new App(new Var(BUILDER), new Attrs(Stream.of(
             pair("name", new LitS(canonName(d))),
             pair("version", new LitS(d.version())),
             pair("module", new Attrs(Stream.of(
@@ -110,10 +101,12 @@ public class NixPackageSet {
                       .orElse(new Null())),
             pair("extension", new LitS(d.publication().ext())),
             pair("type", new LitS(d.publication().type())),
-            pair("raw", new LitL(artifacts.stream().map(a -> new Paren(artifact(a._1, a._2))))),
+            pair("raw", new LitL(r.artifacts.stream().map(a -> new Paren(artifact(a._1, a._2))))),
             pair("dependencies", new LitL(deps.stream().map(NixPackageSet::dep))),
             pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryBytecode")}))
         )));
+
+        return new Fn(params, args);
     }
 
     public static Expr dep(Dependency d) {
