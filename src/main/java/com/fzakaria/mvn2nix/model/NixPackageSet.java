@@ -42,11 +42,11 @@ public class NixPackageSet {
     public static String LIB = "lib";
     public static String NEW_SCOPE = "newScope";
     public static String PKGS = "pkgs";
-    public static String BUILDER = "patchMavenJar";
+    public static String PATCH_MAVEN_JAR = "patchMavenJar";
 
     public static String[] packageSetParams = new String[]{LIB, NEW_SCOPE};
 
-    public static String[] packageParams = new String[]{LIB, PKGS, BUILDER};
+    public static String[] packageParams = new String[]{LIB, PKGS, PATCH_MAVEN_JAR};
 
     public static Expr collect(Map<Dependency, Graph.Res> resolved) {
         return packageSet(new Attrs(resolved.entrySet().stream().map(e -> callPackage(e))));
@@ -92,7 +92,7 @@ public class NixPackageSet {
             deps.stream().map(NixPackageSet::attrName)
         ).toArray(String[]::new));
 
-        Expr args = new App(new Var(BUILDER), new Attrs(Stream.of(
+        Expr args = new App(new Var(PATCH_MAVEN_JAR), new Attrs(Stream.of(
             pair("name", new LitS(canonName(d))),
             pair("module", new Attrs(Stream.of(
                 pair("organization", new LitS(d.module().organization())),
