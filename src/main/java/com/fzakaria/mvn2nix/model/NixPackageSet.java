@@ -32,6 +32,11 @@ import java.util.stream.Collectors;
   allows users to import and contribute them easily.
 
   Inspired by importers in `guix`.
+
+  NB: This generates a thing that is more like ivy than a maven
+  specification. This is not because we generate ivy repositories on
+  the other end so much as we reserve the right to. (Ivy layouts can
+  be translated to Maven but not vice-versa).
 */
 public class NixPackageSet {
     public static String LIB = "lib";
