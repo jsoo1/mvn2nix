@@ -1,14 +1,13 @@
 package com.fzakaria.mvn2nix.model;
 
-import coursier.util.Artifact;
-import coursier.core.Dependency;
 import com.fzakaria.mvn2nix.maven.Graph;
 import com.fzakaria.mvn2nix.model.nix.*;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import scala.Tuple2;
+import coursier.core.Dependency;
+import coursier.core.Publication;
+import coursier.util.Artifact;
+import scala.Tuple3;
 
 import java.util.function.Predicate;
 import java.io.BufferedWriter;
@@ -90,18 +89,16 @@ public class NixPackageSet {
 
         Expr args = new App(new Var(BUILDER), new Attrs(Stream.of(
             pair("name", new LitS(canonName(d))),
-            pair("version", new LitS(d.version())),
             pair("module", new Attrs(Stream.of(
                 pair("organization", new LitS(d.module().organization())),
                 pair("name", new LitS(d.module().name()))
             ))),
+            pair("version", new LitS(d.version())),
             pair("classifier", Optional.ofNullable(d.publication().classifier())
                       .filter(Predicate.not(String::isEmpty))
                       .map(s -> (Expr) new LitS(s))
                       .orElse(new Null())),
-            pair("extension", new LitS(d.publication().ext())),
-            pair("type", new LitS(d.publication().type())),
-            pair("raw", new LitL(r.artifacts.stream().map(a -> new Paren(artifact(a._1, a._2))))),
+            pair("raw", new LitL(r.artifacts.stream().map(a -> new Paren(artifact(a._1(), a._2(), a._3()))))),
             pair("dependencies", new LitL(deps.stream().map(NixPackageSet::dep))),
             pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryBytecode")}))
         )));
@@ -116,13 +113,15 @@ public class NixPackageSet {
         ));
     }
 
-    public static Expr artifact(Artifact a, Optional<File> file) {
+    public static Expr artifact(Publication p, Artifact a, Optional<File> file) {
         return new App(new Var(PKGS + ".fetchurl"), new Attrs(Stream.of(
             pair("url", new LitS(a.url())),
             pair("sha256", file
                  .map(f -> (Expr) new LitS(sha256(f)))
-                 .orElse((Expr) new Null())))
-        ));
+                 .orElse((Expr) new Null())),
+            pair("type", new LitS(p.type())),
+            pair("extension", new LitS(p.ext()))
+        )));
     }
 
     public static <T, U> Map.Entry<T, U> pair(T x, U y) {

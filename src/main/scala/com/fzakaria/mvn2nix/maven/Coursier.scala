@@ -19,55 +19,25 @@ object Coursier {
     val fetched =
       Fetch().withDependencies(dependencies).runResult()
 
-    val artifacts: Seq[(Dependency, Seq[(util.Artifact, Option[File])])] =
-      fetched.resolution
-        .dependencyArtifacts(true)
-        .map((x: (Dependency, util.Artifact)) =>
-          (
-            x._1,
-            fetched.fullArtifacts
-              .filter((y: (util.Artifact, Option[File])) => x._1 == y._2)
-          )
-        )
+    val m = fetched.resolution.minDependencies.map((d: Dependency) => {
+      val a: Seq[(core.Publication, util.Artifact, java.util.Optional[File])] = fetched.fullDetailedArtifacts
+        .flatMap(_ match {
+          case (d2, p, a, f) =>
+            if (d == d2) { (p, a, f.asJava) :: Nil }
+            else { Nil }
+        })
 
-    val m: Map[
-      Dependency,
-      (Seq[Dependency], Seq[(util.Artifact, Option[File])])
-    ] =
-      fetched.resolution.finalDependenciesCache.map(
-        (x: (Dependency, Seq[Dependency])) =>
-          (
-            x._1,
-            (
-              x._2,
-              artifacts.flatMap(
-                (y: (Dependency, Seq[(util.Artifact, Option[File])])) =>
-                  if (x._1 == y._1) { y._2 }
-                  else { Nil }
-              )
-            )
-          )
-      )
+      val ds = fetched.resolution.dependenciesOf(d, true)
 
-    m.map(
-      (x: (
-          Dependency,
-          (Seq[Dependency], Seq[(util.Artifact, Option[File])])
-      )) =>
-        (
-          x._1,
-          new Res(
-            x._2._1.asJava,
-            x._2._2.map(y => (y._1, y._2.asJava)).asJava
-          )
-        )
-    ).asJava
+      (d, new Res(ds.asJava, a.asJava))
+    })
+
+    m.toMap.asJava
   }
-
   class Res(
       val dependencies: java.util.List[Dependency],
       val artifacts: java.util.List[
-        (util.Artifact, java.util.Optional[File])
+        (core.Publication, util.Artifact, java.util.Optional[File])
       ]
   )
 
