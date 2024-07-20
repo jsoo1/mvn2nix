@@ -12,11 +12,25 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import eu.maveniverse.maven.mima.context.Context;
+import eu.maveniverse.maven.mima.context.ContextOverrides;
+import eu.maveniverse.maven.mima.context.Runtimes;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.building.DefaultModelBuilderFactory;
+import org.apache.maven.model.building.DefaultModelBuilderFactory;
+import org.apache.maven.model.building.DefaultModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuilder;
+import org.apache.maven.model.building.ModelBuildingException;
+import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectModelResolver;
+import org.apache.maven.project.ProjectModelResolver;
+import org.apache.maven.project.PublicReactorModelPool;
+import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.ITypeConverter;
-import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -46,6 +60,8 @@ import java.util.stream.Collectors;
 public class Maven2nix implements Callable<Integer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Maven2nix.class);
+
+    private static DefaultModelBuilderFactory factory = new DefaultModelBuilderFactory();
 
     @Spec
     CommandSpec spec;
@@ -119,10 +135,30 @@ public class Maven2nix implements Callable<Integer> {
             break;
 
         case NIX:
+            ContextOverrides overrides = ContextOverrides.create()
+                .withUserSettings(true)
+                .build();
+
+            Context ctx = Runtimes.INSTANCE.getRuntime().create(overrides);
+
+            RemoteRepositoryManager remoteRepositoryManager = ctx.lookup()
+                .lookup(RemoteRepositoryManager.class)
+                .orElseThrow(() -> new IllegalStateException("component not found"));
+
+            ProjectModelResolver resolver = new ProjectModelResolver(
+                ctx.repositorySystemSession(),
+                new RequestTrace(null),
+                ctx.repositorySystem(),
+                remoteRepositoryManager,
+                ctx.remoteRepositories(),
+                ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
+                new PublicReactorModelPool()
+            );
+
             if (outDir != null) {
-                NixPackageSet.collectDir(Graph.resolve(file)).write(outDir);
+                NixPackageSet.collectDir(Graph.resolve(readPOM(resolver, file))).write(outDir);
             } else {
-                Expr pkgs = NixPackageSet.collect(Graph.resolve(file));
+                Expr pkgs = NixPackageSet.collect(Graph.resolve(readPOM(resolver, file)));
 
                 BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 
@@ -135,6 +171,19 @@ public class Maven2nix implements Callable<Integer> {
         }
 
         return 0;
+    }
+
+
+    public static Model readPOM(ProjectModelResolver resolver, Path pom) throws IOException {
+        ModelBuildingRequest req = new DefaultModelBuildingRequest();
+
+        req.setPomFile(pom.toFile()).setModelResolver(resolver);
+
+        try {
+            return factory.newInstance().build(req).getEffectiveModel();
+        } catch (ModelBuildingException e) {
+            throw new IOException(e.getMessage(), (Throwable) e);
+        }
     }
 
     /**

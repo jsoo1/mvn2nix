@@ -137,21 +137,7 @@ public class NixPackageSet {
     }
 
     public static String attrName(Dependency dep) {
-        return Stream.of(
-            Optional.of(dep.mavenPrefix()),
-            Optional.of(dep.version())
-        )
-            .flatMap(Optional::stream)
-            .filter(Predicate.not(String::isEmpty))
-            .map(s -> s.replaceAll("\\.", "_"))
-            .collect(Collectors.joining("__"));
-    }
-
-    public static Expr[] scopedDeps(List<Dependency> deps, String scope) {
-        return deps.stream()
-            .filter(d -> d.configuration().equals(scope))
-            .map(d -> new Var(NixPackageSet.attrName(d)))
-            .toArray(Expr[]::new);
+        return canonName(dep).replaceAll("\\.", "_").replaceAll(":", "__");
     }
 
     public static String canonName(Dependency d) {

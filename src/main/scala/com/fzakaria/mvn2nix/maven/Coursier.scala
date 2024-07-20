@@ -1,20 +1,23 @@
 package com.fzakaria.mvn2nix.maven
 
 import coursier._
-import coursier.maven.PomParser
 import coursier.core.compatibility.xmlParseSax
-import scala.jdk.javaapi.CollectionConverters
+import org.apache.maven.model.Model
 import scala.jdk.OptionConverters._
+import scala.collection.JavaConverters._
 
 import java.nio.file.Path
 import java.io.File
 
 object Coursier {
-  def resolvePOM(pom: Path): java.util.Map[Dependency, Res] = {
-    val proj = readPOM(pom)
+  def resolvePOM(pom: Model): java.util.Map[Dependency, Res] = {
+    val dependencies: Seq[Dependency] = pom
+      .getDependencies()
+      .asScala
+      .map(mavenToCoursier(_))
 
     val fetched =
-      Fetch().withDependencies(proj.dependencies.map(_._2)).runResult()
+      Fetch().withDependencies(dependencies).runResult()
 
     val artifacts: Seq[(Dependency, Seq[(util.Artifact, Option[File])])] =
       fetched.resolution
@@ -46,40 +49,19 @@ object Coursier {
           )
       )
 
-    CollectionConverters.mapAsJavaMap(
-      m.map(
-        (x: (
-            Dependency,
-            (Seq[Dependency], Seq[(util.Artifact, Option[File])])
-        )) =>
-          (
-            x._1,
-            new Res(
-              CollectionConverters.seqAsJavaList(x._2._1),
-              CollectionConverters.seqAsJavaList(
-                x._2._2.map(y => (y._1, y._2.asJava))
-              )
-            )
+    m.map(
+      (x: (
+          Dependency,
+          (Seq[Dependency], Seq[(util.Artifact, Option[File])])
+      )) =>
+        (
+          x._1,
+          new Res(
+            x._2._1.asJava,
+            x._2._2.map(y => (y._1, y._2.asJava)).asJava
           )
-      )
-    )
-  }
-
-  def readPOM(pom: java.nio.file.Path): Project = {
-    val src = scala.io.Source.fromFile(pom.toFile())
-
-    try {
-      val contents = src.mkString
-
-      val project = xmlParseSax(contents, new PomParser).project match {
-        case Left(e)        => throw new java.io.IOException(e)
-        case Right(project) => project
-      }
-
-      project
-    } finally {
-      src.close()
-    }
+        )
+    ).asJava
   }
 
   class Res(
@@ -88,4 +70,15 @@ object Coursier {
         (util.Artifact, java.util.Optional[File])
       ]
   )
+
+  def mavenToCoursier(d: org.apache.maven.model.Dependency): Dependency = {
+    Dependency(
+      Module(
+        Organization(d.getGroupId()),
+        new ModuleName(d.getArtifactId()),
+        Map.empty
+      ),
+      d.getVersion()
+    )
+  }
 }

@@ -2,16 +2,17 @@ package com.fzakaria.mvn2nix.maven;
 
 import coursier.core.Dependency;
 import coursier.util.Artifact;
+import org.apache.maven.model.Model;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 public class Graph {
-    public static Map<Dependency, Res> resolve(final java.nio.file.Path pomfile) throws IOException {
-        return Coursier.resolvePOM(pomfile).entrySet().stream().collect(Collectors.toMap(
+    public static Map<Dependency, Res> resolve(final Model m) throws IOException {
+        return Coursier.resolvePOM(m).entrySet().stream().collect(Collectors.toMap(
             Map.Entry::getKey,
             (Map.Entry<Dependency, Coursier.Res> e) -> new Res(e.getValue()),
             (x1, x2) -> x2
