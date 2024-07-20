@@ -103,7 +103,7 @@ public class NixPackageSet {
                       .filter(Predicate.not(String::isEmpty))
                       .map(s -> (Expr) new LitS(s))
                       .orElse(new Null())),
-            pair("raw", new LitL(r.artifacts.stream().map(a -> new Paren(artifact(a._1(), a._2(), a._3()))))),
+            pair("raw", new LitL(r.artifacts.stream().map(a -> artifact(a._1(), a._2(), a._3())))),
             pair("dependencies", new LitL(deps.stream().map(NixPackageSet::dep))),
             pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryBytecode")}))
         )));
@@ -119,14 +119,16 @@ public class NixPackageSet {
     }
 
     public static Expr artifact(Publication p, Artifact a, Optional<File> file) {
-        return new App(new Var(PKGS + ".fetchurl"), new Attrs(Stream.of(
-            pair("url", new LitS(a.url())),
-            pair("sha256", file
-                 .map(f -> (Expr) new LitS(sha256(f)))
-                 .orElse((Expr) new Null())),
-            pair("type", new LitS(p.type())),
-            pair("extension", new LitS(p.ext()))
-        )));
+        return new Attrs(Stream.of(
+            // This must not be "type" lest nix interpret it as a drv
+            pair("_type", new LitS(p.type())),
+            pair("extension", new LitS(p.ext())),
+            pair("drv", new App(new Var(PKGS + ".fetchurl"), new Attrs(Stream.of(
+                pair("url", new LitS(a.url())),
+                pair("sha256", file
+                     .map(f -> (Expr) new LitS(sha256(f)))
+                     .orElse((Expr) new Null()))
+        ))))));
     }
 
     public static <T, U> Map.Entry<T, U> pair(T x, U y) {
