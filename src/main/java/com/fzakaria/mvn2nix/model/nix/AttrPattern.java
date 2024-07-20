@@ -16,13 +16,13 @@ public class AttrPattern extends Param implements Write {
 
         w.write("{");
 
-        for (String name: attrNames) {
+        for (int i = 0; i < attrNames.length; i++) {
             if (!written) {
                 written = true;
 
-                w.write(" "); w.write(name);
+                indent(ind, w); w.write("  "); w.write(attrNames[i]);
             } else {
-                indent(ind, w); w.write(", "); w.write(name);
+                indent(ind, w); w.write(", "); w.write(attrNames[i]);
             }
         }
 

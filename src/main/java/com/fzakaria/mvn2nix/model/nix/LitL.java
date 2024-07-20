@@ -22,7 +22,7 @@ public class LitL extends Expr implements Write {
         w.write("[");
 
         for (Expr v: vals) {
-            indent(ind + INDENT_WIDTH, w); v.write(ind, w);
+            indent(ind + INDENT_WIDTH, w); v.write(ind + INDENT_WIDTH, w);
         }
 
         if (vals.size() != 0) {
