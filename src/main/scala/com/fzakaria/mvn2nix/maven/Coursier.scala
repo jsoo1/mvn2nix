@@ -10,22 +10,29 @@ import java.nio.file.Path
 import java.io.File
 
 object Coursier {
-  def resolvePOM(pom: Model): java.util.Map[Dependency, Res] = {
-    val dependencies: Seq[Dependency] = pom
-      .getDependencies()
-      .asScala
-      .map(mavenToCoursier(_))
+  def resolvePOM(
+      pom: Model,
+      resolveRoots: Boolean
+  ): java.util.Map[Dependency, Res] = {
+    val todo: Seq[Dependency] = if (resolveRoots) {
+      mavenToCoursier(pom) :: Nil
+    } else {
+      pom
+        .getDependencies()
+        .asScala
+        .map(mavenToCoursier(_))
+    }
 
-    val fetched =
-      Fetch().withDependencies(dependencies).runResult()
+    val fetched = Fetch().withDependencies(todo).runResult()
 
     val m = fetched.resolution.minDependencies.map((d: Dependency) => {
-      val a: Seq[(core.Publication, util.Artifact, java.util.Optional[File])] = fetched.fullDetailedArtifacts
-        .flatMap(_ match {
-          case (d2, p, a, f) =>
-            if (d == d2) { (p, a, f.asJava) :: Nil }
-            else { Nil }
-        })
+      val a: Seq[(core.Publication, util.Artifact, java.util.Optional[File])] =
+        fetched.fullDetailedArtifacts
+          .flatMap(_ match {
+            case (d2, p, a, f) =>
+              if (d == d2) { (p, a, f.asJava) :: Nil }
+              else { Nil }
+          })
 
       val ds = fetched.resolution.dependenciesOf(d, true)
 
@@ -42,6 +49,17 @@ object Coursier {
   )
 
   def mavenToCoursier(d: org.apache.maven.model.Dependency): Dependency = {
+    Dependency(
+      Module(
+        Organization(d.getGroupId()),
+        new ModuleName(d.getArtifactId()),
+        Map.empty
+      ),
+      d.getVersion()
+    )
+  }
+
+  def mavenToCoursier(d: org.apache.maven.model.Model): Dependency = {
     Dependency(
       Module(
         Organization(d.getGroupId()),

@@ -96,6 +96,11 @@ public class Maven2nix implements Callable<Integer> {
             description = "With NIX output type, the directory to write to, otherwise stdout")
     private Path outDir;
 
+    @Option(names = "--resolve-roots",
+            description = "Also fetch and resolve artifacts for specified poms. Helpful if project is not published.",
+            defaultValue = "false")
+    private boolean resolveRoots;
+
     public Maven2nix() {
     }
 
@@ -156,9 +161,9 @@ public class Maven2nix implements Callable<Integer> {
             );
 
             if (outDir != null) {
-                NixPackageSet.collectDir(Graph.resolve(readPOM(resolver, file))).write(outDir);
+                NixPackageSet.collectDir(Graph.resolve(readPOM(resolver, file), resolveRoots)).write(outDir);
             } else {
-                Expr pkgs = NixPackageSet.collect(Graph.resolve(readPOM(resolver, file)));
+                Expr pkgs = NixPackageSet.collect(Graph.resolve(readPOM(resolver, file), resolveRoots));
 
                 BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 

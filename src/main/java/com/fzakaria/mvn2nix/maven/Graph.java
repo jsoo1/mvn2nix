@@ -14,8 +14,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Graph {
-    public static Map<Dependency, Res> resolve(final Model m) throws IOException {
-        return Coursier.resolvePOM(m).entrySet().stream().collect(Collectors.toMap(
+    public static Map<Dependency, Res> resolve(final Model m, final boolean resolveRoots) throws IOException {
+        return Coursier.resolvePOM(m, resolveRoots).entrySet().stream().collect(Collectors.toMap(
             Map.Entry::getKey,
             (Map.Entry<Dependency, Coursier.Res> e) -> new Res(e.getValue()),
             (x1, x2) -> x2
