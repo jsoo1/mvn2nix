@@ -8,6 +8,8 @@ self: super: {
     jdk = self.jdk17_headless;
   };
 
+  patchMavenJar = self.callPackage ./patch-maven-jar.nix { };
+
   buildMavenRepository =
     (self.callPackage ./maven.nix { }).buildMavenRepository;
 
