@@ -88,7 +88,7 @@ public class Maven2nix implements Callable<Integer> {
     private Path javaHome;
 
     @Option(names = "--output-type",
-            description = "Output type, one of NIX or JSON",
+            description = "Output type, one of NIX, NIX_ROOT or JSON",
             defaultValue = "JSON")
     private OutputType outType;
 
@@ -97,7 +97,7 @@ public class Maven2nix implements Callable<Integer> {
     private Path outDir;
 
     @Option(names = "--resolve-roots",
-            description = "Also fetch and resolve artifacts for specified poms. Helpful if project is not published.",
+            description = "Also fetch and resolve artifacts for specified poms. Helpful if roots come from a repository.",
             defaultValue = "false")
     private boolean resolveRoots;
 
@@ -139,47 +139,59 @@ public class Maven2nix implements Callable<Integer> {
             spec.commandLine().getOut().println(toPrettyJson(information));
             break;
 
-        case NIX:
-            ContextOverrides overrides = ContextOverrides.create()
-                .withUserSettings(true)
-                .build();
+        case NIX: doNix(file, resolveRoots, outDir); break;
 
-            Context ctx = Runtimes.INSTANCE.getRuntime().create(overrides);
-
-            RemoteRepositoryManager remoteRepositoryManager = ctx.lookup()
-                .lookup(RemoteRepositoryManager.class)
-                .orElseThrow(() -> new IllegalStateException("component not found"));
-
-            ProjectModelResolver resolver = new ProjectModelResolver(
-                ctx.repositorySystemSession(),
-                new RequestTrace(null),
-                ctx.repositorySystem(),
-                remoteRepositoryManager,
-                ctx.remoteRepositories(),
-                ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
-                new PublicReactorModelPool()
-            );
-
-            if (outDir != null) {
-                NixPackageSet.collectDir(Graph.resolve(readPOM(resolver, file), resolveRoots)).write(outDir);
-            } else {
-                Expr pkgs = NixPackageSet.collect(Graph.resolve(readPOM(resolver, file), resolveRoots));
-
-                BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
-
-                pkgs.write(0, w);
-
-                w.flush();
-            }
-
-            break;
+        case NIX_ROOT: doNixRoot(file); break;
         }
 
         return 0;
     }
 
+    public static void doNix(Path file, boolean resolveRoots, Path outDir) throws IOException {
+        if (outDir != null) {
+            NixPackageSet.collectDir(Graph.resolve(readPOM(file), resolveRoots)).write(outDir);
+        } else {
+            Expr pkgs = NixPackageSet.collect(Graph.resolve(readPOM(file), resolveRoots));
 
-    public static Model readPOM(ProjectModelResolver resolver, Path pom) throws IOException {
+            BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
+
+            pkgs.write(0, w);
+
+            w.flush();
+        }
+    }
+
+    public static void doNixRoot(Path pom) throws IOException {
+        Expr callPackageFn = NixPackageSet.collectSelf(Graph.self(readPOM(pom)));
+
+        BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
+
+        callPackageFn.write(0, w);
+
+        w.flush();
+    }
+
+    public static Model readPOM(Path pom) throws IOException {
+        ContextOverrides overrides = ContextOverrides.create()
+            .withUserSettings(true)
+            .build();
+
+        Context ctx = Runtimes.INSTANCE.getRuntime().create(overrides);
+
+        RemoteRepositoryManager remoteRepositoryManager = ctx.lookup()
+            .lookup(RemoteRepositoryManager.class)
+            .orElseThrow(() -> new IllegalStateException("component not found"));
+
+        ProjectModelResolver resolver = new ProjectModelResolver(
+            ctx.repositorySystemSession(),
+            new RequestTrace(null),
+            ctx.repositorySystem(),
+            remoteRepositoryManager,
+            ctx.remoteRepositories(),
+            ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
+            new PublicReactorModelPool()
+        );
+
         ModelBuildingRequest req = new DefaultModelBuildingRequest();
 
         req.setPomFile(pom.toFile()).setModelResolver(resolver);
@@ -255,5 +267,5 @@ public class Maven2nix implements Callable<Integer> {
         return false;
     }
 
-    public enum OutputType { JSON, NIX }
+    public enum OutputType { JSON, NIX, NIX_ROOT }
 }

@@ -52,6 +52,10 @@ public class NixPackageSet {
         return packageSet(new Attrs(resolved.entrySet().stream().map(e -> callPackage(e))));
     }
 
+    public static Expr collectSelf(Map.Entry<Dependency, Graph.Res> resolved) {
+        return callPackageFn(resolved);
+    }
+
     public static OutputDir collectDir(Map<Dependency, Graph.Res> resolved) {
         return new OutputDir(resolved.entrySet().stream().collect(Collectors.toMap(
             (Map.Entry<Dependency, Graph.Res> e) -> new File(attrName(e.getKey())).toPath(),
