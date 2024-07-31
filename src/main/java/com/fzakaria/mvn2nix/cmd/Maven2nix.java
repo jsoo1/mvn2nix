@@ -141,17 +141,21 @@ public class Maven2nix implements Callable<Integer> {
 
         case NIX: doNix(file, resolveRoots, outDir); break;
 
-        case NIX_ROOT: doNixRoot(file); break;
+        case NIX_ROOT: doNixRoot(readPOM(file)); break;
         }
 
         return 0;
     }
 
     public static void doNix(Path file, boolean resolveRoots, Path outDir) throws IOException {
+        Model pom = readPOM(file);
         if (outDir != null) {
-            NixPackageSet.collectDir(Graph.resolve(readPOM(file), resolveRoots)).write(outDir);
+            if (!resolveRoots) {
+                doNixRoot(pom);
+            }
+            NixPackageSet.collectDir(Graph.resolve(pom, resolveRoots)).write(outDir);
         } else {
-            Expr pkgs = NixPackageSet.collect(Graph.resolve(readPOM(file), resolveRoots));
+            Expr pkgs = NixPackageSet.collect(Graph.resolve(pom, resolveRoots));
 
             BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 
@@ -161,8 +165,8 @@ public class Maven2nix implements Callable<Integer> {
         }
     }
 
-    public static void doNixRoot(Path pom) throws IOException {
-        Expr callPackageFn = NixPackageSet.collectSelf(Graph.self(readPOM(pom)));
+    public static void doNixRoot(Model pom) throws IOException {
+        Expr callPackageFn = NixPackageSet.collectSelf(Graph.self(pom));
 
         BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 
