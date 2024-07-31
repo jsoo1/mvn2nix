@@ -12,7 +12,6 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Graph {
@@ -34,7 +33,7 @@ public class Graph {
 
     public static class Res {
         public final List<Dependency> dependencies;
-        public final List<scala.Tuple3<Publication, Artifact, Optional<File>>> artifacts;
+        public final List<scala.Tuple3<Publication, Artifact, File>> artifacts;
         public Res(Coursier.Res r) {
             dependencies = r.dependencies();
             artifacts = r.artifacts();

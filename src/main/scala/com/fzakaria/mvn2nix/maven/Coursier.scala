@@ -39,13 +39,12 @@ object Coursier {
 
     val m = fetched.resolution.minDependencies
       .map((d: Dependency) => {
-        val a
-            : Seq[(core.Publication, util.Artifact, java.util.Optional[File])] =
-          fetched.fullDetailedArtifacts
+        val a: Seq[(core.Publication, util.Artifact, File)] =
+          fetched.detailedArtifacts
             .flatMap(_ match {
               case (d2, p, a, f) =>
                 if (d.module == d2.module && d.version == d2.version) {
-                  (p, a, f.toJava) :: Nil
+                  (p, a, f) :: Nil
                 } else { Nil }
             })
             .toSet
@@ -64,9 +63,7 @@ object Coursier {
 
   class Res(
       val dependencies: java.util.List[Dependency],
-      val artifacts: java.util.List[
-        (core.Publication, util.Artifact, java.util.Optional[File])
-      ]
+      val artifacts: java.util.List[(core.Publication, util.Artifact, File)]
   )
 
   def mavenToCoursier(d: org.apache.maven.model.Dependency): Dependency =

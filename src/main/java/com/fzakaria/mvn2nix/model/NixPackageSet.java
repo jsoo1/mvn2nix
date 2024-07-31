@@ -122,16 +122,14 @@ public class NixPackageSet {
         ));
     }
 
-    public static Expr artifact(Publication p, Artifact a, Optional<File> file) {
+    public static Expr artifact(Publication p, Artifact a, File file) {
         return new Attrs(Stream.of(
             // This must not be "type" lest nix interpret it as a drv
             pair("_type", new LitS(p.type())),
             pair("extension", new LitS(p.ext())),
             pair("drv", new App(new Var(PKGS + ".fetchurl"), new Attrs(Stream.of(
                 pair("url", new LitS(a.url())),
-                pair("sha256", file
-                     .map(f -> (Expr) new LitS(sha256(f)))
-                     .orElse((Expr) new Null()))
+                pair("sha256", new LitS(sha256(file)))
         ))))));
     }
 
