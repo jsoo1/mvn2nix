@@ -60,7 +60,7 @@ object Coursier {
             .toSet
             .toSeq
 
-        val ds = fetched.resolution.dependenciesOf(d, true)
+        val ds = fetched.resolution.dependenciesOf(d, true).toSet.toSeq
 
         (d, new Res(ds.asJava, a.asJava))
       })
