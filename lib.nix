@@ -62,7 +62,7 @@ rec {
   # This is roughly a mapping of ivy configuration
   # to maven scope, see:
   #
-  # https://github.com/coursier/coursier/blob/4fa4e7eb4cddb6db8612510b64728f331e547ec6/modules/core/shared/src/main/scala/coursier/core/Definitions.scala#L179
+  # https://github.com/coursier/coursier/blob/8d3b79f840e80ebfc3cf6c4db59f2dcc3859ba66/modules/core/shared/src/main/scala/coursier/core/Resolution.scala#L409
   #
   # Since these are binary bytecode it really only makes sense to use
   # runtime deps. This includes compile scope usually.
