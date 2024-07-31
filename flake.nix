@@ -22,6 +22,7 @@
     packages = legacyPackages;
     defaultPackage = packages.mvn2nix;
     apps.mvn2nix = utils.lib.mkApp { drv = packages.mvn2nix; };
+    devShells.devault = packages.mvn2nix.shell;
   }) // {
     overlay = localOverlay;
   };
