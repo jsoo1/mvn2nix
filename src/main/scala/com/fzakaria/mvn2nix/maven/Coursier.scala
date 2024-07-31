@@ -13,7 +13,8 @@ import java.io.File
 object Coursier {
   def resolvePOM(
       pom: Model,
-      resolveRoots: Boolean
+      resolveRoots: Boolean,
+      scalaVersion: java.util.Optional[String]
   ): java.util.Map[Dependency, Res] = {
     val todo: Seq[Dependency] = if (resolveRoots) {
       val self = mavenToCoursier(pom)
@@ -39,6 +40,7 @@ object Coursier {
         params
           .withKeepOptionalDependencies(true)
           .withKeepProvidedDependencies(Some(true))
+          .withScalaVersionOpt(scalaVersion.toScala)
           .addReconciliation(
             (util.ModuleMatchers.all, core.Reconciliation.Relaxed)
           )

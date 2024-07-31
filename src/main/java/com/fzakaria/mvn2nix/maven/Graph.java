@@ -12,11 +12,12 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Graph {
-    public static Map<Dependency, Res> resolve(final Model m, final boolean resolveRoots) throws IOException {
-        return Coursier.resolvePOM(m, resolveRoots).entrySet().stream().collect(Collectors.toMap(
+    public static Map<Dependency, Res> resolve(final Model m, final boolean resolveRoots, final Optional<String> scalaVersion) throws IOException {
+        return Coursier.resolvePOM(m, resolveRoots, scalaVersion).entrySet().stream().collect(Collectors.toMap(
             Map.Entry::getKey,
             (Map.Entry<Dependency, Coursier.Res> e) -> new Res(e.getValue()),
             (x1, x2) -> x2

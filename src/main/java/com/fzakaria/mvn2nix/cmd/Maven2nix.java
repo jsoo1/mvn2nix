@@ -101,6 +101,10 @@ public class Maven2nix implements Callable<Integer> {
             defaultValue = "false")
     private boolean resolveRoots;
 
+    @Option(names = "--scala-version",
+            description = "Specify scala version, if you need")
+    private String scalaVersion;
+
     public Maven2nix() {
     }
 
@@ -139,7 +143,7 @@ public class Maven2nix implements Callable<Integer> {
             spec.commandLine().getOut().println(toPrettyJson(information));
             break;
 
-        case NIX: doNix(file, resolveRoots, outDir); break;
+        case NIX: doNix(file, resolveRoots, outDir, Optional.ofNullable(scalaVersion)); break;
 
         case NIX_ROOT: doNixRoot(readPOM(file)); break;
         }
@@ -147,15 +151,15 @@ public class Maven2nix implements Callable<Integer> {
         return 0;
     }
 
-    public static void doNix(Path file, boolean resolveRoots, Path outDir) throws IOException {
+    public static void doNix(Path file, boolean resolveRoots, Path outDir, Optional<String> scalaVersion) throws IOException {
         Model pom = readPOM(file);
         if (outDir != null) {
             if (!resolveRoots) {
                 doNixRoot(pom);
             }
-            NixPackageSet.collectDir(Graph.resolve(pom, resolveRoots)).write(outDir);
+            NixPackageSet.collectDir(Graph.resolve(pom, resolveRoots, scalaVersion)).write(outDir);
         } else {
-            Expr pkgs = NixPackageSet.collect(Graph.resolve(pom, resolveRoots));
+            Expr pkgs = NixPackageSet.collect(Graph.resolve(pom, resolveRoots, scalaVersion));
 
             BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 
