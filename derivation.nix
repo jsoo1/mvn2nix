@@ -4,11 +4,14 @@
 assert bootstrap -> builtins.trace "mvn2nix does not use the `bootstrap` parameter anymore" true;
 
 let
-  repository = mvn2nix.mkMavenRepository mvn2nix.bootstrapPackages.com_fzakaria__mvn2nix__0_1.dependencies;
-in stdenv.mkDerivation rec {
-  pname = "mvn2nix";
+  name = "mvn2nix";
+
   version = "0.1";
-  name = "${pname}-${version}";
+
+  repository = mvn2nix.mkMavenRepository mvn2nix.bootstrapPackages.com_fzakaria__mvn2nix__0_1.dependencies;
+in stdenv.mkDerivation {
+  inherit name version;
+
   src = nix-gitignore.gitignoreSource [] ./.;
   nativeBuildInputs = [ jdk maven makeWrapper ];
   buildPhase = ''
@@ -31,8 +34,8 @@ in stdenv.mkDerivation rec {
 
     # create a wrapper that will automatically set the classpath
     # this should be the paths from the dependency derivation
-    makeWrapper ${jdk}/bin/java $out/bin/${pname} \
-          --add-flags "-jar $out/${name}.jar" \
+    makeWrapper ${jdk}/bin/java $out/bin/${name} \
+          --add-flags "-jar $out/${name}-${version}.jar" \
           --set M2_HOME ${maven} \
           --set JAVA_HOME ${jdk}
   '';
