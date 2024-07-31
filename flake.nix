@@ -14,6 +14,7 @@
     pkgsForSystem = system: import nixpkgs {
       overlays = [
         localOverlay
+        (final: prev: { default = final.mvn2nix; })
       ];
       inherit system;
     };
