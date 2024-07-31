@@ -1,42 +1,16 @@
-{ lib, stdenv, jdk, maven, makeWrapper, rlwrap, nix-gitignore, java-language-server, metals
-, bootstrap ? false, buildMavenRepositoryFromLockFile }:
+{ lib, stdenv, jdk, mvn2nix, maven, makeWrapper, nix-gitignore
+, bootstrap ? false }:
+
+assert bootstrap -> builtins.trace "mvn2nix does not use the `bootstrap` parameter anymore" true;
+
 let
-  repository = (if bootstrap then
-    stdenv.mkDerivation {
-      name = "bootstrap-repository";
-      buildInputs = [ jdk maven ];
-      src = nix-gitignore.gitignoreSource [] ./.;
-      buildPhase = ''
-        mkdir $out
-
-        while mvn package -Duser.home=`pwd` -Dmaven.repo.local=$out -Dmaven.wagon.rto=5000; [ $? = 1 ]; do
-          echo "timeout, restart maven to continue downloading"
-        done
-      '';
-      # keep only *.{pom,jar,sha1,nbm} and delete all ephemeral files with lastModified timestamps inside
-      installPhase = ''
-        find $out -type f \
-          -name \*.lastUpdated -or \
-          -name resolver-status.properties -or \
-          -name _remote.repositories \
-          -delete
-      '';
-
-      # don't do any fixup
-      dontFixup = true;
-
-      outputHashAlgo = "sha256";
-      outputHashMode = "recursive";
-      outputHash = "sha256-vWrIVzmw/xLt1T3KPSktYQL16ItPpG2jrhdn/KRQfek=";
-    }
-  else
-    buildMavenRepositoryFromLockFile { file = ./mvn2nix-lock.json; });
+  repository = mvn2nix.mkMavenRepository mvn2nix.bootstrapPackages.com_fzakaria__mvn2nix__0_1.dependencies;
 in stdenv.mkDerivation rec {
   pname = "mvn2nix";
   version = "0.1";
   name = "${pname}-${version}";
   src = nix-gitignore.gitignoreSource [] ./.;
-  nativeBuildInputs = [ jdk maven makeWrapper rlwrap java-language-server metals ];
+  nativeBuildInputs = [ jdk maven makeWrapper ];
   buildPhase = ''
     echo "Using repository ${repository}"
     # 'maven.repo.local' must be writable so copy it out of nix store

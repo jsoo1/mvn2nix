@@ -51,9 +51,9 @@ self: super: {
         self.java-language-server
         self.metals
       ];
-
-      passthru.bootstrapPackages = self.mvn2nix.importPackageSet ./bootstrap-packages;
     };
+
+    passthru.bootstrapPackages = self.mvn2nix.importPackageSet ./bootstrap-packages;
   });
 
   mvn2nix-bootstrap =
