@@ -16,9 +16,10 @@
 
 { name
 , version
-, module
+, groupId
+, artifactId
 , classifier ? null
-, raw
+, artifacts
 , dependencies
 , meta ? { }
 , passthru ? { }
@@ -68,10 +69,10 @@ let
     loop str;
 in
 stdenv.mkDerivation {
-  inherit name version classifier meta;
+  inherit name version groupId artifactId classifier meta;
 
   # Things that can't be raw drv attributes because they are attrsets
-  passthru = { inherit module raw dependencies classpath; } // passthru;
+  passthru = { inherit artifacts dependencies classpath; } // passthru;
 
   src = emptyDirectory;
 
@@ -81,7 +82,7 @@ stdenv.mkDerivation {
     runHook preInstall
 
     for raw_jar in ${lib.concatMapStringsSep " " (r: r.drv.outPath)
-      (lib.filter (p: p.extension == "jar") raw)}; do
+      (lib.filter (p: p.extension == "jar") artifacts)}; do
       filename=$(basename $raw_jar)
 
       filename=''${filename:33} # strip hash part

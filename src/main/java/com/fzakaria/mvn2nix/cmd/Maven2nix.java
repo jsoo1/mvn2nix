@@ -27,6 +27,7 @@ import org.apache.maven.project.ProjectModelResolver;
 import org.apache.maven.project.ProjectModelResolver;
 import org.apache.maven.project.PublicReactorModelPool;
 import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,11 +102,29 @@ public class Maven2nix implements Callable<Integer> {
             defaultValue = "false")
     private boolean resolveRoots;
 
-    @Option(names = "--scala-version",
-            description = "Specify scala version, if you need")
-    private String scalaVersion;
+    public final Context ctx;
+    public final ProjectModelResolver resolver;
 
     public Maven2nix() {
+        ContextOverrides overrides = ContextOverrides.create()
+            .withUserSettings(true)
+            .build();
+
+        ctx = Runtimes.INSTANCE.getRuntime().create(overrides);
+
+        RemoteRepositoryManager remoteRepositoryManager = ctx.lookup()
+            .lookup(RemoteRepositoryManager.class)
+            .orElseThrow(() -> new IllegalStateException("component not found"));
+
+        resolver = new ProjectModelResolver(
+            ctx.repositorySystemSession(),
+            new RequestTrace(null),
+            ctx.repositorySystem(),
+            remoteRepositoryManager,
+            ctx.remoteRepositories(),
+            ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
+            new PublicReactorModelPool()
+        );
     }
 
     @Override
@@ -143,7 +162,7 @@ public class Maven2nix implements Callable<Integer> {
             spec.commandLine().getOut().println(toPrettyJson(information));
             break;
 
-        case NIX: doNix(file, resolveRoots, outDir, Optional.ofNullable(scalaVersion)); break;
+        case NIX: doNix(file, resolveRoots, outDir); break;
 
         case NIX_ROOT: doNixRoot(readPOM(file)); break;
         }
@@ -151,15 +170,18 @@ public class Maven2nix implements Callable<Integer> {
         return 0;
     }
 
-    public static void doNix(Path file, boolean resolveRoots, Path outDir, Optional<String> scalaVersion) throws IOException {
+    public void doNix(Path file, boolean resolveRoots, Path outDir) throws IOException {
         Model pom = readPOM(file);
+
+        Path localRepo = ctx.repositorySystemSession().getLocalRepository().getBasedir().getCanonicalFile().toPath();
+
         if (outDir != null) {
             if (!resolveRoots) {
                 doNixRoot(pom);
             }
-            NixPackageSet.collectDir(Graph.resolve(pom, resolveRoots, scalaVersion)).write(outDir);
+            NixPackageSet.collectDir(localRepo, Graph.resolve(ctx, pom, resolveRoots)).write(outDir);
         } else {
-            Expr pkgs = NixPackageSet.collect(Graph.resolve(pom, resolveRoots, scalaVersion));
+            Expr pkgs = NixPackageSet.collect(localRepo, Graph.resolve(ctx, pom, resolveRoots));
 
             BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 
@@ -169,8 +191,10 @@ public class Maven2nix implements Callable<Integer> {
         }
     }
 
-    public static void doNixRoot(Model pom) throws IOException {
-        Expr callPackageFn = NixPackageSet.collectSelf(Graph.self(pom));
+    public void doNixRoot(Model pom) throws IOException {
+        Path localRepo = ctx.repositorySystemSession().getLocalRepository().getBasedir().getCanonicalFile().toPath();
+
+        Expr callPackageFn = NixPackageSet.collectSelf(localRepo, Graph.self(pom));
 
         BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 
@@ -179,27 +203,7 @@ public class Maven2nix implements Callable<Integer> {
         w.flush();
     }
 
-    public static Model readPOM(Path pom) throws IOException {
-        ContextOverrides overrides = ContextOverrides.create()
-            .withUserSettings(true)
-            .build();
-
-        Context ctx = Runtimes.INSTANCE.getRuntime().create(overrides);
-
-        RemoteRepositoryManager remoteRepositoryManager = ctx.lookup()
-            .lookup(RemoteRepositoryManager.class)
-            .orElseThrow(() -> new IllegalStateException("component not found"));
-
-        ProjectModelResolver resolver = new ProjectModelResolver(
-            ctx.repositorySystemSession(),
-            new RequestTrace(null),
-            ctx.repositorySystem(),
-            remoteRepositoryManager,
-            ctx.remoteRepositories(),
-            ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
-            new PublicReactorModelPool()
-        );
-
+    public Model readPOM(Path pom) throws IOException {
         ModelBuildingRequest req = new DefaultModelBuildingRequest();
 
         req.setPomFile(pom.toFile()).setModelResolver(resolver);

@@ -2,25 +2,27 @@ package com.fzakaria.mvn2nix.model;
 
 import com.fzakaria.mvn2nix.maven.Graph;
 import com.fzakaria.mvn2nix.model.nix.*;
+import eu.maveniverse.maven.mima.context.Context;
+import java.net.URISyntaxException;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.resolution.ArtifactResult;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
-import coursier.core.Dependency;
-import coursier.core.Publication;
-import coursier.util.Artifact;
-import scala.Tuple3;
 
-import java.util.function.Predicate;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.nio.file.Path;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Path;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /*
   Walk the dependency tree and the local repository to get a "package
@@ -48,18 +50,18 @@ public class NixPackageSet {
 
     public static String[] packageParams = new String[]{LIB, PKGS, PATCH_MAVEN_JAR};
 
-    public static Expr collect(Map<Dependency, Graph.Res> resolved) {
-        return packageSet(new Attrs(resolved.entrySet().stream().map(e -> callPackage(e))));
+    public static Expr collect(Path localRepo, Map<Dependency, Graph.Res> resolved) {
+        return packageSet(new Attrs(resolved.entrySet().stream().map(e -> callPackage(localRepo, e))));
     }
 
-    public static Expr collectSelf(Map.Entry<Dependency, Graph.Res> resolved) {
-        return callPackageFn(resolved);
+    public static Expr collectSelf(Path localRepo, Map.Entry<Dependency, Graph.Res> resolved) {
+        return callPackageFn(localRepo, resolved);
     }
 
-    public static OutputDir collectDir(Map<Dependency, Graph.Res> resolved) {
+    public static OutputDir collectDir(Path localRepo, Map<Dependency, Graph.Res> resolved) {
         return new OutputDir(resolved.entrySet().stream().collect(Collectors.toMap(
-            (Map.Entry<Dependency, Graph.Res> e) -> new File(attrName(e.getKey())).toPath(),
-            (Map.Entry<Dependency, Graph.Res> e) -> callPackageFn(e),
+            (Map.Entry<Dependency, Graph.Res> e) -> new File(attrName(e.getKey().getArtifact())).toPath(),
+            (Map.Entry<Dependency, Graph.Res> e) -> callPackageFn(localRepo, e),
             (Expr e1, Expr e2) -> e2
         )));
     }
@@ -74,16 +76,18 @@ public class NixPackageSet {
         ))));
     }
 
-    public static Map.Entry<String, Expr> callPackage(Map.Entry<Dependency, Graph.Res> entry) {
+    public static Map.Entry<String, Expr> callPackage(Path localRepo, Map.Entry<Dependency, Graph.Res> entry) {
         Expr expr = new App(new App(new Var("self.callPackage"), new Paren(
-            callPackageFn(entry)
+            callPackageFn(localRepo, entry)
         )), new Attrs(Stream.empty()));
 
-        return pair(attrName(entry.getKey()), expr);
+        return pair(attrName(entry.getKey().getArtifact()), expr);
     }
 
-    public static Expr callPackageFn(Map.Entry<Dependency, Graph.Res> e) {
+    public static Expr callPackageFn(Path localRepo, Map.Entry<Dependency, Graph.Res> e) {
         Dependency d = e.getKey();
+
+        Artifact a = d.getArtifact();
 
         Graph.Res r = e.getValue();
 
@@ -93,21 +97,19 @@ public class NixPackageSet {
 
         Param params = new AttrPattern(Stream.concat(
             Arrays.stream(packageParams),
-            deps.stream().map(NixPackageSet::attrName)
+            deps.stream().map(d_ -> attrName(d_.getArtifact()))
         ).toArray(String[]::new));
 
         Expr args = new App(new Var(PATCH_MAVEN_JAR), new Attrs(Stream.of(
-            pair("name", new LitS(canonName(d))),
-            pair("module", new Attrs(Stream.of(
-                pair("organization", new LitS(d.module().organization())),
-                pair("name", new LitS(d.module().name()))
-            ))),
-            pair("version", new LitS(d.version())),
-            pair("classifier", Optional.ofNullable(d.publication().classifier())
+            pair("name", new LitS(Graph.mavenCoordinates(a))),
+            pair("groupId", new LitS(a.getGroupId())),
+            pair("artifactId", new LitS(a.getArtifactId())),
+            pair("version", new LitS(a.getVersion())),
+            pair("classifier", Optional.ofNullable(a.getClassifier())
                       .filter(Predicate.not(String::isEmpty))
                       .map(s -> (Expr) new LitS(s))
                       .orElse(new Null())),
-            pair("raw", new LitL(r.artifacts.stream().map(a -> artifact(a._1(), a._2(), a._3())))),
+            pair("artifacts", new LitL(r.artifacts.stream().map(ar -> artifact(localRepo, ar)))),
             pair("dependencies", new LitL(deps.stream().map(NixPackageSet::dep))),
             pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryBytecode")}))
         )));
@@ -117,19 +119,18 @@ public class NixPackageSet {
 
     public static Expr dep(Dependency d) {
         return new Attrs(Stream.of(
-            pair("drv", new Var(attrName(d))),
-            pair("configuration", new LitS(d.configuration()))
+            pair("drv", new Var(attrName(d.getArtifact()))),
+            pair("scope", new LitS(d.getScope())),
+            pair("optional", new LitB(d.getOptional()))
         ));
     }
 
-    public static Expr artifact(Publication p, Artifact a, File file) {
+    public static Expr artifact(Path localRepo, ArtifactResult a) {
         return new Attrs(Stream.of(
-            // This must not be "type" lest nix interpret it as a drv
-            pair("_type", new LitS(p.type())),
-            pair("extension", new LitS(p.ext())),
+            pair("extension", new LitS(a.getArtifact().getExtension())),
             pair("drv", new App(new Var(PKGS + ".fetchurl"), new Attrs(Stream.of(
-                pair("url", new LitS(a.url())),
-                pair("sha256", new LitS(sha256(file)))
+                pair("url", new LitS(url(localRepo, a))),
+                pair("sha256", new LitS(sha256(a.getLocalArtifactResult().getFile())))
         ))))));
     }
 
@@ -137,12 +138,22 @@ public class NixPackageSet {
         return new AbstractMap.SimpleImmutableEntry<T, U>(x, y);
     }
 
-    public static String attrName(Dependency dep) {
-        return canonName(dep).replaceAll("\\.", "_").replaceAll(":", "__");
+    public static String url(Path localRepo, ArtifactResult a) {
+        try {
+            URI remote = new URI(a.getLocalArtifactResult().getRepository().getUrl());
+
+            Path base = new File(remote.getPath()).toPath();
+
+            Path rel = localRepo.relativize(a.getLocalArtifactResult().getFile().toPath());
+
+            return remote.resolve(base.resolve(rel).toString()).toString();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static String canonName(Dependency d) {
-        return d.mavenPrefix() + ":" + d.version();
+    public static String attrName(Artifact a) {
+        return Graph.mavenCoordinates(a).replaceAll("\\.", "_").replaceAll(":", "__");
     }
 
     public static String sha256(File f) {
