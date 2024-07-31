@@ -39,6 +39,9 @@ object Coursier {
         params
           .withKeepOptionalDependencies(true)
           .withKeepProvidedDependencies(Some(true))
+          .addReconciliation(
+            (util.ModuleMatchers.all, core.Reconciliation.Relaxed)
+          )
       )
       .runResult()
 
