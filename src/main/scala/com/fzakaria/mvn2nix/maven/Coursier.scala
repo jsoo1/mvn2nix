@@ -35,6 +35,11 @@ object Coursier {
     val fetched = Fetch()
       .withDependencies(todo)
       .allArtifactTypes()
+      .mapResolutionParams(params =>
+        params
+          .withKeepOptionalDependencies(true)
+          .withKeepProvidedDependencies(Some(true))
+      )
       .runResult()
 
     val m = fetched.resolution.minDependencies
