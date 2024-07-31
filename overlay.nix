@@ -1,7 +1,9 @@
 self: super: {
-  mvn2nix = self.callPackage ./derivation.nix {
+  mvn2nix = (self.callPackage ./derivation.nix {
     jdk = self.jdk17_headless;
-  };
+  }).overrideAttrs (o: {
+    passthru.lib = self.callPackage ./lib.nix { };
+  });
 
   mvn2nix-bootstrap = self.callPackage ./derivation.nix {
     bootstrap = true;
