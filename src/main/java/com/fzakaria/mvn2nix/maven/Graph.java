@@ -81,11 +81,13 @@ public class Graph {
         while (!todos.isEmpty()) {
             Dependency d = todos.remove();
 
+            LOGGER.trace("Considering dependency {}", mavenCoordinates(d.getArtifact()));
+
             if (walk.containsKey(d)) {
                 continue;
             }
 
-            LOGGER.debug("Walking dependency {}", mavenCoordinates(d.getArtifact()));
+            LOGGER.trace("Walking dependency {}", mavenCoordinates(d.getArtifact()));
 
             List<Dependency> these = collect(ctx, d).getDependencies(true);
 
