@@ -4,6 +4,7 @@ import com.fzakaria.mvn2nix.maven.MaybeResolvedArtifact;
 import eu.maveniverse.maven.mima.context.Context;
 import eu.maveniverse.maven.mima.context.Runtime;
 import eu.maveniverse.maven.mima.context.Runtimes;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
@@ -106,19 +107,15 @@ public class Graph {
     }
 
     public static List<Dependency> runAndBuildDependencies(Model pom) {
-        Stream<Dependency> deps_ = pom
-            .getDependencies()
-            .stream()
-            .map(Graph::toAether);
+        Stream<org.apache.maven.model.Dependency> deps_ = pom.getDependencies().stream();
 
-        Stream<Dependency> pluginDeps = pom
+        Stream<org.apache.maven.model.Dependency> pluginDeps = pom
             .getBuild()
             .getPlugins()
             .stream()
-            .flatMap(p -> p.getDependencies().stream())
-            .map(Graph::toAether);
+            .flatMap(p -> p.getDependencies().stream());
 
-        return Stream.concat(deps_, pluginDeps).collect(Collectors.toList());
+        return Stream.concat(deps_, pluginDeps).map(Graph::toAether).collect(Collectors.toList());
     }
 
     public static PreorderNodeListGenerator collect(Context ctx, Dependency dep) {
@@ -142,14 +139,21 @@ public class Graph {
 
     public static List<ArtifactResult> fetch(Context ctx, Dependency dep) {
         try {
-            List<ArtifactResult> res = ctx
-                .repositorySystem()
-                .resolveArtifacts(
-                    ctx.repositorySystemSession(),
-                    Stream.of(new ArtifactRequest(dep.getArtifact(), ctx.remoteRepositories(), null)).collect(Collectors.toList())
-            );
+            List<ArtifactRequest> req = new ArrayList<>(Arrays.asList(new ArtifactRequest(dep.getArtifact(), ctx.remoteRepositories(), null)));
 
-            return res;
+            Artifact a = dep.getArtifact();
+
+            if (Optional.ofNullable(a.getClassifier()).filter(Predicate.not(String::isEmpty)).isEmpty()) {
+                DefaultArtifact pom = new DefaultArtifact(a.getGroupId(), a.getArtifactId(), a.getClassifier(), "pom", a.getVersion());
+
+                ArtifactRequest pomReq = new ArtifactRequest(pom, ctx.remoteRepositories(), null);
+
+                req.add(pomReq);
+            }
+
+            return ctx
+                .repositorySystem()
+                .resolveArtifacts(ctx.repositorySystemSession(), req);
         } catch (ArtifactResolutionException e) {
             throw new RuntimeException(e);
         }
