@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
@@ -242,7 +244,37 @@ public class Graph {
 
     public static Model readPOMNoResolve(File f) {
         try {
-            return new MavenXpp3Reader().read(new BufferedReader(new FileReader(f)));
+            Model m = new MavenXpp3Reader().read(new BufferedReader(new FileReader(f)));
+
+            MavenXpp3Reader.ContentTransformer t = new MavenXpp3Reader.ContentTransformer() {
+                @Override
+                public String transform(String content, String fieldName) {
+                    // FIXME(jsoo1): Naive pattern, but there must be an official one
+                    Matcher matcher = Pattern.compile("\\$\\{([a-zA-Z_0-9.-]+)\\}").matcher(content);
+
+                    StringBuffer sb = new StringBuffer();
+
+                    while (matcher.find()) {
+                        String prop = matcher.group(1);
+
+                        Optional<String> val = Optional.ofNullable(m.getProperties().getProperty(prop)).filter(Predicate.not(String::isEmpty));
+
+                        if (val.isEmpty()) {
+                            LOGGER.debug("Interpolation failed, property {} not found for field {} in file {} with original content {}", prop, fieldName, f, content);
+
+                            continue;
+                        }
+
+                        matcher.appendReplacement(sb, Matcher.quoteReplacement(val.get()));
+                    }
+
+                    matcher.appendTail(sb);
+
+                    return sb.toString();
+                }
+            };
+
+            return new MavenXpp3Reader(t).read(new BufferedReader(new FileReader(f)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (XmlPullParserException e) {
