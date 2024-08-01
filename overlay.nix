@@ -25,21 +25,21 @@ self: super: {
     # Make a maven repository from `patchMavenJar.drv`s
     #
     # mkMavenRepository : [ patchMavenJar.drv ] -> drv
-    passthru.mkMavenRepository = classpath:
-      let # The path in a maven repository in a patchMavenJar.drv raw output
-        # given an extension.
-        #
-        # mavenPaths : patchMavenJar.drv -> str -> str
-        mavenPath = d: extension:
-          let
-            group = self.lib.concatStringsSep "/" (self.lib.splitString "." d.groupId);
-          in
-          "${group}/${d.artifactId}/${d.version}/" + self.mvn2nix.lib.filename d extension;
+    passthru.mkMavenRepository = dependencies:
+      let
+        walk = drv: self.symlinkJoin {
+          name = "${drv.name}-maven-repository-join";
+          paths = map (d: walk d.drv) drv.dependencies ++ [ subd drv ];
+        };
+
+        subd = drv: self.linkFarm "${drv.name}-maven-repository"
+          (map (a: { name = self.mvn2nix.lib.mavenPath drv a.extension; path = a.drv; })
+            drv.artifacts);
       in
-      self.linkFarm "maven-repository"
-        (self.lib.concatMap
-          (d: map (r: { name = mavenPath d.drv r.extension; path = r.drv; }) d.drv.artifacts)
-          classpath);
+      self.symlinkJoin {
+        name = "maven-repository";
+        paths = map walk dependencies;
+      };
 
     passthru.shell = self.mkShell {
       name = "mvn2nix-shell";
