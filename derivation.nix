@@ -30,7 +30,7 @@ in stdenv.mkDerivation {
     # copy out the JAR
     # Maven already setup the classpath to use m2 repository layout
     # with the prefix of lib/
-    cp target/${name}.jar $out/
+    cp target/${name}-${version}.jar $out/
 
     # create a wrapper that will automatically set the classpath
     # this should be the paths from the dependency derivation
