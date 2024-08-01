@@ -27,20 +27,23 @@ self: super: {
     # mkMavenRepository : [ patchMavenJar.drv ] -> drv
     passthru.mkMavenRepository = dependencies:
       let
-        # walk : { drv: patchMavenJar.drv; extension: str; } -> drv
-        walk = d: self.symlinkJoin {
-          name = "${d.drv.name}-maven-repository-join";
-          paths = map walk d.drv.dependencies ++ [ (farm d) ];
-        };
+        # go : attrs drv -> { drv: patchMavenJar.drv; ... } -> attrs drv
+        go = seen: { drv, ... }:
+          self.lib.foldl' visit (seen // { ${drv.name} = farm drv; })
+            drv.dependencies;
 
-        # farm : { drv: patchMavenJar.drv; extension: str; } -> drv
-        farm = d: self.linkFarm "${d.drv.name}-maven-repository"
-          (map (a: { name = self.mvn2nix.lib.mavenPath d.drv a.extension; path = a.drv; })
-            d.drv.artifacts);
+        # farm : patchMavenJar.drv; -> drv
+        farm = drv: self.linkFarm "${drv.name}-maven-repository"
+          (map (a: { name = self.mvn2nix.lib.mavenPath drv a.extension; path = a.drv; })
+            drv.artifacts);
+
+        # visit : attrs drv -> { drv: patchMavenJar.drv; ... } -> attrs drv
+        visit = seen: x:
+          go (seen // { ${x.drv.name} = farm x.drv; }) x;
       in
       self.symlinkJoin {
         name = "maven-repository";
-        paths = map walk dependencies;
+        paths = self.lib.attrValues (self.lib.foldl' visit { } dependencies);
       };
 
     passthru.shell = self.mkShell {

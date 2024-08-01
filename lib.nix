@@ -36,14 +36,13 @@ rec {
   # given an extension.
   #
   # mavenPath : patchMavenJar.drv -> str -> str
-  mavenPath = d: extension:
-    "${mavenDir d}" + filename d extension;
+  mavenPath = d: extension: "${mavenDir d}/" + filename d extension;
 
   # The directory in a maven repository of a patchMavenJar.drv
   #
-  # mavenPath : patchMavenJar.drv -> str
-  mavenDir = d:
-    lib.concatStringsSep "/" (lib.splitString "." d.groupId) + /${d.artifactId}/${d.version};
+  # mavenPath : { groupId: str; artifactId: str; version: str; } -> str
+  mavenDir = { groupId, artifactId, version, ... }:
+    lib.concatStringsSep "/" (lib.splitString "." groupId) + "/${artifactId}/${version}";
 
   # The file URIs of all patchMavenJar derivation raw outputs
   #
