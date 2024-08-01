@@ -16,19 +16,6 @@ import eu.maveniverse.maven.mima.context.Context;
 import eu.maveniverse.maven.mima.context.ContextOverrides;
 import eu.maveniverse.maven.mima.context.Runtimes;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.DefaultModelBuilderFactory;
-import org.apache.maven.model.building.DefaultModelBuilderFactory;
-import org.apache.maven.model.building.DefaultModelBuildingRequest;
-import org.apache.maven.model.building.ModelBuilder;
-import org.apache.maven.model.building.ModelBuildingException;
-import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.project.ProjectModelResolver;
-import org.apache.maven.project.ProjectModelResolver;
-import org.apache.maven.project.PublicReactorModelPool;
-import org.eclipse.aether.RequestTrace;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -61,8 +48,6 @@ import java.util.stream.Collectors;
 public class Maven2nix implements Callable<Integer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Maven2nix.class);
-
-    private static DefaultModelBuilderFactory factory = new DefaultModelBuilderFactory();
 
     @Spec
     CommandSpec spec;
@@ -103,7 +88,6 @@ public class Maven2nix implements Callable<Integer> {
     private boolean resolveRoots;
 
     public final Context ctx;
-    public final ProjectModelResolver resolver;
 
     public Maven2nix() {
         ContextOverrides overrides = ContextOverrides.create()
@@ -111,20 +95,6 @@ public class Maven2nix implements Callable<Integer> {
             .build();
 
         ctx = Runtimes.INSTANCE.getRuntime().create(overrides);
-
-        RemoteRepositoryManager remoteRepositoryManager = ctx.lookup()
-            .lookup(RemoteRepositoryManager.class)
-            .orElseThrow(() -> new IllegalStateException("component not found"));
-
-        resolver = new ProjectModelResolver(
-            ctx.repositorySystemSession(),
-            new RequestTrace(null),
-            ctx.repositorySystem(),
-            remoteRepositoryManager,
-            ctx.remoteRepositories(),
-            ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
-            new PublicReactorModelPool()
-        );
     }
 
     @Override
@@ -164,14 +134,14 @@ public class Maven2nix implements Callable<Integer> {
 
         case NIX: doNix(file, resolveRoots, outDir); break;
 
-        case NIX_ROOT: doNixRoot(readPOM(file)); break;
+        case NIX_ROOT: doNixRoot(Graph.readPOM(ctx, file)); break;
         }
 
         return 0;
     }
 
     public void doNix(Path file, boolean resolveRoots, Path outDir) throws IOException {
-        Model pom = readPOM(file);
+        Model pom = Graph.readPOM(ctx, file);
 
         Path localRepo = ctx.repositorySystemSession().getLocalRepository().getBasedir().getCanonicalFile().toPath();
 
@@ -201,18 +171,6 @@ public class Maven2nix implements Callable<Integer> {
         callPackageFn.write(0, w);
 
         w.flush();
-    }
-
-    public Model readPOM(Path pom) throws IOException {
-        ModelBuildingRequest req = new DefaultModelBuildingRequest();
-
-        req.setPomFile(pom.toFile()).setModelResolver(resolver);
-
-        try {
-            return factory.newInstance().build(req).getEffectiveModel();
-        } catch (ModelBuildingException e) {
-            throw new IOException(e.getMessage(), (Throwable) e);
-        }
     }
 
     /**
