@@ -61,7 +61,7 @@ rec {
   #
   # filename : patchMavenJar.drv -> str -> str
   filename = d: extension:
-    "${d.groupId}-${d.version}"
+    "${d.artifactId}-${d.version}"
     + lib.optionalString (null != d.classifier) "-${d.classifier}"
     + "." + extension;
 
