@@ -37,7 +37,7 @@ rec {
   #
   # mavenPath : patchMavenJar.drv -> str -> str
   mavenPath = d: extension:
-    "${mavenDir}" + filename d extension;
+    "${mavenDir d}" + filename d extension;
 
   # The directory in a maven repository of a patchMavenJar.drv
   #

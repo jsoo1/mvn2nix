@@ -27,14 +27,16 @@ self: super: {
     # mkMavenRepository : [ patchMavenJar.drv ] -> drv
     passthru.mkMavenRepository = dependencies:
       let
-        walk = drv: self.symlinkJoin {
-          name = "${drv.name}-maven-repository-join";
-          paths = map (d: walk d.drv) drv.dependencies ++ [ subd drv ];
+        # walk : { drv: patchMavenJar.drv; extension: str; } -> drv
+        walk = d: self.symlinkJoin {
+          name = "${d.drv.name}-maven-repository-join";
+          paths = map walk d.drv.dependencies ++ [ (farm d) ];
         };
 
-        subd = drv: self.linkFarm "${drv.name}-maven-repository"
-          (map (a: { name = self.mvn2nix.lib.mavenPath drv a.extension; path = a.drv; })
-            drv.artifacts);
+        # farm : { drv: patchMavenJar.drv; extension: str; } -> drv
+        farm = d: self.linkFarm "${d.drv.name}-maven-repository"
+          (map (a: { name = self.mvn2nix.lib.mavenPath d.drv a.extension; path = a.drv; })
+            d.drv.artifacts);
       in
       self.symlinkJoin {
         name = "maven-repository";

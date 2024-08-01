@@ -10,7 +10,7 @@ let
 
   repository = mvn2nix.mkMavenRepository mvn2nix.bootstrapPackages.com_fzakaria__mvn2nix__0_1.dependencies;
 in stdenv.mkDerivation {
-  inherit name version;
+  inherit name version repository;
 
   src = nix-gitignore.gitignoreSource [] ./.;
   nativeBuildInputs = [ jdk maven makeWrapper ];
@@ -49,5 +49,4 @@ in stdenv.mkDerivation {
     platforms = platforms.all;
     mainProgram = "mvn2nix";
   };
-  passthru.repository = repository;
 }
