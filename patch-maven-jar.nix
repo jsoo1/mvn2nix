@@ -28,7 +28,6 @@ let
   classpath = mvn2nix.lib.mkRuntimeClasspath dependencies;
 
   # Make a file to link in $out/nix-support for nix to scan
-  # classpathFile
   classpathFile = writeText "${name}-${version}-classpath"
     (lib.concatStringsSep " " classpath);
 
