@@ -4,6 +4,8 @@ import com.fzakaria.mvn2nix.maven.Graph;
 import com.fzakaria.mvn2nix.model.nix.*;
 import eu.maveniverse.maven.mima.context.Context;
 import java.net.URISyntaxException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactResult;
@@ -102,6 +104,8 @@ public class NixPackageSet {
             deps.stream().map(d_ -> attrName(d_.getArtifact()))
         ).toArray(String[]::new));
 
+        Predicate<ArtifactResult> uniqFile = distinctByKey(ar -> ar.getLocalArtifactResult().getFile());
+
         Expr args = new App(new Var(PATCH_MAVEN_JAR), new Attrs(Stream.of(
             pair("name", new LitS(Graph.mavenCoordinates(a))),
             pair("groupId", new LitS(a.getGroupId())),
@@ -111,7 +115,7 @@ public class NixPackageSet {
                       .filter(Predicate.not(String::isEmpty))
                       .map(s -> (Expr) new LitS(s))
                       .orElse(new Null())),
-            pair("artifacts", new LitL(r.artifacts.stream().map(ar -> artifact(localRepo, ar)))),
+            pair("artifacts", new LitL(r.artifacts.stream().filter(uniqFile).map(ar -> artifact(localRepo, ar)))),
             pair("dependencies", new LitL(deps.stream().map(NixPackageSet::dep))),
             pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryBytecode")}))
         )));
@@ -164,5 +168,10 @@ public class NixPackageSet {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
     }
 }

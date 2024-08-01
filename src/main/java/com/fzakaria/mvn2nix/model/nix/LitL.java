@@ -3,6 +3,7 @@ package com.fzakaria.mvn2nix.model.nix;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
