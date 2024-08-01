@@ -32,13 +32,13 @@ self: super: {
         # mavenPaths : patchMavenJar.drv -> str -> str
         mavenPath = d: extension:
           let
-            group = self.lib.concatStringsSep "/" (self.lib.splitString "." d.module.organization);
+            group = self.lib.concatStringsSep "/" (self.lib.splitString "." d.groupId);
           in
-          "${group}/${d.module.name}/${d.version}/" + self.mvn2nix.lib.filename d extension;
+          "${group}/${d.artifactId}/${d.version}/" + self.mvn2nix.lib.filename d extension;
       in
       self.linkFarm "maven-repository"
         (self.lib.concatMap
-          (d: map (r: { name = mavenPath d.drv r.extension; path = r.drv; }) d.drv.raw)
+          (d: map (r: { name = mavenPath d.drv r.extension; path = r.drv; }) d.drv.artifacts)
           classpath);
 
     passthru.shell = self.mkShell {

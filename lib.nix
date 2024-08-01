@@ -7,12 +7,12 @@ rec {
   mkManifestClassPath = classpath:
     mkManifestEntry "Class-Path"
       # Careful to use the jar after patching
-      (lib.concatMapStringsSep " " (lib.concatMap fileUris classpath));
+      (lib.concatStringsSep " " (lib.concatMap fileUris classpath));
 
   # Make a key-value pair for a MANIFEST.MF file
   #
   # mkManifestClassPathEntry : str -> str -> str
-  mkManifestEntry = key: val: classpath: toContinuationLines ("${key}: " + val);
+  mkManifestEntry = key: val: toContinuationLines ("${key}: " + val);
 
   # MANIFEST.MF files must not exceed 72 bytes per line.  To split
   # long lines across lines, they must be split into continuations.
@@ -38,9 +38,9 @@ rec {
   fileUris = d:
     map (f: "file://${d}/share/java/${f}") (filenames d);
 
-  # The base filenames of all patchMavenJar derivation raw outputs.
+  # The base filenames of all patchMavenJar derivation artifact outputs.
   # filename : patchMavenJar.drv -> str -> str
-  filenames = d: map (raw: filename d raw.extension) d.raw;
+  filenames = d: map (a: filename d a.extension) d.artifacts;
 
   # The base filename of a patchMavenJar derivation for a given file
   # extension, looks like a usual maven artifact:
@@ -49,23 +49,17 @@ rec {
   #
   # filename : patchMavenJar.drv -> str -> str
   filename = d: extension:
-    "${d.module.name}-${d.version}"
+    "${d.groupId}-${d.version}"
     + lib.optionalString (null != d.classifier) "-${d.classifier}"
     + "." + extension;
 
   # The runtime dependencies of a patchMavenJar derivation
   #
-  # mkRuntimeClasspath : [ patchMavenConfiguration.drv ] -> [ patchMavenConfiguration.drv ]
+  # mkRuntimeClasspath : [ { scope: str; drv: patchMavenConfiguration.drv } ] -> [ { scope: str: drv: patchMavenConfiguration.drv } ]
   mkRuntimeClasspath = lib.concatMap
-    (d: lib.optional (isRuntime d.configuration) d.drv);
+    (d: lib.optional (isRuntime d.scope) d.drv);
 
-  # This is roughly a mapping of ivy configuration
-  # to maven scope, see:
-  #
-  # https://github.com/coursier/coursier/blob/8d3b79f840e80ebfc3cf6c4db59f2dcc3859ba66/modules/core/shared/src/main/scala/coursier/core/Resolution.scala#L409
-  #
-  # Since these are binary bytecode it really only makes sense to use
-  # runtime deps. This includes compile scope usually.
+  # This is a mapping of maven scope to time of use
   isRuntime = configuration:
     null != builtins.match "^default\\(compile\\)|provided|default|compile|runtime$" configuration;
 }
