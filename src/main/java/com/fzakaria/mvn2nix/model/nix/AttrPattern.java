@@ -3,8 +3,14 @@ package com.fzakaria.mvn2nix.model.nix;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import java.util.Set;
+
 public class AttrPattern extends Param implements Write {
     String[] attrNames;
+
+    public AttrPattern(Set<String> as) {
+        attrNames = as.stream().toArray(String[]::new);
+    }
 
     public AttrPattern(String[] as) {
         attrNames = as;

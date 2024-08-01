@@ -19,6 +19,7 @@ import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -92,7 +93,8 @@ public class NixPackageSet {
         Graph.Res r = e.getValue();
 
         List<Dependency> deps = r.dependencies.stream()
-            .filter(d_ -> !d.equals(d_))
+            .filter(d_ -> !Graph.mavenCoordinates(d.getArtifact()).equals(Graph.mavenCoordinates(d_.getArtifact())))
+            .filter(distinctByKey(d_ -> d_.toString()))
             .collect(Collectors.toList());
 
         Param params = new AttrPattern(Stream.concat(
