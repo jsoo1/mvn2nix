@@ -33,6 +33,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
@@ -199,10 +200,12 @@ public class Graph {
 
     public static PreorderNodeListGenerator collect(Context ctx, Dependency dep) {
         try {
+            CollectRequest req = new CollectRequest(dep.setExclusions(exclusions), ctx.remoteRepositories());
+
             DependencyNode root = ctx.repositorySystem()
                 .resolveDependencies(
                     ctx.repositorySystemSession(),
-                    new DependencyRequest(new CollectRequest(dep, ctx.remoteRepositories()), null)
+                    new DependencyRequest(req, null)
                 )
                 .getRoot();
 
@@ -215,6 +218,13 @@ public class Graph {
             throw new RuntimeException(e);
         }
     }
+
+    public static final List<Exclusion> exclusions = new ArrayList<>(Arrays.asList(new Exclusion[]{
+        new Exclusion("xerces", "xerces-impl", "", "pom"),
+        new Exclusion("xerces", "xerces-impl", "", "jar"),
+        new Exclusion("xml-apis", "xml-apis", "", "pom"),
+        new Exclusion("xml-apis", "xml-apis", "", "jar")
+    }));
 
     public static List<Fetch> fetchTransitive(Context ctx, Map<Dependency, Res> walk, Dependency dep) {
         List<ArtifactRequest> req = new ArrayList<>(Arrays.asList(new ArtifactRequest(dep.getArtifact(), ctx.remoteRepositories(), null)));
