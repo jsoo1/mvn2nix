@@ -112,12 +112,10 @@ public class Graph {
 
             List<ArtifactResult> artifacts = new ArrayList<>();
 
-            for (Fetch f: fetch(ctx, d)) {
+            for (Fetch f: fetchTransitive(ctx, d)) {
                 artifacts.add(f.artifact);
 
-                if (f.parent.isPresent()) {
-                    these.add(f.parent.get());
-                }
+                these.addAll(f.parents);
             }
 
             walk.put(d, new Res(these, artifacts));
@@ -172,7 +170,7 @@ public class Graph {
         }
     }
 
-    public static List<Fetch> fetch(Context ctx, Dependency dep) {
+    public static List<Fetch> fetchTransitive(Context ctx, Dependency dep) {
         try {
             List<ArtifactRequest> req = new ArrayList<>(Arrays.asList(new ArtifactRequest(dep.getArtifact(), ctx.remoteRepositories(), null)));
 
@@ -190,9 +188,9 @@ public class Graph {
                 .stream()
                 .map(a_ -> {
                     if (a_.getArtifact().getExtension().equals("pom")) {
-                        return new Fetch(a_, parent(ctx, a_));
+                        return new Fetch(a_, parents(ctx, a_));
                     } else {
-                        return new Fetch(a_, Optional.empty());
+                        return new Fetch(a_, new ArrayList<>());
                     }
                 })
                 .collect(Collectors.toList());
@@ -201,12 +199,34 @@ public class Graph {
         }
     }
 
+    public static List<ArtifactResult> fetchDirect(Context ctx, Dependency dep) {
+        try {
+            List<ArtifactRequest> req = new ArrayList<>(Arrays.asList(new ArtifactRequest(dep.getArtifact(), ctx.remoteRepositories(), null)));
+
+            Artifact a = dep.getArtifact();
+
+            DefaultArtifact pom = new DefaultArtifact(a.getGroupId(), a.getArtifactId(), "", "pom", a.getVersion());
+
+            ArtifactRequest pomReq = new ArtifactRequest(pom, ctx.remoteRepositories(), null);
+
+            req.add(pomReq);
+
+            return ctx
+                .repositorySystem()
+                .resolveArtifacts(ctx.repositorySystemSession(), req)
+                .stream()
+                .collect(Collectors.toList());
+        } catch (ArtifactResolutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static class Fetch {
         public final ArtifactResult artifact;
-        public final Optional<Dependency> parent;
-        public Fetch(ArtifactResult a, Optional<Dependency> p) {
+        public final List<Dependency> parents;
+        public Fetch(ArtifactResult a, List<Dependency> ps) {
             artifact = a;
-            parent = p;
+            parents = ps;
         }
     }
 
@@ -236,10 +256,26 @@ public class Graph {
         }
     }
 
-    public static Optional<Dependency> parent(Context ctx, ArtifactResult a) {
+    public static List<Dependency> parents(Context ctx, ArtifactResult a) {
         Model m = readPOMNoResolve(ctx, a.getLocalArtifactResult().getFile());
 
-        return Optional.ofNullable(m.getParent()).map(Graph::parentDependency);
+        Optional<Dependency> p = Optional.ofNullable(m.getParent()).map(Graph::parentDependency);
+
+        List<Dependency> res = new ArrayList<>();
+
+        while (p.isPresent()) {
+            res.add(p.get());
+
+            for (ArtifactResult ar : fetchDirect(ctx, p.get())) {
+                if (ar.getArtifact().getExtension().equals("pom")) {
+                    m = readPOMNoResolve(ctx, ar.getLocalArtifactResult().getFile());
+
+                    p = Optional.ofNullable(m.getParent()).map(Graph::parentDependency);
+                }
+            }
+        }
+
+        return res;
     }
 
     public static Model readPOMNoResolve(Context ctx, File f) {
