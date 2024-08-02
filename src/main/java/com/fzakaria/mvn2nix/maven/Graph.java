@@ -11,6 +11,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.maven.lifecycle.mapping.Lifecycle;
+import org.apache.maven.lifecycle.mapping.LifecycleMapping;
+import org.apache.maven.lifecycle.mapping.LifecycleMojo;
+import org.apache.maven.lifecycle.mapping.LifecyclePhase;
+import org.apache.maven.lifecycle.providers.packaging.PublicLifecycleMappings;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
@@ -171,17 +176,25 @@ public class Graph {
             .stream()
             .flatMap(p -> p.getDependencies().stream());
 
-        List<Dependency> ds = Stream.concat(deps_, pluginDeps).map(Graph::toAether).collect(Collectors.toList());
+        List<Dependency> deps = Stream.concat(deps_, pluginDeps).map(Graph::toAether).collect(Collectors.toList());
 
-        List<Dependency> buildPlugins = pom.getBuild().getPlugins().stream().map(Graph::toAether).collect(Collectors.toList());
+        LifecycleMapping lifecycles = PublicLifecycleMappings.getLifecycle(pom.getPackaging())
+            .orElseThrow(() -> new RuntimeException("Don't know how to handle packaging type provided by POM, got: " + pom.getPackaging()));
 
-        List<Dependency> reportingPlugins = pom.getReporting().getPlugins().stream().map(Graph::toAether).collect(Collectors.toList());
+        // This might both over or under-report dependencies but we
+        // don't want to get into the business of traversing plugin
+        // configurations
+        lifecycles.getLifecycles().values().stream()
+            .flatMap(l -> l.getLifecyclePhases().values().stream())
+            .flatMap(lp -> lp.getMojos().stream())
+            .map(Graph::toAether)
+            .forEach(d -> deps.add(d));
 
-        ds.addAll(buildPlugins);
+        pom.getBuild().getPlugins().stream().map(Graph::toAether).forEach(d -> deps.add(d));
 
-        ds.addAll(reportingPlugins);
+        pom.getReporting().getPlugins().stream().map(Graph::toAether).forEach(d -> deps.add(d));
 
-        return ds;
+        return deps;
     }
 
     public static PreorderNodeListGenerator collect(Context ctx, Dependency dep) {
@@ -389,6 +402,21 @@ public class Graph {
             "test",
             false,
             new ArrayList<>()
+        );
+    }
+
+    // FIXME(jsoo1): So naive, but I don't know how else to do it
+    public static Dependency toAether(LifecycleMojo m) {
+        String[] parts = m.getGoal().split(":");
+
+        return new Dependency(
+            new DefaultArtifact(
+                parts[0],
+                parts[1],
+                "jar",
+                parts[2]
+            ),
+            "provided"
         );
     }
 
