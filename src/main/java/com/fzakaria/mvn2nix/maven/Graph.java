@@ -13,6 +13,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuilder;
@@ -21,8 +23,6 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectModelResolver;
 import org.apache.maven.project.PublicReactorModelPool;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -171,7 +171,17 @@ public class Graph {
             .stream()
             .flatMap(p -> p.getDependencies().stream());
 
-        return Stream.concat(deps_, pluginDeps).map(Graph::toAether).collect(Collectors.toList());
+        List<Dependency> ds = Stream.concat(deps_, pluginDeps).map(Graph::toAether).collect(Collectors.toList());
+
+        List<Dependency> buildPlugins = pom.getBuild().getPlugins().stream().map(Graph::toAether).collect(Collectors.toList());
+
+        List<Dependency> reportingPlugins = pom.getReporting().getPlugins().stream().map(Graph::toAether).collect(Collectors.toList());
+
+        ds.addAll(buildPlugins);
+
+        ds.addAll(reportingPlugins);
+
+        return ds;
     }
 
     public static PreorderNodeListGenerator collect(Context ctx, Dependency dep) {
@@ -365,6 +375,34 @@ public class Graph {
             d.getScope(),
             d.isOptional(),
             d.getExclusions().stream().map(Graph::toAether).collect(Collectors.toList())
+        );
+    }
+
+    public static Dependency toAether(Plugin p) {
+        return new Dependency(
+            new DefaultArtifact(
+                p.getGroupId(),
+                p.getArtifactId(),
+                "jar",
+                p.getVersion()
+            ),
+            "test",
+            false,
+            new ArrayList<>()
+        );
+    }
+
+    public static Dependency toAether(ReportPlugin p) {
+        return new Dependency(
+            new DefaultArtifact(
+                p.getGroupId(),
+                p.getArtifactId(),
+                "jar",
+                p.getVersion()
+            ),
+            "test",
+            false,
+            new ArrayList<>()
         );
     }
 
