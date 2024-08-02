@@ -6,7 +6,6 @@
 , org_slf4j__slf4j-api__1_7_36
 , org_apache__apache__pom__29
 , org_fusesource_jansi__jansi__2_4_0
-, commons-io__commons-io__2_11_0
 , org_apache_maven__maven-parent__pom__39
 }:
 patchMavenJar {
@@ -51,11 +50,6 @@ patchMavenJar {
       drv = org_fusesource_jansi__jansi__2_4_0;
       scope = "compile";
       optional = true;
-    }
-    {
-      drv = commons-io__commons-io__2_11_0;
-      scope = "compile";
-      optional = false;
     }
     {
       drv = org_apache_maven__maven-parent__pom__39;
