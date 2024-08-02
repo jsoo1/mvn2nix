@@ -164,7 +164,7 @@ public class Maven2nix implements Callable<Integer> {
     public void doNixRoot(Model pom) throws IOException {
         Path localRepo = ctx.repositorySystemSession().getLocalRepository().getBasedir().getCanonicalFile().toPath();
 
-        Expr callPackageFn = NixPackageSet.collectSelf(localRepo, Graph.self(pom));
+        Expr callPackageFn = NixPackageSet.collectSelf(localRepo, Graph.self(ctx, pom));
 
         BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 

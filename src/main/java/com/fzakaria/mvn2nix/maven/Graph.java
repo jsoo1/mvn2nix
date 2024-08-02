@@ -79,12 +79,39 @@ public class Graph {
 
     private static DefaultModelBuilderFactory factory = new DefaultModelBuilderFactory();
 
-    public static Map.Entry<Dependency, Res> self(Model pom) {
-        Res r = new Res(runAndBuildDependencies(pom), new ArrayList<>());
-        return new AbstractMap.SimpleImmutableEntry<Dependency, Res>(rootDependency(pom), r);
+    public static Map.Entry<Dependency, Res> self(Context ctx, Model pom) {
+        List<Dependency> direct = runAndBuildDependencies(pom);
+
+        Map<Dependency, Res> walk = new HashMap<>();
+
+        List<Dependency> parents = direct.stream()
+            .flatMap(d -> fetchDirect(ctx, d).stream())
+            .flatMap(a -> a.getArtifact().getExtension().equals("pom")
+                ? parents(ctx, walk, a).stream()
+                : Stream.empty()
+            )
+            .collect(Collectors.toList());
+
+        parents.addAll(direct);
+
+        Res r = new Res(parents, new ArrayList<>());
+
+        Model m = pom.clone();
+
+        m.setPackaging("pom");
+
+        return new AbstractMap.SimpleImmutableEntry<Dependency, Res>(rootDependency(m), r);
     }
 
     public static Map<Dependency, Res> resolve(Context ctx, Model pom, boolean resolveRoots) {
+        Map<Dependency, Res> walk = new HashMap<>();
+
+        resolve_(ctx, walk, pom, resolveRoots);
+
+        return walk;
+    }
+
+    public static void resolve_(Context ctx, Map<Dependency, Res> walk, Model pom, boolean resolveRoots) {
         List<Dependency> initial = resolveRoots
             ? pom.getDependencies().stream().map(Graph::toAether).collect(Collectors.toList())
             : runAndBuildDependencies(pom);
@@ -94,8 +121,6 @@ public class Graph {
         if (resolveRoots) {
             todos.add(rootDependency((pom)));
         }
-
-        Map<Dependency, Res> walk = new HashMap<>();
 
         while (!todos.isEmpty()) {
             Dependency d = todos.remove();
@@ -112,7 +137,7 @@ public class Graph {
 
             List<ArtifactResult> artifacts = new ArrayList<>();
 
-            for (Fetch f: fetchTransitive(ctx, d)) {
+            for (Fetch f: fetchTransitive(ctx, walk, d)) {
                 artifacts.add(f.artifact);
 
                 these.addAll(f.parents);
@@ -122,12 +147,10 @@ public class Graph {
 
             todos.addAll(these);
         }
-
-        return walk;
     }
 
     public static Dependency rootDependency(Model pom) {
-        return new Dependency(new DefaultArtifact(pom.getGroupId(), pom.getArtifactId(), "jar", pom.getVersion()), "test");
+        return new Dependency(new DefaultArtifact(pom.getGroupId(), pom.getArtifactId(), pom.getPackaging(), pom.getVersion()), "test");
     }
 
     public static class Res {
@@ -170,25 +193,25 @@ public class Graph {
         }
     }
 
-    public static List<Fetch> fetchTransitive(Context ctx, Dependency dep) {
+    public static List<Fetch> fetchTransitive(Context ctx, Map<Dependency, Res> walk, Dependency dep) {
+        List<ArtifactRequest> req = new ArrayList<>(Arrays.asList(new ArtifactRequest(dep.getArtifact(), ctx.remoteRepositories(), null)));
+
+        Artifact a = dep.getArtifact();
+
+        DefaultArtifact pom = new DefaultArtifact(a.getGroupId(), a.getArtifactId(), "", "pom", a.getVersion());
+
+        ArtifactRequest pomReq = new ArtifactRequest(pom, ctx.remoteRepositories(), null);
+
+        req.add(pomReq);
+
         try {
-            List<ArtifactRequest> req = new ArrayList<>(Arrays.asList(new ArtifactRequest(dep.getArtifact(), ctx.remoteRepositories(), null)));
-
-            Artifact a = dep.getArtifact();
-
-            DefaultArtifact pom = new DefaultArtifact(a.getGroupId(), a.getArtifactId(), "", "pom", a.getVersion());
-
-            ArtifactRequest pomReq = new ArtifactRequest(pom, ctx.remoteRepositories(), null);
-
-            req.add(pomReq);
-
             return ctx
                 .repositorySystem()
                 .resolveArtifacts(ctx.repositorySystemSession(), req)
                 .stream()
                 .map(a_ -> {
                     if (a_.getArtifact().getExtension().equals("pom")) {
-                        return new Fetch(a_, parents(ctx, a_));
+                        return new Fetch(a_, parents(ctx, walk, a_));
                     } else {
                         return new Fetch(a_, new ArrayList<>());
                     }
@@ -200,17 +223,17 @@ public class Graph {
     }
 
     public static List<ArtifactResult> fetchDirect(Context ctx, Dependency dep) {
+        List<ArtifactRequest> req = new ArrayList<>(Arrays.asList(new ArtifactRequest(dep.getArtifact(), ctx.remoteRepositories(), null)));
+
+        Artifact a = dep.getArtifact();
+
+        DefaultArtifact pom = new DefaultArtifact(a.getGroupId(), a.getArtifactId(), "", "pom", a.getVersion());
+
+        ArtifactRequest pomReq = new ArtifactRequest(pom, ctx.remoteRepositories(), null);
+
+        req.add(pomReq);
+
         try {
-            List<ArtifactRequest> req = new ArrayList<>(Arrays.asList(new ArtifactRequest(dep.getArtifact(), ctx.remoteRepositories(), null)));
-
-            Artifact a = dep.getArtifact();
-
-            DefaultArtifact pom = new DefaultArtifact(a.getGroupId(), a.getArtifactId(), "", "pom", a.getVersion());
-
-            ArtifactRequest pomReq = new ArtifactRequest(pom, ctx.remoteRepositories(), null);
-
-            req.add(pomReq);
-
             return ctx
                 .repositorySystem()
                 .resolveArtifacts(ctx.repositorySystemSession(), req)
@@ -256,26 +279,36 @@ public class Graph {
         }
     }
 
-    public static List<Dependency> parents(Context ctx, ArtifactResult a) {
+    public static List<Dependency> parents(Context ctx, Map<Dependency, Res> walk, ArtifactResult a) {
         Model m = readPOMNoResolve(ctx, a.getLocalArtifactResult().getFile());
 
         Optional<Dependency> p = Optional.ofNullable(m.getParent()).map(Graph::parentDependency);
 
-        List<Dependency> res = new ArrayList<>();
+        List<Dependency> parents = new ArrayList<>();
 
         while (p.isPresent()) {
-            res.add(p.get());
+            parents.add(p.get());
 
             for (ArtifactResult ar : fetchDirect(ctx, p.get())) {
+                if (ar.getLocalArtifactResult().getFile() == null) {
+                    LOGGER.info("Artifact resolution was null {}", ar);
+
+                    continue;
+                }
+
                 if (ar.getArtifact().getExtension().equals("pom")) {
                     m = readPOMNoResolve(ctx, ar.getLocalArtifactResult().getFile());
+
+                    m.setDependencies(m.getDependencies().stream().filter(d -> d.getVersion() != null && !d.getVersion().isEmpty()).collect(Collectors.toList()));
+
+                    resolve_(ctx, walk, m, true);
 
                     p = Optional.ofNullable(m.getParent()).map(Graph::parentDependency);
                 }
             }
         }
 
-        return res;
+        return parents;
     }
 
     public static Model readPOMNoResolve(Context ctx, File f) {
