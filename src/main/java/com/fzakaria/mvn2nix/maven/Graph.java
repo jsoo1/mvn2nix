@@ -399,9 +399,7 @@ public class Graph {
                 "jar",
                 p.getVersion()
             ),
-            "test",
-            false,
-            new ArrayList<>()
+            "test"
         );
     }
 
@@ -428,9 +426,7 @@ public class Graph {
                 "jar",
                 p.getVersion()
             ),
-            "test",
-            false,
-            new ArrayList<>()
+            "test"
         );
     }
 
