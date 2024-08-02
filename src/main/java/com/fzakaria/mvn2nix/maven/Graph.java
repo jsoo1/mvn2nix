@@ -190,7 +190,7 @@ public class Graph {
                 .stream()
                 .map(a_ -> {
                     if (a_.getArtifact().getExtension().equals("pom")) {
-                        return new Fetch(a_, parent(a_));
+                        return new Fetch(a_, parent(ctx, a_));
                     } else {
                         return new Fetch(a_, Optional.empty());
                     }
@@ -236,49 +236,36 @@ public class Graph {
         }
     }
 
-    public static Optional<Dependency> parent(ArtifactResult a) {
-        Model m = readPOMNoResolve(a.getLocalArtifactResult().getFile());
+    public static Optional<Dependency> parent(Context ctx, ArtifactResult a) {
+        Model m = readPOMNoResolve(ctx, a.getLocalArtifactResult().getFile());
 
         return Optional.ofNullable(m.getParent()).map(Graph::parentDependency);
     }
 
-    public static Model readPOMNoResolve(File f) {
+    public static Model readPOMNoResolve(Context ctx, File f) {
+        RemoteRepositoryManager remoteRepositoryManager = ctx.lookup()
+            .lookup(RemoteRepositoryManager.class)
+            .orElseThrow(() -> new IllegalStateException("component not found"));
+
+        ProjectModelResolver resolver = new ProjectModelResolver(
+            ctx.repositorySystemSession(),
+            new RequestTrace(null),
+            ctx.repositorySystem(),
+            remoteRepositoryManager,
+            ctx.remoteRepositories(),
+            ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
+            new PublicReactorModelPool()
+        );
+
+        ModelBuildingRequest req = new DefaultModelBuildingRequest();
+
+        req.setTwoPhaseBuilding(true);
+
+        req.setPomFile(f).setModelResolver(resolver);
         try {
-            Model m = new MavenXpp3Reader().read(new BufferedReader(new FileReader(f)));
-
-            MavenXpp3Reader.ContentTransformer t = new MavenXpp3Reader.ContentTransformer() {
-                @Override
-                public String transform(String content, String fieldName) {
-                    // FIXME(jsoo1): Naive pattern, but there must be an official one
-                    Matcher matcher = Pattern.compile("\\$\\{([a-zA-Z_0-9.-]+)\\}").matcher(content);
-
-                    StringBuffer sb = new StringBuffer();
-
-                    while (matcher.find()) {
-                        String prop = matcher.group(1);
-
-                        Optional<String> val = Optional.ofNullable(m.getProperties().getProperty(prop)).filter(Predicate.not(String::isEmpty));
-
-                        if (val.isEmpty()) {
-                            LOGGER.debug("Interpolation failed, property {} not found for field {} in file {} with original content {}", prop, fieldName, f, content);
-
-                            continue;
-                        }
-
-                        matcher.appendReplacement(sb, Matcher.quoteReplacement(val.get()));
-                    }
-
-                    matcher.appendTail(sb);
-
-                    return sb.toString();
-                }
-            };
-
-            return new MavenXpp3Reader(t).read(new BufferedReader(new FileReader(f)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (XmlPullParserException e) {
-            throw new RuntimeException(e);
+            return factory.newInstance().build(req).getEffectiveModel();
+        } catch (ModelBuildingException e) {
+            throw new RuntimeException(e.getMessage(), (Throwable) e);
         }
     }
 
