@@ -369,11 +369,11 @@ public class Graph {
         return a.getGroupId()
             + ":" + a.getArtifactId()
             + (a.getExtension() == "jar" ? "" : (":" + a.getExtension()))
-            + ":" + a.getVersion()
             + Optional.ofNullable(a.getClassifier())
                 .filter(Predicate.not(String::isEmpty))
                 .map(s -> ":" + s)
-                .orElse("");
+                .orElse("")
+            + ":" + a.getVersion();
     }
 
     public static Dependency toAether(org.apache.maven.model.Dependency d) {
