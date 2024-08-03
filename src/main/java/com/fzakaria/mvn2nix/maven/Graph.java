@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Set;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -97,7 +98,7 @@ public class Graph {
         List<Dependency> parents = direct.stream()
             .flatMap(d -> fetchDirect(ctx, d).stream())
             .flatMap(a -> a.getArtifact().getExtension().equals("pom")
-                ? parents(ctx, walk, a).stream()
+                ? parents(ctx, new Stack<>(), walk, a).stream()
                 : Stream.empty()
             )
             .collect(Collectors.toList());
@@ -120,12 +121,12 @@ public class Graph {
     public static Map<Dependency, Res> resolve(Context ctx, Model pom, boolean resolveRoots) {
         Map<Dependency, Res> walk = new HashMap<>();
 
-        resolve_(ctx, walk, pom, resolveRoots);
+        resolve_(ctx, new Stack<>(), walk, pom, resolveRoots);
 
         return walk;
     }
 
-    public static void resolve_(Context ctx, Map<Dependency, Res> walk, Model pom, boolean resolveRoots) {
+    public static void resolve_(Context ctx, Stack<Dependency> seen, Map<Dependency, Res> walk, Model pom, boolean resolveRoots) {
         Stream<Dependency> initial = resolveRoots
             // If this is a published package, then we don't care about build dependencies at all
             ? runDependencies(pom).stream().map(Graph::toAether)
@@ -146,7 +147,7 @@ public class Graph {
 
             LOGGER.trace("Considering dependency {}", d);
 
-            if (walk.containsKey(d)) {
+            if (walk.containsKey(d) || seen.stream().anyMatch(d_ -> d.equals(d_))) {
                 continue;
             }
 
@@ -156,11 +157,15 @@ public class Graph {
 
             List<ArtifactResult> artifacts = new ArrayList<>();
 
-            for (Fetch f: fetchTransitive(ctx, walk, d)) {
+            seen.push(d);
+
+            for (Fetch f: fetchTransitive(ctx, seen, walk, d)) {
                 artifacts.add(f.artifact);
 
                 these.addAll(f.parents);
             }
+
+            seen.pop();
 
             walk.put(d, new Res(these, artifacts));
 
@@ -255,7 +260,7 @@ public class Graph {
         new Exclusion("jdk", "srczip", "", "jar")
     }));
 
-    public static List<Fetch> fetchTransitive(Context ctx, Map<Dependency, Res> walk, Dependency dep) {
+    public static List<Fetch> fetchTransitive(Context ctx, Stack<Dependency> seen, Map<Dependency, Res> walk, Dependency dep) {
         List<ArtifactRequest> req = new ArrayList<>(Arrays.asList(new ArtifactRequest(dep.getArtifact(), ctx.remoteRepositories(), null)));
 
         Artifact a = dep.getArtifact();
@@ -273,7 +278,7 @@ public class Graph {
                 .stream()
                 .map(a_ -> {
                     if (a_.getArtifact().getExtension().equals("pom")) {
-                        return new Fetch(a_, parents(ctx, walk, a_));
+                        return new Fetch(a_, parents(ctx, seen, walk, a_));
                     } else {
                         return new Fetch(a_, new ArrayList<>());
                     }
@@ -350,7 +355,7 @@ public class Graph {
         }
     }
 
-    public static List<Dependency> parents(Context ctx, Map<Dependency, Res> walk, ArtifactResult a) {
+    public static List<Dependency> parents(Context ctx, Stack<Dependency> seen, Map<Dependency, Res> walk, ArtifactResult a) {
         Model m = readPOMNoResolve(ctx, a.getLocalArtifactResult().getFile());
 
         Optional<Dependency> p = Optional.ofNullable(m.getParent()).map(Graph::parentDependency);
@@ -372,7 +377,7 @@ public class Graph {
 
                     m.setDependencies(runDependencies(m).stream().filter(d -> d.getVersion() != null && !d.getVersion().isEmpty()).collect(Collectors.toList()));
 
-                    resolve_(ctx, walk, m, true);
+                    resolve_(ctx, seen, walk, m, true);
 
                     p = Optional.ofNullable(m.getParent()).map(Graph::parentDependency);
                 }
