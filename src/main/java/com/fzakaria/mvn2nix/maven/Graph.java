@@ -231,10 +231,14 @@ public class Graph {
     }
 
     public static final List<Exclusion> exclusions = new ArrayList<>(Arrays.asList(new Exclusion[]{
+        // These are not available in central (only care about central)
         new Exclusion("xerces", "xerces-impl", "", "pom"),
         new Exclusion("xerces", "xerces-impl", "", "jar"),
         new Exclusion("xml-apis", "xml-apis", "", "pom"),
         new Exclusion("xml-apis", "xml-apis", "", "jar"),
+        new Exclusion("org.jboss.ejb3", "jboss-ejb3-api", "", "pom"),
+        new Exclusion("org.jboss.ejb3", "jboss-ejb3-api", "", "jar"),
+        // We want to control the jdk ourselves, probably
         new Exclusion("jdk", "srczip", "", "pom"),
         new Exclusion("jdk", "srczip", "", "jar")
     }));
