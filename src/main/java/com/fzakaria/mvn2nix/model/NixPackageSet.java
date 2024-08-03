@@ -146,7 +146,11 @@ public class NixPackageSet {
 
     public static String url(Path localRepo, ArtifactResult a) {
         try {
-            URI remote = new URI(a.getLocalArtifactResult().getRepository().getUrl());
+            String repo = Optional.ofNullable(a.getLocalArtifactResult().getRepository())
+                .map(r -> r.getUrl())
+                .orElse(CENTRAL);
+
+            URI remote = new URI(repo);
 
             Path base = new File(remote.getPath()).toPath();
 
@@ -157,6 +161,8 @@ public class NixPackageSet {
             throw new RuntimeException(e);
         }
     }
+
+    public static final String CENTRAL = "https://repo.maven.apache.org/maven2/";
 
     public static String attrName(Artifact a) {
         return Graph.mavenCoordinates(a).replaceAll("\\.", "_").replaceAll(":", "__");
