@@ -56,7 +56,6 @@ self: super: {
       nativeBuildInputs = [
         self.rlwrap # very handy for jdb
         self.java-language-server
-        self.metals
       ];
     };
 
