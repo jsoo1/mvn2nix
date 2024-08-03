@@ -234,7 +234,9 @@ public class Graph {
         new Exclusion("xerces", "xerces-impl", "", "pom"),
         new Exclusion("xerces", "xerces-impl", "", "jar"),
         new Exclusion("xml-apis", "xml-apis", "", "pom"),
-        new Exclusion("xml-apis", "xml-apis", "", "jar")
+        new Exclusion("xml-apis", "xml-apis", "", "jar"),
+        new Exclusion("jdk", "srczip", "", "pom"),
+        new Exclusion("jdk", "srczip", "", "jar")
     }));
 
     public static List<Fetch> fetchTransitive(Context ctx, Map<Dependency, Res> walk, Dependency dep) {
