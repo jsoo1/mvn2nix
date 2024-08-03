@@ -142,13 +142,13 @@ public class Graph {
         while (!todos.isEmpty()) {
             Dependency d = todos.remove();
 
-            LOGGER.trace("Considering dependency {}", mavenCoordinates(d.getArtifact()));
+            LOGGER.trace("Considering dependency {}", d);
 
             if (walk.containsKey(d)) {
                 continue;
             }
 
-            LOGGER.trace("Walking dependency {}", mavenCoordinates(d.getArtifact()));
+            LOGGER.trace("Walking dependency {}", d);
 
             List<Dependency> these = collect(ctx, d).getDependencies(true);
 
@@ -399,17 +399,6 @@ public class Graph {
 
     public static Dependency parentDependency(Parent p) {
         return new Dependency(new DefaultArtifact(p.getGroupId(), p.getArtifactId(), "pom", p.getVersion()), "test");
-    }
-
-    public static String mavenCoordinates(Artifact a) {
-        return a.getGroupId()
-            + ":" + a.getArtifactId()
-            + (a.getExtension() == "jar" ? "" : (":" + a.getExtension()))
-            + Optional.ofNullable(a.getClassifier())
-                .filter(Predicate.not(String::isEmpty))
-                .map(s -> ":" + s)
-                .orElse("")
-            + ":" + a.getVersion();
     }
 
     public static Dependency toAether(org.apache.maven.model.Dependency d) {

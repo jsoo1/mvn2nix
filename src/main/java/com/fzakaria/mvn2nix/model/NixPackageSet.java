@@ -95,7 +95,7 @@ public class NixPackageSet {
         Graph.Res r = e.getValue();
 
         List<Dependency> deps = r.dependencies.stream()
-            .filter(d_ -> !Graph.mavenCoordinates(d.getArtifact()).equals(Graph.mavenCoordinates(d_.getArtifact())))
+            .filter(d_ -> !d.getArtifact().toString().equals(d_.getArtifact().toString()))
             .filter(distinctByKey(d_ -> d_.toString()))
             .collect(Collectors.toList());
 
@@ -107,7 +107,7 @@ public class NixPackageSet {
         Predicate<ArtifactResult> uniqFile = distinctByKey(ar -> ar.getLocalArtifactResult().getFile());
 
         Expr args = new App(new Var(PATCH_MAVEN_JAR), new Attrs(Stream.of(
-            pair("name", new LitS(Graph.mavenCoordinates(a))),
+            pair("name", new LitS(a.toString())),
             pair("groupId", new LitS(a.getGroupId())),
             pair("artifactId", new LitS(a.getArtifactId())),
             pair("version", new LitS(a.getVersion())),
@@ -165,7 +165,7 @@ public class NixPackageSet {
     public static final String CENTRAL = "https://repo.maven.apache.org/maven2/";
 
     public static String attrName(Artifact a) {
-        return Graph.mavenCoordinates(a).replaceAll("\\.", "_").replaceAll(":", "__");
+        return a.toString().replaceAll("\\.", "_").replaceAll(":", "__");
     }
 
     public static String sha256(File f) {
