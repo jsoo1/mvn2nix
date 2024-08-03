@@ -96,7 +96,7 @@ public class Graph {
         Map<Dependency, Res> walk = new HashMap<>();
 
         List<Dependency> parents = direct.stream()
-            .flatMap(d -> fetchDirect(ctx, d).stream())
+            .flatMap(d -> fetchDirect(ctx, d, Optional.empty()).stream())
             .flatMap(a -> a.getArtifact().getExtension().equals("pom")
                 ? parents(ctx, new Stack<>(), walk, a).stream()
                 : Stream.empty()
@@ -142,6 +142,8 @@ public class Graph {
             todos.add(rootDependency((pom)));
         }
 
+        Optional<RemoteRepository> pomRepo = resolveRoots ? remoteRepository(pom) : Optional.empty();
+
         while (!todos.isEmpty()) {
             Dependency d = todos.remove();
 
@@ -159,7 +161,7 @@ public class Graph {
 
             seen.push(d);
 
-            for (Fetch f: fetchTransitive(ctx, seen, walk, d)) {
+            for (Fetch f: fetchTransitive(ctx, seen, walk, pomRepo, d)) {
                 artifacts.add(f.artifact);
 
                 these.addAll(f.parents);
@@ -175,6 +177,12 @@ public class Graph {
 
     public static Dependency rootDependency(Model pom) {
         return new Dependency(new DefaultArtifact(pom.getGroupId(), pom.getArtifactId(), pom.getPackaging(), pom.getVersion()), "test");
+    }
+
+    public static Optional<RemoteRepository> remoteRepository(Model pom) {
+        return Optional.ofNullable(pom.getDistributionManagement())
+            .flatMap(dm -> Optional.ofNullable(dm.getRepository()))
+            .map(Graph::toAether);
     }
 
     public static class Res {
@@ -260,14 +268,20 @@ public class Graph {
         new Exclusion("jdk", "srczip", "", "jar")
     }));
 
-    public static List<Fetch> fetchTransitive(Context ctx, Stack<Dependency> seen, Map<Dependency, Res> walk, Dependency dep) {
+    public static List<Fetch> fetchTransitive(Context ctx, Stack<Dependency> seen, Map<Dependency, Res> walk, Optional<RemoteRepository> pomRepo, Dependency dep) {
         List<ArtifactRequest> req = new ArrayList<>(Arrays.asList(new ArtifactRequest(dep.getArtifact(), ctx.remoteRepositories(), null)));
 
         Artifact a = dep.getArtifact();
 
         DefaultArtifact pom = new DefaultArtifact(a.getGroupId(), a.getArtifactId(), "", "pom", a.getVersion());
 
-        ArtifactRequest pomReq = new ArtifactRequest(pom, ctx.remoteRepositories(), null);
+        List<RemoteRepository> repos = new ArrayList<>(ctx.remoteRepositories());
+
+        if (pomRepo.isPresent()) {
+            repos.add(pomRepo.get());
+        }
+
+        ArtifactRequest pomReq = new ArtifactRequest(pom, repos, null);
 
         req.add(pomReq);
 
@@ -289,14 +303,20 @@ public class Graph {
         }
     }
 
-    public static List<ArtifactResult> fetchDirect(Context ctx, Dependency dep) {
+    public static List<ArtifactResult> fetchDirect(Context ctx, Dependency dep, Optional<RemoteRepository> pomRepo) {
         List<ArtifactRequest> req = new ArrayList<>(Arrays.asList(new ArtifactRequest(dep.getArtifact(), ctx.remoteRepositories(), null)));
 
         Artifact a = dep.getArtifact();
 
         DefaultArtifact pom = new DefaultArtifact(a.getGroupId(), a.getArtifactId(), "", "pom", a.getVersion());
 
-        ArtifactRequest pomReq = new ArtifactRequest(pom, ctx.remoteRepositories(), null);
+        List<RemoteRepository> repos = new ArrayList<>(ctx.remoteRepositories());
+
+        if (pomRepo.isPresent()) {
+            repos.add(pomRepo.get());
+        }
+
+        ArtifactRequest pomReq = new ArtifactRequest(pom, repos, null);
 
         req.add(pomReq);
 
@@ -356,7 +376,7 @@ public class Graph {
         while (p.isPresent()) {
             parents.add(p.get());
 
-            for (ArtifactResult ar : fetchDirect(ctx, p.get())) {
+            for (ArtifactResult ar : fetchDirect(ctx, p.get(), remoteRepository(m))) {
                 if (ar.getLocalArtifactResult().getFile() == null) {
                     LOGGER.info("Artifact resolution was null {}", ar);
 
@@ -465,6 +485,10 @@ public class Graph {
 
     public static Exclusion toAether(org.apache.maven.model.Exclusion e) {
         return new Exclusion(e.getGroupId(), e.getArtifactId(), null, null);
+    }
+
+    public static RemoteRepository toAether(org.apache.maven.model.DeploymentRepository r) {
+        return new RemoteRepository.Builder(r.getId(), null, r.getUrl()).build();
     }
 
     public static Optional<String> extension(File file) {
