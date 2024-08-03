@@ -7,6 +7,8 @@ import eu.maveniverse.maven.mima.context.Runtimes;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -100,7 +102,11 @@ public class Graph {
 
         parents.addAll(direct);
 
-        Res r = new Res(parents, new ArrayList<>());
+        List<Dependency> deps = parents.stream()
+            .filter(distinctByKey(d -> d.getArtifact().toString()))
+            .collect(Collectors.toList());
+
+        Res r = new Res(deps, new ArrayList<>());
 
         Model m = pom.clone();
 
@@ -119,10 +125,15 @@ public class Graph {
 
     public static void resolve_(Context ctx, Map<Dependency, Res> walk, Model pom, boolean resolveRoots) {
         List<Dependency> initial = resolveRoots
+            // If this is a published package, then we don't care about build dependencies at all
             ? pom.getDependencies().stream().map(Graph::toAether).collect(Collectors.toList())
+            // Otherwise we want to make sure this can do a full offline build
             : runAndBuildDependencies(pom);
 
-        Queue<Dependency> todos = new ArrayDeque<>(initial);
+        Queue<Dependency> todos = new ArrayDeque<>(initial.stream()
+            .filter(distinctByKey(d -> d.getArtifact().toString()))
+            .collect(Collectors.toList())
+        );
 
         if (resolveRoots) {
             todos.add(rootDependency((pom)));
@@ -460,5 +471,10 @@ public class Graph {
             return Optional.empty(); // empty extension
         }
         return Optional.of(name.substring(lastIndexOf));
+    }
+
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
     }
 }
