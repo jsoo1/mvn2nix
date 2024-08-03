@@ -88,7 +88,9 @@ public class Graph {
     private static DefaultModelBuilderFactory factory = new DefaultModelBuilderFactory();
 
     public static Map.Entry<Dependency, Res> self(Context ctx, Model pom) {
-        List<Dependency> direct = runAndBuildDependencies(pom);
+        List<Dependency> direct = runDependencies(pom).stream().map(Graph::toAether).collect(Collectors.toList());
+
+        direct.addAll(buildDependencies(pom));
 
         Map<Dependency, Res> walk = new HashMap<>();
 
@@ -124,13 +126,13 @@ public class Graph {
     }
 
     public static void resolve_(Context ctx, Map<Dependency, Res> walk, Model pom, boolean resolveRoots) {
-        List<Dependency> initial = resolveRoots
+        Stream<Dependency> initial = resolveRoots
             // If this is a published package, then we don't care about build dependencies at all
-            ? pom.getDependencies().stream().map(Graph::toAether).collect(Collectors.toList())
+            ? runDependencies(pom).stream().map(Graph::toAether)
             // Otherwise we want to make sure this can do a full offline build
-            : runAndBuildDependencies(pom);
+            : Stream.concat(runDependencies(pom).stream().map(Graph::toAether), buildDependencies(pom).stream());
 
-        Queue<Dependency> todos = new ArrayDeque<>(initial.stream()
+        Queue<Dependency> todos = new ArrayDeque<>(initial
             .filter(distinctByKey(d -> d.getArtifact().toString()))
             .collect(Collectors.toList())
         );
@@ -179,16 +181,14 @@ public class Graph {
         }
     };
 
-    public static List<Dependency> runAndBuildDependencies(Model pom) {
-        Stream<org.apache.maven.model.Dependency> deps_ = pom.getDependencies().stream();
-
-        Stream<org.apache.maven.model.Dependency> pluginDeps = pom
+    public static List<Dependency> buildDependencies(Model pom) {
+        List<Dependency> deps = pom
             .getBuild()
             .getPlugins()
             .stream()
-            .flatMap(p -> p.getDependencies().stream());
-
-        List<Dependency> deps = Stream.concat(deps_, pluginDeps).map(Graph::toAether).collect(Collectors.toList());
+            .flatMap(p -> p.getDependencies().stream())
+            .map(Graph::toAether)
+            .collect(Collectors.toList());
 
         LifecycleMapping lifecycles = PublicLifecycleMappings.getLifecycle(pom.getPackaging())
             .orElseThrow(() -> new RuntimeException("Don't know how to handle packaging type provided by POM, got: " + pom.getPackaging()));
@@ -205,6 +205,18 @@ public class Graph {
         pom.getBuild().getPlugins().stream().map(Graph::toAether).forEach(d -> deps.add(d));
 
         pom.getReporting().getPlugins().stream().map(Graph::toAether).forEach(d -> deps.add(d));
+
+        return deps;
+    }
+
+    public static List<org.apache.maven.model.Dependency> runDependencies(Model pom) {
+        List<org.apache.maven.model.Dependency> deps = pom.getDependencies();
+
+        List<org.apache.maven.model.Dependency> managed = Optional.ofNullable(pom.getDependencyManagement())
+            .map(ds -> ds.getDependencies())
+            .orElse(new ArrayList<>());
+
+        deps.addAll(managed);
 
         return deps;
     }
@@ -358,7 +370,7 @@ public class Graph {
                 if (ar.getArtifact().getExtension().equals("pom")) {
                     m = readPOMNoResolve(ctx, ar.getLocalArtifactResult().getFile());
 
-                    m.setDependencies(m.getDependencies().stream().filter(d -> d.getVersion() != null && !d.getVersion().isEmpty()).collect(Collectors.toList()));
+                    m.setDependencies(runDependencies(m).stream().filter(d -> d.getVersion() != null && !d.getVersion().isEmpty()).collect(Collectors.toList()));
 
                     resolve_(ctx, walk, m, true);
 
