@@ -27,19 +27,21 @@ self: super: {
     # mkMavenRepository : [ patchMavenJar.drv ] -> drv
     passthru.mkMavenRepository = dependencies:
       let
+        # TODO(jsoo1): Use evalConfig?
+
         # go : attrs drv -> { drv: patchMavenJar.drv; ... } -> attrs drv
         go = seen: { drv, ... }:
-          self.lib.foldl' visit (seen // { ${drv.name} = farm drv; })
-            drv.dependencies;
-
-        # farm : patchMavenJar.drv; -> drv
-        farm = drv: self.linkFarm "${drv.name}-maven-repository"
-          (map (a: { name = self.mvn2nix.lib.mavenPath drv a.extension; path = a.drv; })
-            drv.artifacts);
+          self.lib.foldl' visit (cons drv seen) drv.dependencies;
 
         # visit : attrs drv -> { drv: patchMavenJar.drv; ... } -> attrs drv
         visit = seen: x:
-          go (seen // { ${x.drv.name} = farm x.drv; }) x;
+          if seen ? ${x.drv.name}
+          then seen
+          else go (cons x.drv seen) x;
+
+        # mkFarm : attrs drv -> patchMavenJar.drv -> attrs drv
+        cons = drv: seen:
+          { ${drv.name} = drv.maven-repository; } // seen;
       in
       self.symlinkJoin {
         name = "maven-repository";

@@ -32,6 +32,15 @@ rec {
     in
     loop str;
 
+  # Make a maven repository `linkFarm` spec out of a patchMavenJar
+  # derivation artifact.
+  #
+  # mavenRepositoryLink : patchMavenJar.drv -> { drv: fetchurl.drv; extension: str; ... } -> attrs str
+  mavenRepositoryLink = drv: a: {
+    name = mavenPath drv a.extension;
+    path = "${a.drv}";
+  };
+
   # The path in a maven repository in a patchMavenJar.drv raw output
   # given an extension.
   #
