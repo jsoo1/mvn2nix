@@ -10,15 +10,13 @@ patchMavenJar {
   artifactId = "plexus-containers";
   version = "2.0.0";
   classifier = null;
-  artifacts = [
-    {
-      extension = "pom";
-      drv = pkgs.fetchurl {
-        url = "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-containers/2.0.0/plexus-containers-2.0.0.pom";
-        sha256 = "be5e3f8e59edce852a0fdaef8caedb32f364bf13db654d15f98e17930e456487";
-      };
-    }
-  ];
+  artifact = {
+    extension = "pom";
+    drv = pkgs.fetchurl {
+      url = "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-containers/2.0.0/plexus-containers-2.0.0.pom";
+      sha256 = "be5e3f8e59edce852a0fdaef8caedb32f364bf13db654d15f98e17930e456487";
+    };
+  };
   dependencies = [
     {
       drv = org_codehaus_plexus__plexus__pom__5_1;

@@ -9,15 +9,13 @@ patchMavenJar {
   artifactId = "slf4j-bom";
   version = "2.0.13";
   classifier = null;
-  artifacts = [
-    {
-      extension = "pom";
-      drv = pkgs.fetchurl {
-        url = "https://repo.maven.apache.org/maven2/org/slf4j/slf4j-bom/2.0.13/slf4j-bom-2.0.13.pom";
-        sha256 = "7af272d7a738e2b98763791ffdd896040e8beb298a88fd606214407976cd310a";
-      };
-    }
-  ];
+  artifact = {
+    extension = "pom";
+    drv = pkgs.fetchurl {
+      url = "https://repo.maven.apache.org/maven2/org/slf4j/slf4j-bom/2.0.13/slf4j-bom-2.0.13.pom";
+      sha256 = "7af272d7a738e2b98763791ffdd896040e8beb298a88fd606214407976cd310a";
+    };
+  };
   dependencies = [ ];
   meta.sourceProvenance = [
     lib.sourceTypes.binaryBytecode

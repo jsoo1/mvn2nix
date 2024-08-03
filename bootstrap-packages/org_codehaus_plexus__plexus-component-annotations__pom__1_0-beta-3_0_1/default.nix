@@ -1,0 +1,30 @@
+{
+  lib
+, pkgs
+, patchMavenJar
+, org_codehaus_plexus__plexus-containers__pom__1_0-beta-3_0_1
+}:
+patchMavenJar {
+  name = "org.codehaus.plexus:plexus-component-annotations:pom:1.0-beta-3.0.1";
+  groupId = "org.codehaus.plexus";
+  artifactId = "plexus-component-annotations";
+  version = "1.0-beta-3.0.1";
+  classifier = null;
+  artifact = {
+    extension = "pom";
+    drv = pkgs.fetchurl {
+      url = "https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-component-annotations/1.0-beta-3.0.1/plexus-component-annotations-1.0-beta-3.0.1.pom";
+      sha256 = "eb602c9bf4e94de7f6a88d1ed10662259632153a721957c0cb17502e955de361";
+    };
+  };
+  dependencies = [
+    {
+      drv = org_codehaus_plexus__plexus-containers__pom__1_0-beta-3_0_1;
+      scope = "test";
+      optional = false;
+    }
+  ];
+  meta.sourceProvenance = [
+    lib.sourceTypes.binaryBytecode
+  ];
+}

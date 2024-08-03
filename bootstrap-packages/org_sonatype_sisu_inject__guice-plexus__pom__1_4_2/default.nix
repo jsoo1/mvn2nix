@@ -3,9 +3,6 @@
 , pkgs
 , patchMavenJar
 , org_sonatype_sisu_inject__guice-bean__pom__1_4_2
-, org_sonatype_sisu__sisu-parent__pom__1_4_2
-, org_sonatype_forge__forge-parent__pom__6
-, org_sonatype_sisu__sisu-inject__pom__1_4_2
 }:
 patchMavenJar {
   name = "org.sonatype.sisu.inject:guice-plexus:pom:1.4.2";
@@ -13,33 +10,16 @@ patchMavenJar {
   artifactId = "guice-plexus";
   version = "1.4.2";
   classifier = null;
-  artifacts = [
-    {
-      extension = "pom";
-      drv = pkgs.fetchurl {
-        url = "https://repo.maven.apache.org/maven2/org/sonatype/sisu/inject/guice-plexus/1.4.2/guice-plexus-1.4.2.pom";
-        sha256 = "13a66ca6e6ad1a186076513eea822db2c3c0e460a983a0a31f4d937de336ad98";
-      };
-    }
-  ];
+  artifact = {
+    extension = "pom";
+    drv = pkgs.fetchurl {
+      url = "https://repo.maven.apache.org/maven2/org/sonatype/sisu/inject/guice-plexus/1.4.2/guice-plexus-1.4.2.pom";
+      sha256 = "13a66ca6e6ad1a186076513eea822db2c3c0e460a983a0a31f4d937de336ad98";
+    };
+  };
   dependencies = [
     {
       drv = org_sonatype_sisu_inject__guice-bean__pom__1_4_2;
-      scope = "test";
-      optional = false;
-    }
-    {
-      drv = org_sonatype_sisu__sisu-parent__pom__1_4_2;
-      scope = "test";
-      optional = false;
-    }
-    {
-      drv = org_sonatype_forge__forge-parent__pom__6;
-      scope = "test";
-      optional = false;
-    }
-    {
-      drv = org_sonatype_sisu__sisu-inject__pom__1_4_2;
       scope = "test";
       optional = false;
     }

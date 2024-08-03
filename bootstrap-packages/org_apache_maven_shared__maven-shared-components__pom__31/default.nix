@@ -3,7 +3,6 @@
 , pkgs
 , patchMavenJar
 , org_apache_maven__maven-parent__pom__31
-, org_apache__apache__pom__19
 }:
 patchMavenJar {
   name = "org.apache.maven.shared:maven-shared-components:pom:31";
@@ -11,23 +10,16 @@ patchMavenJar {
   artifactId = "maven-shared-components";
   version = "31";
   classifier = null;
-  artifacts = [
-    {
-      extension = "pom";
-      drv = pkgs.fetchurl {
-        url = "https://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/31/maven-shared-components-31.pom";
-        sha256 = "d81a80d2cb54500a4f9f2a015e484393cba991e39d336425458ec6682d9a2dca";
-      };
-    }
-  ];
+  artifact = {
+    extension = "pom";
+    drv = pkgs.fetchurl {
+      url = "https://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-shared-components/31/maven-shared-components-31.pom";
+      sha256 = "d81a80d2cb54500a4f9f2a015e484393cba991e39d336425458ec6682d9a2dca";
+    };
+  };
   dependencies = [
     {
       drv = org_apache_maven__maven-parent__pom__31;
-      scope = "test";
-      optional = false;
-    }
-    {
-      drv = org_apache__apache__pom__19;
       scope = "test";
       optional = false;
     }

@@ -2,8 +2,8 @@
   lib
 , pkgs
 , patchMavenJar
+, org_junit__junit-bom__pom__5_10_2
 , org_apache_maven__maven-parent__pom__42
-, org_apache__apache__pom__32
 }:
 patchMavenJar {
   name = "org.apache.maven.resolver:maven-resolver:pom:1.9.20";
@@ -11,23 +11,21 @@ patchMavenJar {
   artifactId = "maven-resolver";
   version = "1.9.20";
   classifier = null;
-  artifacts = [
-    {
-      extension = "pom";
-      drv = pkgs.fetchurl {
-        url = "https://repo.maven.apache.org/maven2/org/apache/maven/resolver/maven-resolver/1.9.20/maven-resolver-1.9.20.pom";
-        sha256 = "4a737dcae48cc0970996f1afdf2d30f4b3954bf4510cee0bf4699f78ed58b97a";
-      };
-    }
-  ];
+  artifact = {
+    extension = "pom";
+    drv = pkgs.fetchurl {
+      url = "https://repo.maven.apache.org/maven2/org/apache/maven/resolver/maven-resolver/1.9.20/maven-resolver-1.9.20.pom";
+      sha256 = "4a737dcae48cc0970996f1afdf2d30f4b3954bf4510cee0bf4699f78ed58b97a";
+    };
+  };
   dependencies = [
     {
-      drv = org_apache_maven__maven-parent__pom__42;
+      drv = org_junit__junit-bom__pom__5_10_2;
       scope = "test";
       optional = false;
     }
     {
-      drv = org_apache__apache__pom__32;
+      drv = org_apache_maven__maven-parent__pom__42;
       scope = "test";
       optional = false;
     }

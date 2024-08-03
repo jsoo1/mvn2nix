@@ -10,15 +10,13 @@ patchMavenJar {
   artifactId = "maven-parent";
   version = "41";
   classifier = null;
-  artifacts = [
-    {
-      extension = "pom";
-      drv = pkgs.fetchurl {
-        url = "https://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/41/maven-parent-41.pom";
-        sha256 = "762fcdd4ce8621c5fa0a2cf6495ad26972a8093eb432aa3e402bc2d4e2500c53";
-      };
-    }
-  ];
+  artifact = {
+    extension = "pom";
+    drv = pkgs.fetchurl {
+      url = "https://repo.maven.apache.org/maven2/org/apache/maven/maven-parent/41/maven-parent-41.pom";
+      sha256 = "762fcdd4ce8621c5fa0a2cf6495ad26972a8093eb432aa3e402bc2d4e2500c53";
+    };
+  };
   dependencies = [
     {
       drv = org_apache__apache__pom__31;

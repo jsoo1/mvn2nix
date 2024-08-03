@@ -2,8 +2,6 @@
   lib
 , pkgs
 , patchMavenJar
-, org_apache__apache__pom__29
-, org_apache_maven_plugin-tools__maven-plugin-annotations__3_7_0
 , org_apache_maven__maven-parent__pom__39
 }:
 patchMavenJar {
@@ -12,26 +10,14 @@ patchMavenJar {
   artifactId = "maven-plugins";
   version = "39";
   classifier = null;
-  artifacts = [
-    {
-      extension = "pom";
-      drv = pkgs.fetchurl {
-        url = "https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-plugins/39/maven-plugins-39.pom";
-        sha256 = "18085afbef3a17942b442135a3f0e77018cda66edd33c6b18fd18440661bc29e";
-      };
-    }
-  ];
+  artifact = {
+    extension = "pom";
+    drv = pkgs.fetchurl {
+      url = "https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-plugins/39/maven-plugins-39.pom";
+      sha256 = "18085afbef3a17942b442135a3f0e77018cda66edd33c6b18fd18440661bc29e";
+    };
+  };
   dependencies = [
-    {
-      drv = org_apache__apache__pom__29;
-      scope = "test";
-      optional = false;
-    }
-    {
-      drv = org_apache_maven_plugin-tools__maven-plugin-annotations__3_7_0;
-      scope = "compile";
-      optional = false;
-    }
     {
       drv = org_apache_maven__maven-parent__pom__39;
       scope = "test";

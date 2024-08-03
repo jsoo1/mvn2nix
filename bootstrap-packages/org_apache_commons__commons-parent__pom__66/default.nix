@@ -2,6 +2,7 @@
   lib
 , pkgs
 , patchMavenJar
+, org_junit__junit-bom__pom__5_10_1
 , org_apache__apache__pom__31
 }:
 patchMavenJar {
@@ -10,16 +11,19 @@ patchMavenJar {
   artifactId = "commons-parent";
   version = "66";
   classifier = null;
-  artifacts = [
-    {
-      extension = "pom";
-      drv = pkgs.fetchurl {
-        url = "https://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/66/commons-parent-66.pom";
-        sha256 = "48fd6dc846e56b1f408660d163e75300f9e384bb63be482a8082a21d72a8db9c";
-      };
-    }
-  ];
+  artifact = {
+    extension = "pom";
+    drv = pkgs.fetchurl {
+      url = "https://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/66/commons-parent-66.pom";
+      sha256 = "48fd6dc846e56b1f408660d163e75300f9e384bb63be482a8082a21d72a8db9c";
+    };
+  };
   dependencies = [
+    {
+      drv = org_junit__junit-bom__pom__5_10_1;
+      scope = "test";
+      optional = false;
+    }
     {
       drv = org_apache__apache__pom__31;
       scope = "test";
