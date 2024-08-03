@@ -305,15 +305,6 @@ public class Graph {
                 .repositorySystem()
                 .resolveArtifacts(ctx.repositorySystemSession(), req)
                 .stream()
-                .filter(ar -> {
-                    if (ar.getLocalArtifactResult().getFile() == null) {
-                        LOGGER.debug("Missing local file for {}", ar.getArtifact());
-
-                        return false;
-                    }
-
-                    return true;
-                })
                 .collect(Collectors.toList());
         } catch (ArtifactResolutionException e) {
             throw new RuntimeException(e);
