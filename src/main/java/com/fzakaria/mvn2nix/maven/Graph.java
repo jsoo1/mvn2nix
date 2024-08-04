@@ -209,6 +209,8 @@ public class Graph {
 
         pom.getBuild().getPlugins().stream().map(Graph::toAether).forEach(d -> deps.add(d));
 
+        pom.getBuild().getPluginManagement().getPlugins().stream().map(Graph::toAether).forEach(d -> deps.add(d));
+
         pom.getReporting().getPlugins().stream().map(Graph::toAether).forEach(d -> deps.add(d));
 
         return deps;
