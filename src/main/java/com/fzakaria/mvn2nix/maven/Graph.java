@@ -28,6 +28,8 @@ import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.superpom.DefaultSuperPomProvider;
+import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectModelResolver;
 import org.apache.maven.project.PublicReactorModelPool;
@@ -88,13 +90,17 @@ public class Graph {
 
     private static DefaultModelBuilderFactory factory = new DefaultModelBuilderFactory();
 
-    public static Map.Entry<Dependency, Res> self(Model pom) {
+    public static final SuperPomProvider getSuperPom = new DefaultSuperPomProvider();
+
+    public static Map.Entry<Dependency, Res> self(Model pom, boolean resolveRoots) {
         List<Dependency> deps = runDependencies(pom)
             .stream()
             .map(Graph::toAether)
             .collect(Collectors.toList());
 
         deps.addAll(buildDependencies(pom));
+
+        superDependencies(pom, resolveRoots).forEach(d -> deps.add(d));
 
         Res r = new Res(
             deps.stream().filter(distinctByKey(d -> d.getArtifact().toString())).collect(Collectors.toList()),
@@ -115,9 +121,10 @@ public class Graph {
             // Otherwise we want to make sure this can do a full offline build
             : Stream.concat(runDependencies(pom).stream().map(Graph::toAether), buildDependencies(pom).stream());
 
-        Queue<Dependency> todos = new ArrayDeque<>(initial
-            .filter(distinctByKey(d -> d.getArtifact().toString()))
-            .collect(Collectors.toList())
+        Queue<Dependency> todos = new ArrayDeque<>(
+            Stream.concat(initial, superDependencies(pom, resolveRoots))
+                .filter(distinctByKey(d -> d.getArtifact().toString()))
+                .collect(Collectors.toList())
         );
 
         if (resolveRoots) {
@@ -166,6 +173,16 @@ public class Graph {
                 pom.getVersion()
             ),
             "test"
+        );
+    }
+
+    public static Stream<Dependency> superDependencies(Model pom, boolean resolveRoots) {
+
+        Model superPom = getSuperPom.getSuperModel(pom.getModelVersion());
+
+        return Stream.concat(
+            runDependencies(superPom).stream().map(Graph::toAether),
+            resolveRoots ? Stream.empty() : buildDependencies(superPom).stream()
         );
     }
 
