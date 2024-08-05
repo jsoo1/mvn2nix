@@ -373,6 +373,9 @@ public class Graph {
         new Exclusion("xerces", "xerces-impl", "", "jar"),
         new Exclusion("xml-apis", "xml-apis", "", "pom"),
         new Exclusion("xml-apis", "xml-apis", "", "jar"),
+        // FIXME(jsoo1): Why?
+        new Exclusion("org.jboss.ejb3", "jboss-ejb3-api", "", "jar"),
+        new Exclusion("org.jboss.ejb3", "jboss-ejb3-api", "", "pom"),
         // We want to control the jdk ourselves, probably
         new Exclusion("jdk", "srczip", "", "pom"),
         new Exclusion("jdk", "srczip", "", "jar")
