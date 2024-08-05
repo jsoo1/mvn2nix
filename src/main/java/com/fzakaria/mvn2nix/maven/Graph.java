@@ -420,6 +420,7 @@ public class Graph {
                 : parents.stream()
                     .flatMap(f -> Optional.ofNullable(f.pom.getDependencyManagement()).stream())
                     .flatMap(dm -> managedBy(dm, d).stream())
+                    .filter(d_ -> Optional.ofNullable(d_.getArtifact().getVersion()).filter(Predicate.not(String::isEmpty)).isPresent())
                     .findFirst())
             .orElse(d);
     }
@@ -441,7 +442,10 @@ public class Graph {
 
         return (fromPOM.isPresent()
             ? fromPOM
-            : parents.stream().flatMap(f -> managedBy(f.pom.getBuild().getPluginManagement(), p).stream()).findFirst())
+            : parents.stream()
+                .flatMap(f -> managedBy(f.pom.getBuild().getPluginManagement(), p).stream())
+                .filter(d_ -> Optional.ofNullable(d_.getVersion()).filter(Predicate.not(String::isEmpty)).isPresent())
+                .findFirst())
             .orElse(p);
     }
 
