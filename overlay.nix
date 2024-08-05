@@ -4,9 +4,9 @@ self: super: {
   }).overrideAttrs (o: {
     passthru.lib = self.callPackage ./lib.nix { };
 
-    passthru.patchMavenJar = self.callPackage ./patch-maven-jar.nix { };
+    passthru.patchMavenJar = self.callPackage ./build-support/patch-maven-jar.nix { };
 
-    passthru.buildMavenPackage = self.callPackage ./build-maven-package.nix { };
+    passthru.buildMavenPackage = self.callPackage ./build-support/build-maven-package.nix { };
 
     # Import a package set from the output directory created by:
     #

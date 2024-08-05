@@ -54,4 +54,5 @@ stdenv.mkDerivation ({
           --set M2_HOME ${maven} \
           --set JAVA_HOME ${jdk}
   '';
+
 } // args)
