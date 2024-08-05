@@ -188,7 +188,7 @@ public class Graph {
     };
 
     public static List<Dependency> buildDependencies(Context ctx, Model pom) {
-        List<ParentFetch> parents = fetchParents(ctx, pom);
+        List<POMFetch> parents = fetchParents(ctx, pom);
 
         List<Dependency> buildDeps = new ArrayList<>();
 
@@ -229,7 +229,7 @@ public class Graph {
     }
 
     public static List<Dependency> runDependencies(Context ctx, Model pom) {
-        List<ParentFetch> parents = fetchParents(ctx, pom);
+        List<POMFetch> parents = fetchParents(ctx, pom);
 
         return pom.getDependencies()
             .stream()
@@ -238,7 +238,21 @@ public class Graph {
             .collect(Collectors.toList());
     }
 
-    public static List<ParentFetch> fetchParents(Context ctx, Dependency d) {
+    public static List<POMFetch> fetchParents(Context ctx, Dependency d) {
+        POMFetch self = fetchPOM(ctx, d);
+
+        List<POMFetch> parents = fetchParents(ctx, self.pom);
+
+        List<POMFetch> res = new ArrayList<>(1 + parents.size());
+
+        res.add(self);
+
+        res.addAll(parents);
+
+        return res;
+    }
+
+    public static POMFetch fetchPOM(Context ctx, Dependency d) {
         Artifact pom = new DefaultArtifact(
             d.getArtifact().getGroupId(),
             d.getArtifact().getArtifactId(),
@@ -253,18 +267,18 @@ public class Graph {
 
             Model m = readPOMNoResolve(ctx, initial.getLocalArtifactResult().getFile());
 
-            return fetchParents(ctx, m);
+            return new POMFetch(m, initial);
         } catch (ArtifactResolutionException e) {
             throw new RuntimeException(e);
         }
     }
 
     // FIXME(jsoo1): Naive, for now we want to be conservative
-    public static List<ParentFetch> fetchParents(Context ctx, Model m) {
+    public static List<POMFetch> fetchParents(Context ctx, Model m) {
         try {
-            Model next = m.clone();
+            Model next = m;
 
-            List<ParentFetch> parents = new ArrayList<>();
+            List<POMFetch> parents = new ArrayList<>();
 
             while (next.getParent() != null) {
                 Set<RemoteRepository> repos = new HashSet<>(ctx.remoteRepositories());
@@ -280,7 +294,7 @@ public class Graph {
 
                 next = readPOMNoResolve(ctx, res.getLocalArtifactResult().getFile());
 
-                parents.add(new ParentFetch(next, res));
+                parents.add(new POMFetch(next, res));
             }
 
             return parents;
@@ -289,10 +303,10 @@ public class Graph {
         }
     }
 
-    public static class ParentFetch {
+    public static class POMFetch {
         public final Model pom;
         public final ArtifactResult res;
-        public ParentFetch(Model p, ArtifactResult r) {
+        public POMFetch(Model p, ArtifactResult r) {
             pom = p;
             res = r;
         }
@@ -339,11 +353,27 @@ public class Graph {
 
         Set<RemoteRepository> repos = new HashSet<>(ctx.remoteRepositories());
 
-        List<ParentFetch> parents = fetchParents(ctx, dep);
+        List<Model> parents = new ArrayList<>();
+
+        List<ArtifactResult> ars = new ArrayList<>();
+
+        for (POMFetch f : fetchParents(ctx, dep)) {
+            if (f.pom.getDependencyManagement() != null) {
+                ImportFetch i = getImports(ctx, f.pom.getDependencyManagement(), pomRepos);
+
+                ars.addAll(i.artifacts);
+
+                for (Dependency d : i.dependencies) {
+                    f.pom.getDependencyManagement().getDependencies().add(toMaven(d));
+                }
+
+                parents.add(f.pom);
+            }
+        }
 
         parents
             .stream()
-            .flatMap(f -> remoteRepositories(f.pom).stream())
+            .flatMap(m -> remoteRepositories(m).stream())
             .forEach(repo -> repos.add(repo));
 
         repos.addAll(pomRepos);
@@ -359,11 +389,11 @@ public class Graph {
                 .stream()
                 .collect(Collectors.toList());
 
-            parents.stream().forEach(f -> results.add(f.res));
+            results.addAll(ars);
 
             List<Dependency> discovered = parents
                 .stream()
-                .flatMap(f -> runDependencies(ctx, f.pom).stream())
+                .flatMap(m -> runDependencies(ctx, m).stream())
                 .collect(Collectors.toList());
 
             return new Fetch(results, discovered);
@@ -381,7 +411,7 @@ public class Graph {
         }
     }
 
-    public static Dependency dominatingDependency(Model pom, List<ParentFetch> parents, Dependency d) {
+    public static Dependency dominatingDependency(Model pom, List<POMFetch> parents, Dependency d) {
         Optional<Dependency> fromPOM = Optional.ofNullable(pom.getDependencyManagement())
             .flatMap(dm -> managedBy(dm, d));
 
@@ -405,7 +435,7 @@ public class Graph {
             && managing.getArtifactId().equals(a.getArtifactId());
     }
 
-    public static Plugin dominatingPluginDependency(Model pom, List<ParentFetch> parents, Plugin p) {
+    public static Plugin dominatingPluginDependency(Model pom, List<POMFetch> parents, Plugin p) {
         Optional<Plugin> fromPOM = Optional.ofNullable(pom.getBuild().getPluginManagement())
             .flatMap((PluginManagement pm) -> managedBy(pm, p));
 
@@ -477,6 +507,60 @@ public class Graph {
         }
     }
 
+    public static ImportFetch getImports(Context ctx, DependencyManagement dm, List<RemoteRepository> repos) {
+        Set<RemoteRepository> initRepos = new HashSet<>(ctx.remoteRepositories());
+
+        initRepos.addAll(repos);
+
+        List<ArtifactRequest> reqs = dm.getDependencies()
+            .stream()
+            .filter(d -> Optional.ofNullable(d.getScope()).map(s -> s.equals("import")).orElse(false)
+                    && Optional.ofNullable(d.getType()).map(t -> t.equals("pom")).orElse(false))
+            .map(d -> new ArtifactRequest(toAether(d).getArtifact(), initRepos.stream().collect(Collectors.toList()), null))
+            .collect(Collectors.toList());
+
+        try {
+            List<ArtifactResult> initial = ctx
+                .repositorySystem()
+                .resolveArtifacts(ctx.repositorySystemSession(), reqs);
+
+            List<Dependency> dependencies = new ArrayList<>();
+
+            List<ArtifactResult> artifacts = new ArrayList<>(initial);
+
+            for (ArtifactResult ar : initial) {
+                Model m = readPOMNoResolve(ctx, ar.getLocalArtifactResult().getFile());
+
+                if (m.getDependencyManagement() != null) {
+                    Set<RemoteRepository> rs = new HashSet<>(repos);
+
+                    rs.addAll(ctx.remoteRepositories());
+
+                    rs.addAll(remoteRepositories(m));
+
+                    ImportFetch f = getImports(ctx, m.getDependencyManagement(), rs.stream().collect(Collectors.toList()));
+
+                    dependencies.addAll(f.dependencies);
+
+                    artifacts.addAll(f.artifacts);
+                }
+            }
+
+            return new ImportFetch(dependencies, artifacts);
+        } catch (ArtifactResolutionException e ) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static class ImportFetch {
+        public final List<Dependency> dependencies;
+        public final List<ArtifactResult> artifacts;
+        public ImportFetch(List<Dependency> ds, List<ArtifactResult> as) {
+            dependencies = ds;
+            artifacts = as;
+        }
+    }
+
     public static Dependency toAether(Parent p) {
         return new Dependency(
             new DefaultArtifact(
@@ -502,6 +586,30 @@ public class Graph {
             d.isOptional(),
             d.getExclusions().stream().map(Graph::toAether).collect(Collectors.toList())
         );
+    }
+
+    public static org.apache.maven.model.Dependency toMaven(Dependency d) {
+        Artifact a = d.getArtifact();
+
+        org.apache.maven.model.Dependency res = new org.apache.maven.model.Dependency();
+
+        res.setGroupId(a.getGroupId());
+
+        res.setArtifactId(a.getArtifactId());
+
+        res.setClassifier(a.getClassifier());
+
+        res.setType(a.getExtension());
+
+        res.setVersion(a.getVersion());
+
+        res.setScope(d.getScope());
+
+        res.setOptional(d.getOptional());
+
+        res.setExclusions(d.getExclusions().stream().map(Graph::toMaven).collect(Collectors.toList()));
+
+        return res;
     }
 
     public static Dependency toAether(Plugin p) {
@@ -545,6 +653,16 @@ public class Graph {
 
     public static Exclusion toAether(org.apache.maven.model.Exclusion e) {
         return new Exclusion(e.getGroupId(), e.getArtifactId(), null, null);
+    }
+
+    public static org.apache.maven.model.Exclusion toMaven(Exclusion e) {
+        org.apache.maven.model.Exclusion ex = new org.apache.maven.model.Exclusion();
+
+        ex.setGroupId(e.getGroupId());
+
+        ex.setArtifactId(e.getArtifactId());
+
+        return ex;
     }
 
     public static RemoteRepository toAether(org.apache.maven.model.Repository r) {
