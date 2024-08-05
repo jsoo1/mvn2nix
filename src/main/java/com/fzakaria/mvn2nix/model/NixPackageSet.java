@@ -57,7 +57,7 @@ public class NixPackageSet {
         return packageSet(new Attrs(resolved.entrySet().stream().map(e -> callPackage(localRepo, e))));
     }
 
-    public static Expr collectSelf(Path localRepo, Map.Entry<Artifact, Graph.Res> resolved) {
+    public static Expr collectRoot(Path localRepo, Graph.Root root) {
         return callPackageFn(localRepo, resolved);
     }
 
@@ -93,16 +93,14 @@ public class NixPackageSet {
         Graph.Res r = e.getValue();
 
         List<Dependency> deps = r.dependencies.stream()
-            .filter(a_ -> !attrName(a).equals(attrName(a_.getArtifact())))
-            .filter(distinctByKey(d_ -> attrName(d_.getArtifact())))
+            .filter(a_ -> !a.toString().equals(a_.getArtifact().toString()))
+            .filter(distinctByKey(d_ -> d_.getArtifact().toString()))
             .collect(Collectors.toList());
 
         Param params = new AttrPattern(Stream.concat(
             Arrays.stream(packageParams),
             deps.stream().map(d_ -> attrName(d_.getArtifact()))
         ).toArray(String[]::new));
-
-        Predicate<ArtifactResult> uniqFile = distinctByKey(ar -> ar.getLocalArtifactResult().getFile());
 
         Expr args = new App(new Var(PATCH_MAVEN_JAR), new Attrs(Stream.of(
             pair("name", new LitS(a.toString())),
@@ -113,7 +111,7 @@ public class NixPackageSet {
                       .filter(Predicate.not(String::isEmpty))
                       .map(s -> (Expr) new LitS(s))
                       .orElse(new Null())),
-            pair("artifacts", new LitL(r.artifacts.stream().filter(uniqFile).map(ar -> artifact(localRepo, ar)))),
+            pair("artifact", artifact(localRepo, r.artifact)),
             pair("dependencies", new LitL(deps.stream().map(NixPackageSet::dep))),
             pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryBytecode")}))
         )));

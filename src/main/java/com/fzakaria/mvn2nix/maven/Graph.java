@@ -91,23 +91,45 @@ public class Graph {
 
     private static DefaultModelBuilderFactory factory = new DefaultModelBuilderFactory();
 
-    public static Map.Entry<Artifact, Res> self(Context ctx, Model pom) {
+    public static Root root(Context ctx, Model pom) {
         List<Dependency> deps = runDependencies(ctx, pom)
             .stream()
             .collect(Collectors.toList());
 
         deps.addAll(buildDependencies(ctx, pom));
 
-        Res r = new Res(
-            deps.stream().filter(distinctByKey(d -> d.getArtifact().toString())).collect(Collectors.toList()),
-            new ArrayList<>()
-        );
+        Map<Artifact, Res> discovered = new HashMap<>();
 
-        Model m = pom.clone();
+        List<POMFetch> parents = fetchParents(ctx, rootDependency(pom));
 
-        m.setPackaging("pom");
+        discovered.putAll(pomGraph(parents));
 
-        return new AbstractMap.SimpleImmutableEntry<>(rootDependency(m).getArtifact(), r);
+        parents.stream().findFirst().ifPresent(p -> deps.add(rootDependency(p.pom)));
+
+        Optional.ofNullable(pom.getDependencyManagement()).ifPresent(pm -> {
+            ImportFetch i = getImports(ctx, pm, remoteRepositories(pom));
+
+            for (Dependency d : i.dependencies) {
+                pom.getDependencyManagement().getDependencies().add(toMaven(d));
+            }
+
+            discovered.putAll(pomGraph(i.imports));
+
+            i.imports.stream().findFirst().ifPresent(p -> deps.add(rootDependency(p.pom)));
+        });
+
+        Map.Entry<Artifact, List<Dependency>> node = new AbstractMap.SimpleImmutableEntry<>(rootDependency(pom).getArtifact(), deps);
+
+        return new Root(node, discovered);
+    }
+
+    public static class Root {
+        public final Map.Entry<Artifact, List<Dependency>> node;
+        public final Map<Artifact, Res> discovered;
+        public Root(Map.Entry<Artifact, List<Dependency>> n, Map<Artifact, Res> ds) {
+            node = n;
+            discovered = ds;
+        }
     }
 
     public static Map<Artifact, Res> resolve(Context ctx, Model pom, boolean resolveRoots) {
@@ -147,7 +169,7 @@ public class Graph {
 
             these.addAll(f.discovered);
 
-            walk.put(d.getArtifact(), new Res(these, f.artifacts));
+            walk.put(d.getArtifact(), new Res(these, f.artifact));
 
             f.parents.stream().findFirst().ifPresent(p -> these.add(rootDependency(p.pom)));
 
@@ -186,7 +208,7 @@ public class Graph {
     public static Res pomNode(POMFetch f, Optional<POMFetch> parent) {
         return new Res(
             parent.map(p -> new ArrayList<>(Arrays.asList(rootDependency(p.pom)))).orElse(new ArrayList<>()),
-            new ArrayList<ArtifactResult>(Arrays.asList(f.res))
+            f.res
         );
     }
 
@@ -211,11 +233,11 @@ public class Graph {
     }
 
     public static class Res {
+        public final ArtifactResult artifact;
         public final List<Dependency> dependencies;
-        public final List<ArtifactResult> artifacts;
-        public Res(List<Dependency> ds, List<ArtifactResult> as) {
+        public Res(List<Dependency> ds, ArtifactResult a) {
             dependencies = ds;
-            artifacts = as;
+            artifact = a;
         }
     };
 
@@ -397,17 +419,9 @@ public class Graph {
     }));
 
     public static Fetch fetch(Context ctx, Dependency dep, List<RemoteRepository> pomRepos) {
-        List<ArtifactRequest> req = new ArrayList<>(Arrays.asList(new ArtifactRequest(dep.getArtifact(), ctx.remoteRepositories(), null)));
-
-        Artifact a = dep.getArtifact();
-
-        DefaultArtifact pom = new DefaultArtifact(a.getGroupId(), a.getArtifactId(), null, "pom", a.getVersion());
-
         Set<RemoteRepository> repos = new HashSet<>(ctx.remoteRepositories());
 
         List<Model> parents = new ArrayList<>();
-
-        List<ArtifactResult> ars = new ArrayList<>();
 
         List<POMFetch> imports = new ArrayList<>();
 
@@ -416,8 +430,6 @@ public class Graph {
         for (POMFetch f : parentResults) {
             if (f.pom.getDependencyManagement() != null) {
                 ImportFetch i = getImports(ctx, f.pom.getDependencyManagement(), pomRepos);
-
-                ars.addAll(i.artifacts);
 
                 imports.addAll(i.imports);
 
@@ -436,37 +448,32 @@ public class Graph {
 
         repos.addAll(pomRepos);
 
-        ArtifactRequest pomReq = new ArtifactRequest(pom, repos.stream().collect(Collectors.toList()), null);
-
-        req.add(pomReq);
-
         try {
-            List<ArtifactResult> results = ctx
+            ArtifactResult artifact = ctx
                 .repositorySystem()
-                .resolveArtifacts(ctx.repositorySystemSession(), req)
-                .stream()
-                .collect(Collectors.toList());
-
-            results.addAll(ars);
+                .resolveArtifact(
+                    ctx.repositorySystemSession(),
+                    new ArtifactRequest(dep.getArtifact(), new ArrayList<>(repos), null)
+                );
 
             List<Dependency> discovered = parents
                 .stream()
                 .flatMap(m -> runDependencies(ctx, m).stream())
                 .collect(Collectors.toList());
 
-            return new Fetch(results, discovered, parentResults, imports);
+            return new Fetch(artifact, discovered, parentResults, imports);
         } catch (ArtifactResolutionException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static class Fetch {
-        public final List<ArtifactResult> artifacts;
+        public final ArtifactResult artifact;
         public final List<Dependency> discovered;
         public final List<POMFetch> parents;
         public final List<POMFetch> imports;
-        public Fetch(List<ArtifactResult> as, List<Dependency> ds, List<POMFetch> ps, List<POMFetch> is) {
-            artifacts = as;
+        public Fetch(ArtifactResult a, List<Dependency> ds, List<POMFetch> ps, List<POMFetch> is) {
+            artifact = a;
             discovered = ds;
             parents = ps;
             imports = is;
@@ -592,8 +599,6 @@ public class Graph {
 
             List<Dependency> dependencies = new ArrayList<>();
 
-            List<ArtifactResult> artifacts = new ArrayList<>(initial);
-
             List<POMFetch> imports = new ArrayList<>();
 
             for (ArtifactResult ar : initial) {
@@ -612,13 +617,11 @@ public class Graph {
 
                     dependencies.addAll(f.dependencies);
 
-                    artifacts.addAll(f.artifacts);
-
                     imports.addAll(f.imports);
                 }
             }
 
-            return new ImportFetch(dependencies, artifacts, imports);
+            return new ImportFetch(dependencies, imports);
         } catch (ArtifactResolutionException e ) {
             throw new RuntimeException(e);
         }
@@ -626,11 +629,9 @@ public class Graph {
 
     public static class ImportFetch {
         public final List<Dependency> dependencies;
-        public final List<ArtifactResult> artifacts;
         public final List<POMFetch> imports;
-        public ImportFetch(List<Dependency> ds, List<ArtifactResult> as, List<POMFetch> is) {
+        public ImportFetch(List<Dependency> ds, List<POMFetch> is) {
             dependencies = ds;
-            artifacts = as;
             imports = is;
         }
     }
