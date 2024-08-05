@@ -90,7 +90,7 @@ public class Graph {
 
     private static DefaultModelBuilderFactory factory = new DefaultModelBuilderFactory();
 
-    public static Map.Entry<Dependency, Res> self(Context ctx, Model pom) {
+    public static Map.Entry<Artifact, Res> self(Context ctx, Model pom) {
         List<Dependency> deps = runDependencies(ctx, pom)
             .stream()
             .collect(Collectors.toList());
@@ -106,10 +106,10 @@ public class Graph {
 
         m.setPackaging("pom");
 
-        return new AbstractMap.SimpleImmutableEntry<Dependency, Res>(rootDependency(m), r);
+        return new AbstractMap.SimpleImmutableEntry<>(rootDependency(m).getArtifact(), r);
     }
 
-    public static Map<Dependency, Res> resolve(Context ctx, Model pom, boolean resolveRoots) {
+    public static Map<Artifact, Res> resolve(Context ctx, Model pom, boolean resolveRoots) {
         Stream<Dependency> initial = resolveRoots
             // If this is a published package, then we don't care about build dependencies at all
             ? runDependencies(ctx, pom).stream()
@@ -127,14 +127,14 @@ public class Graph {
 
         List<RemoteRepository> pomRepos = remoteRepositories(pom);
 
-        Map<Dependency, Res> walk = new HashMap<>();
+        Map<Artifact, Res> walk = new HashMap<>();
 
         while (!todos.isEmpty()) {
             Dependency d = todos.remove();
 
             LOGGER.trace("Considering dependency {}", d);
 
-            if (walk.containsKey(d)) {
+            if (walk.containsKey(d.getArtifact())) {
                 continue;
             }
 
@@ -150,7 +150,7 @@ public class Graph {
 
             these.addAll(f.discovered);
 
-            walk.put(d, new Res(these, artifacts));
+            walk.put(d.getArtifact(), new Res(these, artifacts));
 
             todos.addAll(these);
         }

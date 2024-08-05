@@ -53,18 +53,18 @@ public class NixPackageSet {
 
     public static String[] packageParams = new String[]{LIB, PKGS, PATCH_MAVEN_JAR};
 
-    public static Expr collect(Path localRepo, Map<Dependency, Graph.Res> resolved) {
+    public static Expr collect(Path localRepo, Map<Artifact, Graph.Res> resolved) {
         return packageSet(new Attrs(resolved.entrySet().stream().map(e -> callPackage(localRepo, e))));
     }
 
-    public static Expr collectSelf(Path localRepo, Map.Entry<Dependency, Graph.Res> resolved) {
+    public static Expr collectSelf(Path localRepo, Map.Entry<Artifact, Graph.Res> resolved) {
         return callPackageFn(localRepo, resolved);
     }
 
-    public static OutputDir collectDir(Path localRepo, Map<Dependency, Graph.Res> resolved) {
+    public static OutputDir collectDir(Path localRepo, Map<Artifact, Graph.Res> resolved) {
         return new OutputDir(resolved.entrySet().stream().collect(Collectors.toMap(
-            (Map.Entry<Dependency, Graph.Res> e) -> new File(attrName(e.getKey().getArtifact())).toPath(),
-            (Map.Entry<Dependency, Graph.Res> e) -> callPackageFn(localRepo, e),
+            (Map.Entry<Artifact, Graph.Res> e) -> new File(attrName(e.getKey())).toPath(),
+            (Map.Entry<Artifact, Graph.Res> e) -> callPackageFn(localRepo, e),
             (Expr e1, Expr e2) -> e2
         )));
     }
@@ -79,23 +79,21 @@ public class NixPackageSet {
         ))));
     }
 
-    public static Map.Entry<String, Expr> callPackage(Path localRepo, Map.Entry<Dependency, Graph.Res> entry) {
+    public static Map.Entry<String, Expr> callPackage(Path localRepo, Map.Entry<Artifact, Graph.Res> entry) {
         Expr expr = new App(new App(new Var("self.callPackage"), new Paren(
             callPackageFn(localRepo, entry)
         )), new Attrs(Stream.empty()));
 
-        return pair(attrName(entry.getKey().getArtifact()), expr);
+        return pair(attrName(entry.getKey()), expr);
     }
 
-    public static Expr callPackageFn(Path localRepo, Map.Entry<Dependency, Graph.Res> e) {
-        Dependency d = e.getKey();
-
-        Artifact a = d.getArtifact();
+    public static Expr callPackageFn(Path localRepo, Map.Entry<Artifact, Graph.Res> e) {
+        Artifact a = e.getKey();
 
         Graph.Res r = e.getValue();
 
         List<Dependency> deps = r.dependencies.stream()
-            .filter(d_ -> !d.getArtifact().toString().equals(d_.getArtifact().toString()))
+            .filter(a_ -> !a.toString().equals(a_.toString()))
             .filter(distinctByKey(d_ -> d_.toString()))
             .collect(Collectors.toList());
 
