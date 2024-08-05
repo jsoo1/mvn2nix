@@ -64,7 +64,7 @@ public class NixPackageSet {
     public static OutputDir collectDir(Path localRepo, Map<Artifact, Graph.Res> resolved) {
         return new OutputDir(resolved.entrySet().stream().collect(Collectors.toMap(
             (Map.Entry<Artifact, Graph.Res> e) -> new File(attrName(e.getKey())).toPath(),
-            (Map.Entry<Artifact, Graph.Res> e) -> callPackageFn(localRepo, e),
+            (Map.Entry<Artifact, Graph.Res> e) -> binaryCallPackageFn(localRepo, e),
             (Expr e1, Expr e2) -> e2
         )));
     }
@@ -81,25 +81,20 @@ public class NixPackageSet {
 
     public static Map.Entry<String, Expr> callPackage(Path localRepo, Map.Entry<Artifact, Graph.Res> entry) {
         Expr expr = new App(new App(new Var("self.callPackage"), new Paren(
-            callPackageFn(localRepo, entry)
+            binaryCallPackageFn(localRepo, entry)
         )), new Attrs(Stream.empty()));
 
         return pair(attrName(entry.getKey()), expr);
     }
 
-    public static Expr callPackageFn(Path localRepo, Map.Entry<Artifact, Graph.Res> e) {
+    public static Expr binaryCallPackageFn(Path localRepo, Map.Entry<Artifact, Graph.Res> e) {
         Artifact a = e.getKey();
 
         Graph.Res r = e.getValue();
 
-        List<Dependency> deps = r.dependencies.stream()
-            .filter(a_ -> !a.toString().equals(a_.getArtifact().toString()))
-            .filter(distinctByKey(d_ -> d_.getArtifact().toString()))
-            .collect(Collectors.toList());
-
         Param params = new AttrPattern(Stream.concat(
             Arrays.stream(packageParams),
-            deps.stream().map(d_ -> attrName(d_.getArtifact()))
+            r.dependencies.stream().map(d_ -> attrName(d_.getArtifact()))
         ).toArray(String[]::new));
 
         Expr args = new App(new Var(PATCH_MAVEN_JAR), new Attrs(Stream.of(
@@ -112,7 +107,7 @@ public class NixPackageSet {
                       .map(s -> (Expr) new LitS(s))
                       .orElse(new Null())),
             pair("artifact", artifact(localRepo, r.artifact)),
-            pair("dependencies", new LitL(deps.stream().map(NixPackageSet::dep))),
+            pair("dependencies", new LitL(r.dependencies.stream().map(NixPackageSet::dep))),
             pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryBytecode")}))
         )));
 
@@ -170,10 +165,5 @@ public class NixPackageSet {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
     }
 }

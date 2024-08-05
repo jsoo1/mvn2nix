@@ -92,11 +92,11 @@ public class Graph {
     private static DefaultModelBuilderFactory factory = new DefaultModelBuilderFactory();
 
     public static Root root(Context ctx, Model pom) {
-        List<Dependency> deps = runDependencies(ctx, pom)
+        List<Dependency> dependencies = runDependencies(ctx, pom)
             .stream()
             .collect(Collectors.toList());
 
-        deps.addAll(buildDependencies(ctx, pom));
+        dependencies.addAll(buildDependencies(ctx, pom));
 
         Map<Artifact, Res> discovered = new HashMap<>();
 
@@ -104,7 +104,7 @@ public class Graph {
 
         discovered.putAll(pomGraph(parents));
 
-        parents.stream().findFirst().ifPresent(p -> deps.add(rootDependency(p.pom)));
+        parents.stream().findFirst().ifPresent(p -> dependencies.add(rootDependency(p.pom)));
 
         Optional.ofNullable(pom.getDependencyManagement()).ifPresent(pm -> {
             ImportFetch i = getImports(ctx, pm, remoteRepositories(pom));
@@ -115,10 +115,10 @@ public class Graph {
 
             discovered.putAll(pomGraph(i.imports));
 
-            i.imports.stream().findFirst().ifPresent(p -> deps.add(rootDependency(p.pom)));
+            i.imports.stream().findFirst().ifPresent(p -> dependencies.add(rootDependency(p.pom)));
         });
 
-        Map.Entry<Artifact, List<Dependency>> node = new AbstractMap.SimpleImmutableEntry<>(rootDependency(pom).getArtifact(), deps);
+        Map.Entry<Artifact, List<Dependency>> node = new AbstractMap.SimpleImmutableEntry<>(rootDependency(pom).getArtifact(), uniq(dependencies));
 
         return new Root(node, discovered);
     }
@@ -169,8 +169,6 @@ public class Graph {
 
             these.addAll(f.discovered);
 
-            walk.put(d.getArtifact(), new Res(these, f.artifact));
-
             f.parents.stream().findFirst().ifPresent(p -> these.add(rootDependency(p.pom)));
 
             f.imports.stream().findFirst().ifPresent(i -> these.add(rootDependency(i.pom)));
@@ -178,6 +176,8 @@ public class Graph {
             walk.putAll(pomGraph(f.parents));
 
             walk.putAll(pomGraph(f.imports));
+
+            walk.put(d.getArtifact(), new Res(f.artifact, uniq(these)));
 
             todos.addAll(these);
 
@@ -207,8 +207,8 @@ public class Graph {
 
     public static Res pomNode(POMFetch f, Optional<POMFetch> parent) {
         return new Res(
-            parent.map(p -> new ArrayList<>(Arrays.asList(rootDependency(p.pom)))).orElse(new ArrayList<>()),
-            f.res
+            f.res,
+            parent.map(p -> new ArrayList<>(Arrays.asList(rootDependency(p.pom)))).orElse(new ArrayList<>())
         );
     }
 
@@ -235,9 +235,9 @@ public class Graph {
     public static class Res {
         public final ArtifactResult artifact;
         public final List<Dependency> dependencies;
-        public Res(List<Dependency> ds, ArtifactResult a) {
-            dependencies = ds;
+        public Res(ArtifactResult a, List<Dependency> ds) {
             artifact = a;
+            dependencies = ds;
         }
     };
 
@@ -756,5 +756,12 @@ public class Graph {
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
         return t -> seen.add(keyExtractor.apply(t));
+    }
+
+    public static List<Dependency> uniq(List<Dependency> ds) {
+        return ds.stream()
+            // .filter(a_ -> !a.toString().equals(a_.getArtifact().toString()))
+            .filter(distinctByKey(d_ -> d_.getArtifact().toString()))
+            .collect(Collectors.toList());
     }
 }
