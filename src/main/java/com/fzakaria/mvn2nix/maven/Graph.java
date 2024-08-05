@@ -132,13 +132,13 @@ public class Graph {
         while (!todos.isEmpty()) {
             Dependency d = todos.remove();
 
-            LOGGER.trace("Considering dependency {}", d);
+            LOGGER.trace("Considering {}", d.getArtifact());
 
             if (walk.containsKey(d.getArtifact())) {
                 continue;
             }
 
-            LOGGER.trace("Walking dependency {}", d);
+            LOGGER.info("Adding {}", d.getArtifact());
 
             List<Dependency> these = collect(ctx, d).getDependencies(true);
 
