@@ -160,6 +160,14 @@ public class Graph {
                 walk.put(p.getArtifact(), pomNode(parent));
             }
 
+            for (POMFetch p : f.imports) {
+                Dependency i = rootDependency(p.pom);
+
+                these.add(i);
+
+                walk.put(i.getArtifact(), pomNode(p));
+            }
+
             todos.addAll(these);
 
             LOGGER.debug("Adding todos {}", todos);
@@ -394,6 +402,8 @@ public class Graph {
 
         List<ArtifactResult> ars = new ArrayList<>();
 
+        List<POMFetch> imports = new ArrayList<>();
+
         List<POMFetch> parentResults = fetchParents(ctx, dep);
 
         for (POMFetch f : parentResults) {
@@ -401,6 +411,8 @@ public class Graph {
                 ImportFetch i = getImports(ctx, f.pom.getDependencyManagement(), pomRepos);
 
                 ars.addAll(i.artifacts);
+
+                imports.addAll(i.imports);
 
                 for (Dependency d : i.dependencies) {
                     f.pom.getDependencyManagement().getDependencies().add(toMaven(d));
@@ -435,7 +447,7 @@ public class Graph {
                 .flatMap(m -> runDependencies(ctx, m).stream())
                 .collect(Collectors.toList());
 
-            return new Fetch(results, discovered, parentResults);
+            return new Fetch(results, discovered, parentResults, imports);
         } catch (ArtifactResolutionException e) {
             throw new RuntimeException(e);
         }
@@ -445,10 +457,12 @@ public class Graph {
         public final List<ArtifactResult> artifacts;
         public final List<Dependency> discovered;
         public final List<POMFetch> parents;
-        public Fetch(List<ArtifactResult> as, List<Dependency> ds, List<POMFetch> ps) {
+        public final List<POMFetch> imports;
+        public Fetch(List<ArtifactResult> as, List<Dependency> ds, List<POMFetch> ps, List<POMFetch> is) {
             artifacts = as;
             discovered = ds;
             parents = ps;
+            imports = is;
         }
     }
 
@@ -573,8 +587,12 @@ public class Graph {
 
             List<ArtifactResult> artifacts = new ArrayList<>(initial);
 
+            List<POMFetch> imports = new ArrayList<>();
+
             for (ArtifactResult ar : initial) {
                 Model m = readPOMNoResolve(ctx, ar.getLocalArtifactResult().getFile());
+
+                imports.add(new POMFetch(m, ar));
 
                 if (m.getDependencyManagement() != null) {
                     Set<RemoteRepository> rs = new HashSet<>(repos);
@@ -588,10 +606,12 @@ public class Graph {
                     dependencies.addAll(f.dependencies);
 
                     artifacts.addAll(f.artifacts);
+
+                    imports.addAll(f.imports);
                 }
             }
 
-            return new ImportFetch(dependencies, artifacts);
+            return new ImportFetch(dependencies, artifacts, imports);
         } catch (ArtifactResolutionException e ) {
             throw new RuntimeException(e);
         }
@@ -600,9 +620,11 @@ public class Graph {
     public static class ImportFetch {
         public final List<Dependency> dependencies;
         public final List<ArtifactResult> artifacts;
-        public ImportFetch(List<Dependency> ds, List<ArtifactResult> as) {
+        public final List<POMFetch> imports;
+        public ImportFetch(List<Dependency> ds, List<ArtifactResult> as, List<POMFetch> is) {
             dependencies = ds;
             artifacts = as;
+            imports = is;
         }
     }
 
