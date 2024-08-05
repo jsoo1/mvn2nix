@@ -35,7 +35,7 @@ mvn2nix.buildMavenPackage {
   artifactId = "mvn2nix";
   version = "0.1";
   classifier = null;
-  src = ./.;
+  src = ../../.;
   dependencies = [
     {
       drv = eu_maveniverse_maven_mima_runtime__standalone-static-uber__jar__2_4_15;
