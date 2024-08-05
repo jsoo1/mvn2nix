@@ -7,6 +7,7 @@ import eu.maveniverse.maven.mima.context.Runtimes;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -142,31 +143,19 @@ public class Graph {
 
             List<Dependency> these = resolve(ctx, d).getDependencies(true);
 
-            List<ArtifactResult> artifacts = new ArrayList<>();
-
             Fetch f = fetch(ctx, d, pomRepos);
-
-            artifacts.addAll(f.artifacts);
 
             these.addAll(f.discovered);
 
-            walk.put(d.getArtifact(), new Res(these, artifacts));
+            walk.put(d.getArtifact(), new Res(these, f.artifacts));
 
-            for (POMFetch parent : f.parents) {
-                Dependency p = rootDependency(parent.pom);
+            f.parents.stream().findFirst().ifPresent(p -> these.add(rootDependency(p.pom)));
 
-                these.add(p);
+            f.imports.stream().findFirst().ifPresent(i -> these.add(rootDependency(i.pom)));
 
-                walk.put(p.getArtifact(), pomNode(parent));
-            }
+            walk.putAll(pomGraph(f.parents));
 
-            for (POMFetch p : f.imports) {
-                Dependency i = rootDependency(p.pom);
-
-                these.add(i);
-
-                walk.put(i.getArtifact(), pomNode(p));
-            }
+            walk.putAll(pomGraph(f.imports));
 
             todos.addAll(these);
 
@@ -176,9 +165,27 @@ public class Graph {
         return walk;
     }
 
-    public static Res pomNode(POMFetch f) {
+    public static Map<Artifact, Res> pomGraph(List<POMFetch> ps) {
+        Map<Artifact, Res> res = new HashMap<>();
+
+        Optional<POMFetch> parent = Optional.empty();
+
+        List<POMFetch> ps_ = new ArrayList<>(ps);
+
+        Collections.reverse(ps_);
+
+        for (POMFetch p : ps_) {
+            res.put(rootDependency(p.pom).getArtifact(), pomNode(p, parent));
+
+            parent = Optional.of(p);
+        }
+
+        return res;
+    }
+
+    public static Res pomNode(POMFetch f, Optional<POMFetch> parent) {
         return new Res(
-            new ArrayList<>(),
+            parent.map(p -> new ArrayList<>(Arrays.asList(rootDependency(p.pom)))).orElse(new ArrayList<>()),
             new ArrayList<ArtifactResult>(Arrays.asList(f.res))
         );
     }
