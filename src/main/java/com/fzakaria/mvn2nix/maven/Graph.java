@@ -212,7 +212,7 @@ public class Graph {
         pom.getDependencies()
             .stream()
             .map(Graph::toAether)
-            .filter(d -> isOnlyBuildScope(d.getScope()))
+            .filter(d -> isOnlyBuildScope(d.getScope()) || d.isOptional())
             .map(d -> dominatingDependency(pom, parents, d))
             .forEach(d -> buildDeps.add(d));
 
@@ -263,6 +263,7 @@ public class Graph {
             .stream()
             .map(Graph::toAether)
             .filter(d -> isRunScope(d.getScope()))
+            .filter(d -> !d.isOptional())
             .map(d -> dominatingDependency(pom, parents, d))
             .collect(Collectors.toList());
     }
