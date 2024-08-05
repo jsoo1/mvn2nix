@@ -6,6 +6,8 @@ self: super: {
 
     passthru.patchMavenJar = self.callPackage ./patch-maven-jar.nix { };
 
+    passthru.buildMavenPackage = self.callPackage ./build-maven-package.nix { };
+
     # Import a package set from the output directory created by:
     #
     # `mvn2nix --output-type NIX --output-dir <dir>`
