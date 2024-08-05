@@ -93,8 +93,8 @@ public class NixPackageSet {
         Graph.Res r = e.getValue();
 
         List<Dependency> deps = r.dependencies.stream()
-            .filter(a_ -> !a.toString().equals(a_.toString()))
-            .filter(distinctByKey(d_ -> d_.toString()))
+            .filter(a_ -> !attrName(a).equals(attrName(a_.getArtifact())))
+            .filter(distinctByKey(d_ -> attrName(d_.getArtifact())))
             .collect(Collectors.toList());
 
         Param params = new AttrPattern(Stream.concat(
