@@ -170,6 +170,8 @@ public class Maven2nix implements Callable<Integer> {
 
         callPackageFn.write(0, w);
 
+        w.newLine();
+
         w.flush();
     }
 
