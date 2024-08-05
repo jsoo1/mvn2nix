@@ -48,17 +48,16 @@ public class NixPackageSet {
     public static String NEW_SCOPE = "newScope";
     public static String PKGS = "pkgs";
     public static String PATCH_MAVEN_JAR = "patchMavenJar";
+    public static String MVN2NIX = "mvn2nix";
 
     public static String[] packageSetParams = new String[]{LIB, NEW_SCOPE};
 
-    public static String[] packageParams = new String[]{LIB, PKGS, PATCH_MAVEN_JAR};
+    public static String[] binaryPackageParams = new String[]{LIB, PKGS, PATCH_MAVEN_JAR};
+
+    public static String[] sourcePackageParams = new String[]{MVN2NIX};
 
     public static Expr collect(Path localRepo, Map<Artifact, Graph.Res> resolved) {
         return packageSet(new Attrs(resolved.entrySet().stream().map(e -> callPackage(localRepo, e))));
-    }
-
-    public static Expr collectRoot(Path localRepo, Graph.Root root) {
-        return callPackageFn(localRepo, resolved);
     }
 
     public static OutputDir collectDir(Path localRepo, Map<Artifact, Graph.Res> resolved) {
@@ -87,17 +86,37 @@ public class NixPackageSet {
         return pair(attrName(entry.getKey()), expr);
     }
 
-    public static Expr binaryCallPackageFn(Path localRepo, Map.Entry<Artifact, Graph.Res> e) {
-        Artifact a = e.getKey();
+    public static Expr sourceCallPackageFn(Map.Entry<Artifact, List<Dependency>> e) {
+        List<Dependency> dependencies = e.getValue();
 
+        return new Fn(params(sourcePackageParams, dependencies), new App(new Var(MVN2NIX + ".buildMavenPackage"),
+            new Attrs(Stream.concat(coordAttrs(e.getKey()), Stream.of(
+                pair("src", new Var("./.")),
+                pair("dependencies", new LitL(dependencies.stream().map(NixPackageSet::dep)))
+        )))));
+    }
+
+    public static Expr binaryCallPackageFn(Path localRepo, Map.Entry<Artifact, Graph.Res> e) {
         Graph.Res r = e.getValue();
 
-        Param params = new AttrPattern(Stream.concat(
-            Arrays.stream(packageParams),
-            r.dependencies.stream().map(d_ -> attrName(d_.getArtifact()))
-        ).toArray(String[]::new));
+        Expr args = new App(new Var(PATCH_MAVEN_JAR), new Attrs(Stream.concat(coordAttrs(e.getKey()), Stream.of(
+            pair("artifact", artifact(localRepo, r.artifact)),
+            pair("dependencies", new LitL(r.dependencies.stream().map(NixPackageSet::dep))),
+            pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryBytecode")}))
+        ))));
 
-        Expr args = new App(new Var(PATCH_MAVEN_JAR), new Attrs(Stream.of(
+        return new Fn(params(binaryPackageParams, r.dependencies), args);
+    }
+
+    public static Param params(String[] standardParams, List<Dependency> ds) {
+        return new AttrPattern(Stream.concat(
+            Arrays.stream(standardParams),
+            ds.stream().map(d_ -> attrName(d_.getArtifact()))
+        ).toArray(String[]::new));
+    }
+
+    public static Stream<Map.Entry<String, Expr>> coordAttrs(Artifact a) {
+        return Stream.of(
             pair("name", new LitS(a.toString())),
             pair("groupId", new LitS(a.getGroupId())),
             pair("artifactId", new LitS(a.getArtifactId())),
@@ -105,13 +124,8 @@ public class NixPackageSet {
             pair("classifier", Optional.ofNullable(a.getClassifier())
                       .filter(Predicate.not(String::isEmpty))
                       .map(s -> (Expr) new LitS(s))
-                      .orElse(new Null())),
-            pair("artifact", artifact(localRepo, r.artifact)),
-            pair("dependencies", new LitL(r.dependencies.stream().map(NixPackageSet::dep))),
-            pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryBytecode")}))
-        )));
-
-        return new Fn(params, args);
+                      .orElse(new Null()))
+        );
     }
 
     public static Expr dep(Dependency d) {

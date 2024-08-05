@@ -15,6 +15,7 @@ import com.squareup.moshi.Moshi;
 import eu.maveniverse.maven.mima.context.Context;
 import eu.maveniverse.maven.mima.context.ContextOverrides;
 import eu.maveniverse.maven.mima.context.Runtimes;
+import java.util.HashMap;
 import org.apache.maven.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,10 +147,13 @@ public class Maven2nix implements Callable<Integer> {
         Path localRepo = ctx.repositorySystemSession().getLocalRepository().getBasedir().getCanonicalFile().toPath();
 
         if (outDir != null) {
-            if (!resolveRoots) {
-                doNixRoot(pom);
-            }
-            NixPackageSet.collectDir(localRepo, Graph.resolve(ctx, pom, resolveRoots)).write(outDir);
+            Map<org.eclipse.aether.artifact.Artifact, Graph.Res> g = !resolveRoots ? doNixRoot(pom) : new HashMap<>();
+
+            Map<org.eclipse.aether.artifact.Artifact, Graph.Res> others = Graph.resolve(ctx, pom, resolveRoots);
+
+            g.putAll(others);
+
+            NixPackageSet.collectDir(localRepo, g).write(outDir);
         } else {
             Expr pkgs = NixPackageSet.collect(localRepo, Graph.resolve(ctx, pom, resolveRoots));
 
@@ -161,10 +165,10 @@ public class Maven2nix implements Callable<Integer> {
         }
     }
 
-    public void doNixRoot(Model pom) throws IOException {
-        Path localRepo = ctx.repositorySystemSession().getLocalRepository().getBasedir().getCanonicalFile().toPath();
+    public Map<org.eclipse.aether.artifact.Artifact, Graph.Res> doNixRoot(Model pom) throws IOException {
+        Graph.Root r = Graph.root(ctx, pom);
 
-        Expr callPackageFn = NixPackageSet.collectRoot(localRepo, Graph.root(ctx, pom));
+        Expr callPackageFn = NixPackageSet.sourceCallPackageFn(r.node);
 
         BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 
@@ -173,6 +177,8 @@ public class Maven2nix implements Callable<Integer> {
         w.newLine();
 
         w.flush();
+
+        return r.discovered;
     }
 
     /**
