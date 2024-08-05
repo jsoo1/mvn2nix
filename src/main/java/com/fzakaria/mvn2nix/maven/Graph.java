@@ -19,9 +19,11 @@ import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.lifecycle.mapping.LifecycleMojo;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 import org.apache.maven.lifecycle.providers.packaging.PublicLifecycleMappings;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
@@ -88,13 +90,12 @@ public class Graph {
 
     private static DefaultModelBuilderFactory factory = new DefaultModelBuilderFactory();
 
-    public static Map.Entry<Dependency, Res> self(Model pom) {
-        List<Dependency> deps = runDependencies(pom)
+    public static Map.Entry<Dependency, Res> self(Context ctx, Model pom) {
+        List<Dependency> deps = runDependencies(ctx, pom)
             .stream()
-            .map(Graph::toAether)
             .collect(Collectors.toList());
 
-        deps.addAll(buildDependencies(pom));
+        deps.addAll(buildDependencies(ctx, pom));
 
         Res r = new Res(
             deps.stream().filter(distinctByKey(d -> d.getArtifact().toString())).collect(Collectors.toList()),
@@ -111,9 +112,9 @@ public class Graph {
     public static Map<Dependency, Res> resolve(Context ctx, Model pom, boolean resolveRoots) {
         Stream<Dependency> initial = resolveRoots
             // If this is a published package, then we don't care about build dependencies at all
-            ? runDependencies(pom).stream().map(Graph::toAether)
+            ? runDependencies(ctx, pom).stream()
             // Otherwise we want to make sure this can do a full offline build
-            : Stream.concat(runDependencies(pom).stream().map(Graph::toAether), buildDependencies(pom).stream());
+            : Stream.concat(runDependencies(ctx, pom).stream(), buildDependencies(ctx, pom).stream());
 
         Queue<Dependency> todos = new ArrayDeque<>(initial
             .filter(distinctByKey(d -> d.getArtifact().toString()))
@@ -186,14 +187,31 @@ public class Graph {
         }
     };
 
-    public static List<Dependency> buildDependencies(Model pom) {
-        List<Dependency> deps = pom
-            .getBuild()
+    public static List<Dependency> buildDependencies(Context ctx, Model pom) {
+        List<ParentFetch> parents = fetchParents(ctx, pom);
+
+        List<Dependency> buildDeps = new ArrayList<>();
+
+        pom.getBuild()
+            .getPlugins()
+            .stream()
+            .map(p -> dominatingPluginDependency(pom, parents, p))
+            .map(Graph::toAether)
+            .forEach(d -> buildDeps.add(d));
+
+        pom.getBuild()
             .getPlugins()
             .stream()
             .flatMap(p -> p.getDependencies().stream())
             .map(Graph::toAether)
-            .collect(Collectors.toList());
+            .map(d -> dominatingDependency(pom, parents, d))
+            .forEach(d -> buildDeps.add(d));
+
+        pom.getReporting()
+            .getPlugins()
+            .stream()
+            .map(Graph::toAether)
+            .forEach(d -> buildDeps.add(d));
 
         LifecycleMapping lifecycles = PublicLifecycleMappings.getLifecycle(pom.getPackaging())
             .orElseThrow(() -> new RuntimeException("Don't know how to handle packaging type provided by POM, got: " + pom.getPackaging()));
@@ -205,44 +223,46 @@ public class Graph {
             .flatMap(l -> l.getLifecyclePhases().values().stream())
             .flatMap(lp -> lp.getMojos().stream())
             .map(Graph::toAether)
-            .forEach(d -> deps.add(d));
+            .forEach(d -> buildDeps.add(d));
 
-        pom.getBuild().getPlugins().stream().map(Graph::toAether).forEach(d -> deps.add(d));
-
-        pom.getBuild().getPluginManagement().getPlugins().stream().map(Graph::toAether).forEach(d -> deps.add(d));
-
-        pom.getReporting().getPlugins().stream().map(Graph::toAether).forEach(d -> deps.add(d));
-
-        return deps;
+        return buildDeps;
     }
 
-    public static List<org.apache.maven.model.Dependency> runDependencies(Model pom) {
-        List<org.apache.maven.model.Dependency> deps = pom.getDependencies();
+    public static List<Dependency> runDependencies(Context ctx, Model pom) {
+        List<ParentFetch> parents = fetchParents(ctx, pom);
 
-        List<org.apache.maven.model.Dependency> managed = Optional.ofNullable(pom.getDependencyManagement())
-            .map(ds -> ds.getDependencies())
-            .orElse(new ArrayList<>());
-
-        deps.addAll(managed);
-
-        return deps;
+        return pom.getDependencies()
+            .stream()
+            .map(Graph::toAether)
+            .map(d -> dominatingDependency(pom, parents, d))
+            .collect(Collectors.toList());
     }
 
-    // FIXME(jsoo1): Naive, for now we want to be conservative
     public static List<ParentFetch> fetchParents(Context ctx, Dependency d) {
-        try {
-            Artifact pom = new DefaultArtifact(
-                d.getArtifact().getGroupId(),
-                d.getArtifact().getArtifactId(),
-                "pom",
-                d.getArtifact().getVersion()
-            );
+        Artifact pom = new DefaultArtifact(
+            d.getArtifact().getGroupId(),
+            d.getArtifact().getArtifactId(),
+            "pom",
+            d.getArtifact().getVersion()
+        );
 
+        try {
             ArtifactResult initial = ctx
                 .repositorySystem()
                 .resolveArtifact(ctx.repositorySystemSession(), new ArtifactRequest(pom, ctx.remoteRepositories(), null));
 
-            Model next = readPOMNoResolve(ctx, initial.getLocalArtifactResult().getFile());
+            Model m = readPOMNoResolve(ctx, initial.getLocalArtifactResult().getFile());
+
+            return fetchParents(ctx, m);
+        } catch (ArtifactResolutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // FIXME(jsoo1): Naive, for now we want to be conservative
+    public static List<ParentFetch> fetchParents(Context ctx, Model m) {
+        try {
+            Model next = m.clone();
 
             List<ParentFetch> parents = new ArrayList<>();
 
@@ -343,8 +363,7 @@ public class Graph {
 
             List<Dependency> discovered = parents
                 .stream()
-                .flatMap(f -> runDependencies(f.pom).stream())
-                .map(Graph::toAether)
+                .flatMap(f -> runDependencies(ctx, f.pom).stream())
                 .collect(Collectors.toList());
 
             return new Fetch(results, discovered);
@@ -360,6 +379,49 @@ public class Graph {
             artifacts = as;
             discovered = ds;
         }
+    }
+
+    public static Dependency dominatingDependency(Model pom, List<ParentFetch> parents, Dependency d) {
+        Optional<Dependency> fromPOM = Optional.ofNullable(pom.getDependencyManagement())
+            .flatMap(dm -> managedBy(dm, d));
+
+        return (fromPOM.isPresent()
+                ? fromPOM
+                : parents.stream()
+                    .flatMap(f -> Optional.ofNullable(f.pom.getDependencyManagement()).stream())
+                    .flatMap(dm -> managedBy(dm, d).stream())
+                    .findFirst())
+            .orElse(d);
+    }
+
+    public static Optional<Dependency> managedBy(DependencyManagement dm, Dependency d) {
+        return dm.getDependencies().stream().filter(md -> managedBy(md, d)).findFirst().map(Graph::toAether);
+    }
+
+    public static boolean managedBy(org.apache.maven.model.Dependency managing, Dependency d) {
+        Artifact a = d.getArtifact();
+
+        return managing.getGroupId().equals(a.getGroupId())
+            && managing.getArtifactId().equals(a.getArtifactId());
+    }
+
+    public static Plugin dominatingPluginDependency(Model pom, List<ParentFetch> parents, Plugin p) {
+        Optional<Plugin> fromPOM = Optional.ofNullable(pom.getBuild().getPluginManagement())
+            .flatMap((PluginManagement pm) -> managedBy(pm, p));
+
+        return (fromPOM.isPresent()
+            ? fromPOM
+            : parents.stream().flatMap(f -> managedBy(f.pom.getBuild().getPluginManagement(), p).stream()).findFirst())
+            .orElse(p);
+    }
+
+    public static Optional<Plugin> managedBy(PluginManagement pm, Plugin p) {
+        return pm.getPlugins().stream().filter(mp -> managedBy(mp, p)).findFirst();
+    }
+
+    public static boolean managedBy(Plugin managing, Plugin p) {
+        return managing.getGroupId().equals(p.getGroupId())
+            && managing.getArtifactId().equals(p.getArtifactId());
     }
 
     public static Model readPOM(Context ctx, Path pom) throws IOException {
