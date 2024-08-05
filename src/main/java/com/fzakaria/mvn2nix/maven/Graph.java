@@ -161,6 +161,8 @@ public class Graph {
             }
 
             todos.addAll(these);
+
+            LOGGER.debug("Adding todos {}", todos);
         }
 
         return walk;
