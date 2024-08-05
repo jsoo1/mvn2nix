@@ -335,7 +335,7 @@ public class Graph {
 
         Artifact a = dep.getArtifact();
 
-        DefaultArtifact pom = new DefaultArtifact(a.getGroupId(), a.getArtifactId(), "", "pom", a.getVersion());
+        DefaultArtifact pom = new DefaultArtifact(a.getGroupId(), a.getArtifactId(), null, "pom", a.getVersion());
 
         Set<RemoteRepository> repos = new HashSet<>(ctx.remoteRepositories());
 
