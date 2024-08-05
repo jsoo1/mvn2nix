@@ -140,7 +140,7 @@ public class Graph {
 
             LOGGER.info("Adding {}", d.getArtifact());
 
-            List<Dependency> these = collect(ctx, d).getDependencies(true);
+            List<Dependency> these = resolve(ctx, d).getDependencies(true);
 
             List<ArtifactResult> artifacts = new ArrayList<>();
 
@@ -354,7 +354,7 @@ public class Graph {
         }
     }
 
-    public static PreorderNodeListGenerator collect(Context ctx, Dependency dep) {
+    public static PreorderNodeListGenerator resolve(Context ctx, Dependency dep) {
         try {
             CollectRequest req = new CollectRequest(dep.setExclusions(exclusions), ctx.remoteRepositories());
 
