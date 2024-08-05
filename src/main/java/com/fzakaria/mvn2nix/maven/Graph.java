@@ -152,10 +152,25 @@ public class Graph {
 
             walk.put(d.getArtifact(), new Res(these, artifacts));
 
+            for (POMFetch parent : f.parents) {
+                Dependency p = rootDependency(parent.pom);
+
+                these.add(p);
+
+                walk.put(p.getArtifact(), pomNode(parent));
+            }
+
             todos.addAll(these);
         }
 
         return walk;
+    }
+
+    public static Res pomNode(POMFetch f) {
+        return new Res(
+            new ArrayList<>(),
+            new ArrayList<ArtifactResult>(Arrays.asList(f.res))
+        );
     }
 
     public static Dependency rootDependency(Model pom) {
@@ -373,7 +388,9 @@ public class Graph {
 
         List<ArtifactResult> ars = new ArrayList<>();
 
-        for (POMFetch f : fetchParents(ctx, dep)) {
+        List<POMFetch> parentResults = fetchParents(ctx, dep);
+
+        for (POMFetch f : parentResults) {
             if (f.pom.getDependencyManagement() != null) {
                 ImportFetch i = getImports(ctx, f.pom.getDependencyManagement(), pomRepos);
 
@@ -412,7 +429,7 @@ public class Graph {
                 .flatMap(m -> runDependencies(ctx, m).stream())
                 .collect(Collectors.toList());
 
-            return new Fetch(results, discovered);
+            return new Fetch(results, discovered, parentResults);
         } catch (ArtifactResolutionException e) {
             throw new RuntimeException(e);
         }
@@ -421,9 +438,11 @@ public class Graph {
     public static class Fetch {
         public final List<ArtifactResult> artifacts;
         public final List<Dependency> discovered;
-        public Fetch(List<ArtifactResult> as, List<Dependency> ds) {
+        public final List<POMFetch> parents;
+        public Fetch(List<ArtifactResult> as, List<Dependency> ds, List<POMFetch> ps) {
             artifacts = as;
             discovered = ds;
+            parents = ps;
         }
     }
 
