@@ -91,6 +91,7 @@ public class Graph {
 
     private static DefaultModelBuilderFactory factory = new DefaultModelBuilderFactory();
 
+    // FIXME(jsoo1): No parents handled
     public static Root root(Context ctx, Model pom) {
         List<Dependency> dependencies = runDependencies(ctx, pom)
             .stream()
@@ -99,12 +100,6 @@ public class Graph {
         dependencies.addAll(buildDependencies(ctx, pom));
 
         Map<Artifact, Res> discovered = new HashMap<>();
-
-        List<POMFetch> parents = fetchParents(ctx, rootDependency(pom));
-
-        discovered.putAll(pomGraph(parents));
-
-        parents.stream().findFirst().ifPresent(p -> dependencies.add(rootDependency(p.pom)));
 
         Optional.ofNullable(pom.getDependencyManagement()).ifPresent(pm -> {
             ImportFetch i = getImports(ctx, pm, remoteRepositories(pom));
