@@ -7,7 +7,7 @@ rec {
   mkManifestClassPath = classpath:
     mkManifestEntry "Class-Path"
       # Careful to use the jar after patching
-      (lib.concatStringsSep " " (lib.concatMap fileUris classpath));
+      (lib.concatMapStringsSep " " fileUri classpath);
 
   # Make a key-value pair for a MANIFEST.MF file
   #
@@ -32,15 +32,6 @@ rec {
     in
     loop str;
 
-  # Make a maven repository `linkFarm` spec out of a patchMavenJar
-  # derivation artifact.
-  #
-  # mavenRepositoryLink : patchMavenJar.drv -> { drv: fetchurl.drv; extension: str; ... } -> attrs str
-  mavenRepositoryLink = drv: a: {
-    name = mavenPath drv a.extension;
-    path = "${a.drv}";
-  };
-
   # The path in a maven repository in a patchMavenJar.drv raw output
   # given an extension.
   #
@@ -55,13 +46,8 @@ rec {
 
   # The file URIs of all patchMavenJar derivation raw outputs
   #
-  # fileUris : patchMavenJar.drv -> [ str ]
-  fileUris = d:
-    map (f: "file://${d}/share/java/${f}") (filenames d);
-
-  # The base filenames of all patchMavenJar derivation artifact outputs.
-  # filename : patchMavenJar.drv -> str -> str
-  filenames = d: map (a: filename d a.extension) d.artifacts;
+  # fileUri : patchMavenJar.drv -> str
+  fileUri = d: "file://${d}/share/java/${filename d d.artifact.extension}";
 
   # The base filename of a patchMavenJar derivation for a given file
   # extension, looks like a usual maven artifact:
