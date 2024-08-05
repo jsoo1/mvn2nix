@@ -192,6 +192,13 @@ public class Graph {
 
         List<Dependency> buildDeps = new ArrayList<>();
 
+        pom.getDependencies()
+            .stream()
+            .map(Graph::toAether)
+            .filter(d -> isOnlyBuildScope(d.getScope()))
+            .map(d -> dominatingDependency(pom, parents, d))
+            .forEach(d -> buildDeps.add(d));
+
         pom.getBuild()
             .getPlugins()
             .stream()
@@ -228,14 +235,23 @@ public class Graph {
         return buildDeps;
     }
 
+    public static boolean isOnlyBuildScope(String scope) {
+        return Pattern.compile("compile|test").asPredicate().test(scope);
+    }
+
     public static List<Dependency> runDependencies(Context ctx, Model pom) {
         List<POMFetch> parents = fetchParents(ctx, pom);
 
         return pom.getDependencies()
             .stream()
             .map(Graph::toAether)
+            .filter(d -> isRunScope(d.getScope()))
             .map(d -> dominatingDependency(pom, parents, d))
             .collect(Collectors.toList());
+    }
+
+    public static boolean isRunScope(String scope) {
+        return Pattern.compile("provided|runtime").asPredicate().test(scope);
     }
 
     public static List<POMFetch> fetchParents(Context ctx, Dependency d) {
