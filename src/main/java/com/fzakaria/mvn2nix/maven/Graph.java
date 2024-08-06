@@ -127,23 +127,13 @@ public class Graph {
         }
     }
 
-    public static Map<Artifact, Res> resolve(Context ctx, Model pom, boolean resolveRoots) {
-        Stream<Dependency> initial = resolveRoots
-            // If this is a published package, then we don't care about build dependencies at all
-            ? runDependencies(ctx, pom).stream()
-            // Otherwise we want to make sure this can do a full offline build
-            : Stream.concat(runDependencies(ctx, pom).stream(), buildDependencies(ctx, pom).stream());
-
-        Queue<Dependency> todos = new ArrayDeque<>(initial
-            .filter(distinctByKey(d -> d.getArtifact().toString()))
-            .collect(Collectors.toList())
+    public static Map<Artifact, Res> resolve(Context ctx, List<RemoteRepository> pomRepos, List<Dependency> initial) {
+        Queue<Dependency> todos = new ArrayDeque<>(
+            initial
+                .stream()
+                .filter(distinctByKey(d -> d.getArtifact().toString()))
+                .collect(Collectors.toList())
         );
-
-        if (resolveRoots) {
-            todos.add(toAether(pom));
-        }
-
-        List<RemoteRepository> pomRepos = remoteRepositories(pom);
 
         Map<Artifact, Res> walk = new HashMap<>();
 
