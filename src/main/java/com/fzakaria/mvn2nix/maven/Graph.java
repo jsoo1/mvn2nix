@@ -133,7 +133,7 @@ public class Graph {
 
             LOGGER.info("Adding {}", d.getArtifact());
 
-            List<Dependency> these = resolve(ctx, d).getDependencies(true);
+            List<Dependency> these = resolve(ctx, pomRepos, d).getDependencies(true);
 
             Fetch f = fetch(ctx, d, pomRepos);
 
@@ -316,9 +316,13 @@ public class Graph {
         }
     }
 
-    public static PreorderNodeListGenerator resolve(Context ctx, Dependency dep) {
+    public static PreorderNodeListGenerator resolve(Context ctx, List<RemoteRepository> repos, Dependency dep) {
         try {
-            CollectRequest req = new CollectRequest(dep.setExclusions(exclusions), ctx.remoteRepositories());
+            Set<RemoteRepository> moreRepos = new HashSet<>(ctx.remoteRepositories());
+
+            moreRepos.addAll(repos);
+
+            CollectRequest req = new CollectRequest(dep.setExclusions(exclusions), moreRepos.stream().collect(Collectors.toList()));
 
             DependencyNode root = ctx.repositorySystem()
                 .resolveDependencies(
