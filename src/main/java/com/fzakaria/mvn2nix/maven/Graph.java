@@ -102,11 +102,9 @@ public class Graph {
         Map<Artifact, Res> discovered = new HashMap<>();
 
         Optional.ofNullable(pom.getDependencyManagement()).ifPresent(pm -> {
-            ImportFetch i = getImports(ctx, pm, remoteRepositories(pom));
+            ImportFetch i = fetchImports(ctx, pm, remoteRepositories(pom));
 
-            for (Dependency d : i.dependencies) {
-                pom.getDependencyManagement().getDependencies().add(toMaven(d));
-            }
+            pom.setDependencyManagement(i.dependencyManagement);
 
             discovered.putAll(pomGraph(i.imports));
 
@@ -412,21 +410,20 @@ public class Graph {
 
         List<POMFetch> imports = new ArrayList<>();
 
-        List<POMFetch> parentResults = fetchParents(ctx, dep);
-
-        for (POMFetch f : parentResults) {
-            if (f.pom.getDependencyManagement() != null) {
-                ImportFetch i = getImports(ctx, f.pom.getDependencyManagement(), pomRepos);
+        List<POMFetch> parentResults = fetchParents(ctx, dep)
+            .stream()
+            .map(f -> Optional.ofNullable(f.pom.getDependencyManagement()).map(dm -> {
+                ImportFetch i = fetchImports(ctx, dm, pomRepos);
 
                 imports.addAll(i.imports);
 
-                for (Dependency d : i.dependencies) {
-                    f.pom.getDependencyManagement().getDependencies().add(toMaven(d));
-                }
+                f.pom.setDependencyManagement(i.dependencyManagement);
 
-                parents.add(f.pom);
-            }
-        }
+                return f;
+            }).orElse(f))
+            .collect(Collectors.toList());
+
+        parentResults.stream().forEach(f -> parents.add(f.pom));
 
         parents
             .stream()
@@ -567,7 +564,7 @@ public class Graph {
         }
     }
 
-    public static ImportFetch getImports(Context ctx, DependencyManagement dm, List<RemoteRepository> repos) {
+    public static ImportFetch fetchImports(Context ctx, DependencyManagement dm, List<RemoteRepository> repos) {
         Set<RemoteRepository> initRepos = new HashSet<>(ctx.remoteRepositories());
 
         initRepos.addAll(repos);
@@ -593,33 +590,41 @@ public class Graph {
 
                 imports.add(new POMFetch(m, ar));
 
-                if (m.getDependencyManagement() != null) {
+                Optional.ofNullable(m.getDependencyManagement()).ifPresent(dm2 -> {
                     Set<RemoteRepository> rs = new HashSet<>(repos);
 
                     rs.addAll(ctx.remoteRepositories());
 
                     rs.addAll(remoteRepositories(m));
 
-                    ImportFetch f = getImports(ctx, m.getDependencyManagement(), rs.stream().collect(Collectors.toList()));
+                    ImportFetch f = fetchImports(ctx, dm2, rs.stream().collect(Collectors.toList()));
 
                     dependencies.addAll(f.dependencies);
 
                     imports.addAll(f.imports);
-                }
+                });
             }
 
-            return new ImportFetch(dependencies, imports);
+            DependencyManagement clone = dm.clone();
+
+            for (Dependency d : dependencies) {
+                clone.getDependencies().add(toMaven(d));
+            }
+
+            return new ImportFetch(clone, imports, dependencies);
         } catch (ArtifactResolutionException e ) {
             throw new RuntimeException(e);
         }
     }
 
     public static class ImportFetch {
-        public final List<Dependency> dependencies;
+        public final DependencyManagement dependencyManagement;
         public final List<POMFetch> imports;
-        public ImportFetch(List<Dependency> ds, List<POMFetch> is) {
-            dependencies = ds;
+        public final List<Dependency> dependencies;
+        public ImportFetch(DependencyManagement dm, List<POMFetch> is, List<Dependency> ds) {
+            dependencyManagement = dm;
             imports = is;
+            dependencies = ds;
         }
     }
 
