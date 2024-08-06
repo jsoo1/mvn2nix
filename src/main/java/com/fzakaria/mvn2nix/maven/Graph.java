@@ -176,9 +176,9 @@ public class Graph {
 
             walk.put(d.getArtifact(), new Res(f.artifact, uniq(these)));
 
-            todos.addAll(these);
+            LOGGER.debug("Adding todos {}", these);
 
-            LOGGER.debug("Adding todos {}", todos);
+            todos.addAll(these);
         }
 
         return walk;
