@@ -110,10 +110,12 @@ public class Graph {
 
             discovered.putAll(pomGraph(i.imports));
 
-            i.imports.stream().findFirst().ifPresent(p -> dependencies.add(rootDependency(p.pom)));
+            for (POMFetch f : i.imports) {
+                dependencies.add(toAether(f.pom));
+            }
         });
 
-        Map.Entry<Artifact, List<Dependency>> node = new AbstractMap.SimpleImmutableEntry<>(rootDependency(pom).getArtifact(), uniq(dependencies));
+        Map.Entry<Artifact, List<Dependency>> node = new AbstractMap.SimpleImmutableEntry<>(toAether(pom).getArtifact(), uniq(dependencies));
 
         return new Root(node, discovered);
     }
@@ -140,7 +142,7 @@ public class Graph {
         );
 
         if (resolveRoots) {
-            todos.add(rootDependency((pom)));
+            todos.add(toAether(pom));
         }
 
         List<RemoteRepository> pomRepos = remoteRepositories(pom);
@@ -164,9 +166,11 @@ public class Graph {
 
             these.addAll(f.discovered);
 
-            f.parents.stream().findFirst().ifPresent(p -> these.add(rootDependency(p.pom)));
+            f.parents.stream().findFirst().ifPresent(p -> these.add(toAether(p.pom)));
 
-            f.imports.stream().findFirst().ifPresent(i -> these.add(rootDependency(i.pom)));
+            for (POMFetch i : f.imports) {
+                these.add(toAether(i.pom));
+            }
 
             walk.putAll(pomGraph(f.parents));
 
@@ -192,7 +196,7 @@ public class Graph {
         Collections.reverse(ps_);
 
         for (POMFetch p : ps_) {
-            res.put(rootDependency(p.pom).getArtifact(), pomNode(p, parent));
+            res.put(toAether(p.pom).getArtifact(), pomNode(p, parent));
 
             parent = Optional.of(p);
         }
@@ -203,7 +207,7 @@ public class Graph {
     public static Res pomNode(POMFetch f, Optional<POMFetch> parent) {
         return new Res(
             f.res,
-            parent.map(p -> new ArrayList<>(Arrays.asList(rootDependency(p.pom)))).orElse(new ArrayList<>())
+            parent.map(p -> new ArrayList<>(Arrays.asList(toAether(p.pom)))).orElse(new ArrayList<>())
         );
     }
 
