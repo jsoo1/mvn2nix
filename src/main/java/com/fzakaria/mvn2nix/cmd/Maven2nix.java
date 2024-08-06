@@ -160,21 +160,11 @@ public class Maven2nix implements Callable<Integer> {
         Path localRepo = ctx.repositorySystemSession().getLocalRepository().getBasedir().getCanonicalFile().toPath();
 
         if (outDir != null) {
-            Map<org.eclipse.aether.artifact.Artifact, Graph.Res> g = new HashMap<>();
-
             if (!resolveRoots) {
-                Graph.Root root = doNixRoot(pom);
-
-                g.putAll(root.discovered);
-
-                initial.addAll(root.node.getValue());
+                initial.addAll(doNixRoot(pom).getValue());
             }
 
-            Map<org.eclipse.aether.artifact.Artifact, Graph.Res> others = Graph.resolve(ctx, Graph.remoteRepositories(pom), initial);
-
-            g.putAll(others);
-
-            NixPackageSet.collectDir(localRepo, g).write(outDir);
+            NixPackageSet.collectDir(localRepo, Graph.resolve(ctx, Graph.remoteRepositories(pom), initial)).write(outDir);
         } else {
             Expr pkgs = NixPackageSet.collect(localRepo, Graph.resolve(ctx, Graph.remoteRepositories(pom), initial));
 
@@ -186,10 +176,12 @@ public class Maven2nix implements Callable<Integer> {
         }
     }
 
-    public Graph.Root doNixRoot(Model pom) throws IOException {
-        Graph.Root r = Graph.root(ctx, pom);
+    public Map.Entry<org.eclipse.aether.artifact.Artifact, List<org.eclipse.aether.graph.Dependency>>
+        doNixRoot(Model pom) throws IOException
+    {
+        Map.Entry<org.eclipse.aether.artifact.Artifact, List<org.eclipse.aether.graph.Dependency>> root = Graph.root(ctx, pom);
 
-        Expr callPackageFn = NixPackageSet.sourceCallPackageFn(r.node);
+        Expr callPackageFn = NixPackageSet.sourceCallPackageFn(root);
 
         BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 
@@ -199,7 +191,7 @@ public class Maven2nix implements Callable<Integer> {
 
         w.flush();
 
-        return r;
+        return root;
     }
 
     /**

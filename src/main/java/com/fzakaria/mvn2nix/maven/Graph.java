@@ -92,39 +92,24 @@ public class Graph {
     private static DefaultModelBuilderFactory factory = new DefaultModelBuilderFactory();
 
     // FIXME(jsoo1): No parents handled
-    public static Root root(Context ctx, Model pom) {
+    public static Map.Entry<Artifact, List<Dependency>> root(Context ctx, Model pom) {
         List<Dependency> dependencies = runDependencies(ctx, pom)
             .stream()
             .collect(Collectors.toList());
 
         dependencies.addAll(buildDependencies(ctx, pom));
 
-        Map<Artifact, Res> discovered = new HashMap<>();
-
         Optional.ofNullable(pom.getDependencyManagement()).ifPresent(pm -> {
             ImportFetch i = fetchImports(ctx, pm, remoteRepositories(pom));
 
             pom.setDependencyManagement(i.dependencyManagement);
-
-            discovered.putAll(pomGraph(i.imports));
 
             for (POMFetch f : i.imports) {
                 dependencies.add(toAether(f.pom));
             }
         });
 
-        Map.Entry<Artifact, List<Dependency>> node = new AbstractMap.SimpleImmutableEntry<>(toAether(pom).getArtifact(), uniq(dependencies));
-
-        return new Root(node, discovered);
-    }
-
-    public static class Root {
-        public final Map.Entry<Artifact, List<Dependency>> node;
-        public final Map<Artifact, Res> discovered;
-        public Root(Map.Entry<Artifact, List<Dependency>> n, Map<Artifact, Res> ds) {
-            node = n;
-            discovered = ds;
-        }
+        return new AbstractMap.SimpleImmutableEntry<>(toAether(pom).getArtifact(), uniq(dependencies));
     }
 
     public static Map<Artifact, Res> resolve(Context ctx, List<RemoteRepository> pomRepos, List<Dependency> initial) {
@@ -154,15 +139,13 @@ public class Graph {
 
             these.addAll(f.discovered);
 
-            f.parents.stream().findFirst().ifPresent(p -> these.add(toAether(p.pom)));
+            for (POMFetch p : f.parents) {
+                these.add(toAether(p.pom));
+            }
 
             for (POMFetch i : f.imports) {
                 these.add(toAether(i.pom));
             }
-
-            walk.putAll(pomGraph(f.parents));
-
-            walk.putAll(pomGraph(f.imports));
 
             walk.put(d.getArtifact(), new Res(f.artifact, uniq(these)));
 
@@ -172,31 +155,6 @@ public class Graph {
         }
 
         return walk;
-    }
-
-    public static Map<Artifact, Res> pomGraph(List<POMFetch> ps) {
-        Map<Artifact, Res> res = new HashMap<>();
-
-        Optional<POMFetch> parent = Optional.empty();
-
-        List<POMFetch> ps_ = new ArrayList<>(ps);
-
-        Collections.reverse(ps_);
-
-        for (POMFetch p : ps_) {
-            res.put(toAether(p.pom).getArtifact(), pomNode(p, parent));
-
-            parent = Optional.of(p);
-        }
-
-        return res;
-    }
-
-    public static Res pomNode(POMFetch f, Optional<POMFetch> parent) {
-        return new Res(
-            f.res,
-            parent.map(p -> new ArrayList<>(Arrays.asList(toAether(p.pom)))).orElse(new ArrayList<>())
-        );
     }
 
     public static List<RemoteRepository> remoteRepositories(Model pom) {
