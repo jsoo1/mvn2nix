@@ -139,9 +139,12 @@ public class Graph {
 
             these.addAll(f.discovered);
 
-            for (POMFetch p : f.parents) {
-                these.add(toAether(p.pom));
-            }
+            walk.putAll(parentGraph(f.parents));
+
+            // Add self pom to deps
+            f.parents.stream().findFirst().ifPresent(self -> {
+                these.add(new Dependency(self.res.getArtifact(), "test"));
+            });
 
             for (POMFetch i : f.imports) {
                 these.add(toAether(i.pom));
@@ -220,6 +223,36 @@ public class Graph {
             .forEach(d -> buildDeps.add(d));
 
         return buildDeps;
+    }
+
+    public static Map<Artifact, Res> parentGraph(List<POMFetch> parents) {
+        Optional<POMFetch> parent = Optional.empty();
+
+        Map<Artifact, Res> g = new HashMap<>();
+
+        List<POMFetch> clone = new ArrayList<>(parents);
+
+        Collections.reverse(clone);
+
+        for (POMFetch f : clone) {
+            g.put(
+                f.res.getArtifact(),
+                new Res(
+                    f.res,
+                    parent
+                        .map(p -> new ArrayList<>(Arrays.asList(toDependency(p))))
+                        .orElse(new ArrayList<>())
+                )
+            );
+
+            parent = Optional.of(f);
+        }
+
+        return g;
+    }
+
+    public static Dependency toDependency(POMFetch f) {
+        return new Dependency(f.res.getArtifact(), "test");
     }
 
     public static boolean isOnlyBuildScope(String scope) {
