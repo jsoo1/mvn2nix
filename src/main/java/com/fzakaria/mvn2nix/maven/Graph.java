@@ -636,7 +636,7 @@ public class Graph {
             new DefaultArtifact(
                 pom.getGroupId(),
                 pom.getArtifactId(),
-                pom.getPackaging(),
+                packagingExtension(pom.getPackaging()),
                 pom.getVersion()
             ),
             "test"
@@ -684,6 +684,16 @@ public class Graph {
 
     public static Exclusion toAether(org.apache.maven.model.Exclusion e) {
         return new Exclusion(e.getGroupId(), e.getArtifactId(), null, null);
+    }
+
+    // Some common packaging->artifact extension mappings
+    public static String packagingExtension(String packaging) {
+        switch (packaging) {
+        case "bundle": return "jar";
+        case "maven-plugin": return "jar";
+        case "eclipse-plugin": return "jar";
+        default: return packaging;
+        }
     }
 
     public static org.apache.maven.model.Exclusion toMaven(Exclusion e) {
