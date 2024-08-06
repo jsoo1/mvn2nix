@@ -207,18 +207,6 @@ public class Graph {
         );
     }
 
-    public static Dependency rootDependency(Model pom) {
-        return new Dependency(
-            new DefaultArtifact(
-                pom.getGroupId(),
-                pom.getArtifactId(),
-                pom.getPackaging(),
-                pom.getVersion()
-            ),
-            "test"
-        );
-    }
-
     public static List<RemoteRepository> remoteRepositories(Model pom) {
         return Stream.concat(
             pom.getRepositories().stream().map(Graph::toAether),
@@ -631,6 +619,30 @@ public class Graph {
         }
     }
 
+    public static org.apache.maven.model.Dependency toMaven(Dependency d) {
+        Artifact a = d.getArtifact();
+
+        org.apache.maven.model.Dependency res = new org.apache.maven.model.Dependency();
+
+        res.setGroupId(a.getGroupId());
+
+        res.setArtifactId(a.getArtifactId());
+
+        res.setClassifier(a.getClassifier());
+
+        res.setType(a.getExtension());
+
+        res.setVersion(a.getVersion());
+
+        res.setScope(d.getScope());
+
+        res.setOptional(d.getOptional());
+
+        res.setExclusions(d.getExclusions().stream().map(Graph::toMaven).collect(Collectors.toList()));
+
+        return res;
+    }
+
     public static Dependency toAether(Parent p) {
         return new Dependency(
             new DefaultArtifact(
@@ -658,28 +670,16 @@ public class Graph {
         );
     }
 
-    public static org.apache.maven.model.Dependency toMaven(Dependency d) {
-        Artifact a = d.getArtifact();
-
-        org.apache.maven.model.Dependency res = new org.apache.maven.model.Dependency();
-
-        res.setGroupId(a.getGroupId());
-
-        res.setArtifactId(a.getArtifactId());
-
-        res.setClassifier(a.getClassifier());
-
-        res.setType(a.getExtension());
-
-        res.setVersion(a.getVersion());
-
-        res.setScope(d.getScope());
-
-        res.setOptional(d.getOptional());
-
-        res.setExclusions(d.getExclusions().stream().map(Graph::toMaven).collect(Collectors.toList()));
-
-        return res;
+    public static Dependency toAether(Model pom) {
+        return new Dependency(
+            new DefaultArtifact(
+                pom.getGroupId(),
+                pom.getArtifactId(),
+                pom.getPackaging(),
+                pom.getVersion()
+            ),
+            "test"
+        );
     }
 
     public static Dependency toAether(Plugin p) {
