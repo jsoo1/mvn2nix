@@ -1,6 +1,7 @@
 self: super: {
-  mvn2nix = (self.callPackage ./derivation.nix {
-    jdk = self.jdk17_headless;
+  mvn2nix = (self.callPackage ./derivation2.nix {
+    jre = self.jre_headless;
+    buildMavenPackage = self.callPackage ./build-support/build-maven-package.nix { };
   }).overrideAttrs (o: {
     passthru.lib = self.callPackage ./lib.nix { };
 
