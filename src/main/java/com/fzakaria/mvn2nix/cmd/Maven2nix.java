@@ -15,8 +15,11 @@ import com.squareup.moshi.Moshi;
 import eu.maveniverse.maven.mima.context.Context;
 import eu.maveniverse.maven.mima.context.ContextOverrides;
 import eu.maveniverse.maven.mima.context.Runtimes;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.function.Predicate;
 import org.apache.maven.model.Model;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -89,6 +92,10 @@ public class Maven2nix implements Callable<Integer> {
             defaultValue = "false")
     private boolean resolveRoots;
 
+    @Option(names = "--additional-dependencies",
+            description = "Additional dependencies of root in as comma-separated maven coordinates prepended by scope=. i.e.: compile=info.picocli:picocli-codegen:4.5.0,test=org.junit:junit:5.11.0")
+    private String additionalDependencies = "";
+
     public final Context ctx;
 
     public Maven2nix() {
@@ -153,6 +160,8 @@ public class Maven2nix implements Callable<Integer> {
         )
             .collect(Collectors.toList());
 
+        initial.addAll(getAdditionalDependencies());
+
         if (resolveRoots) {
             initial.add(Graph.toAether(pom));
         }
@@ -181,6 +190,8 @@ public class Maven2nix implements Callable<Integer> {
     {
         Map.Entry<org.eclipse.aether.artifact.Artifact, List<org.eclipse.aether.graph.Dependency>> root = Graph.root(ctx, pom);
 
+        root.getValue().addAll(getAdditionalDependencies());
+
         Expr callPackageFn = NixPackageSet.sourceCallPackageFn(root);
 
         BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
@@ -192,6 +203,20 @@ public class Maven2nix implements Callable<Integer> {
         w.flush();
 
         return root;
+    }
+
+    public List<org.eclipse.aether.graph.Dependency> getAdditionalDependencies() {
+        return Arrays.asList(additionalDependencies.split(","))
+            .stream()
+            .filter(Predicate.not(String::isEmpty))
+            .map(spec -> {
+                String[] x = Arrays.asList(spec.split("=")).stream().filter(Predicate.not(String::isEmpty)).toArray(String[]::new);
+                String scope = x[0];
+                String coord = x[1];
+
+                return new org.eclipse.aether.graph.Dependency(new DefaultArtifact(coord), scope);
+            })
+            .collect(Collectors.toList());
     }
 
     /**
