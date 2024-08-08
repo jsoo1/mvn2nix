@@ -1,6 +1,7 @@
 package com.fzakaria.mvn2nix.model;
 
 import com.fzakaria.mvn2nix.maven.Graph;
+import com.fzakaria.mvn2nix.maven.graph.Node;
 import com.fzakaria.mvn2nix.model.nix.*;
 import eu.maveniverse.maven.mima.context.Context;
 import java.net.URISyntaxException;
@@ -56,14 +57,14 @@ public class NixPackageSet {
 
     public static String[] sourcePackageParams = new String[]{MVN2NIX};
 
-    public static Expr collect(Path localRepo, Map<Artifact, Graph.Res> resolved) {
+    public static Expr collect(Path localRepo, Map<Artifact, Node> resolved) {
         return packageSet(new Attrs(resolved.entrySet().stream().map(e -> callPackage(localRepo, e))));
     }
 
-    public static OutputDir collectDir(Path localRepo, Map<Artifact, Graph.Res> resolved) {
+    public static OutputDir collectDir(Path localRepo, Map<Artifact, Node> resolved) {
         return new OutputDir(resolved.entrySet().stream().collect(Collectors.toMap(
-            (Map.Entry<Artifact, Graph.Res> e) -> new File(attrName(e.getKey())).toPath(),
-            (Map.Entry<Artifact, Graph.Res> e) -> binaryCallPackageFn(localRepo, e),
+            (Map.Entry<Artifact, Node> e) -> new File(attrName(e.getKey())).toPath(),
+            (Map.Entry<Artifact, Node> e) -> binaryCallPackageFn(localRepo, e),
             (Expr e1, Expr e2) -> e2
         )));
     }
@@ -78,7 +79,7 @@ public class NixPackageSet {
         ))));
     }
 
-    public static Map.Entry<String, Expr> callPackage(Path localRepo, Map.Entry<Artifact, Graph.Res> entry) {
+    public static Map.Entry<String, Expr> callPackage(Path localRepo, Map.Entry<Artifact, Node> entry) {
         Expr expr = new App(new App(new Var("self.callPackage"), new Paren(
             binaryCallPackageFn(localRepo, entry)
         )), new Attrs(Stream.empty()));
@@ -96,8 +97,8 @@ public class NixPackageSet {
         )))));
     }
 
-    public static Expr binaryCallPackageFn(Path localRepo, Map.Entry<Artifact, Graph.Res> e) {
-        Graph.Res r = e.getValue();
+    public static Expr binaryCallPackageFn(Path localRepo, Map.Entry<Artifact, Node> e) {
+        Node r = e.getValue();
 
         Expr args = new App(new Var(PATCH_MAVEN_JAR), new Attrs(Stream.concat(coordAttrs(e.getKey()), Stream.of(
             pair("artifact", artifact(localRepo, r.artifact)),

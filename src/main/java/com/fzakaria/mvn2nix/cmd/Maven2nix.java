@@ -2,6 +2,8 @@ package com.fzakaria.mvn2nix.cmd;
 
 import com.fzakaria.mvn2nix.maven.Artifact;
 import com.fzakaria.mvn2nix.maven.Graph;
+import com.fzakaria.mvn2nix.maven.graph.Aether;
+import com.fzakaria.mvn2nix.maven.graph.POM;
 import com.fzakaria.mvn2nix.maven.Maven;
 import com.fzakaria.mvn2nix.model.MavenArtifact;
 import com.fzakaria.mvn2nix.model.MavenNixInformation;
@@ -143,27 +145,27 @@ public class Maven2nix implements Callable<Integer> {
 
         case NIX: doNix(file, resolveRoots, outDir); break;
 
-        case NIX_ROOT: doNixRoot(Graph.readPOM(ctx, file)); break;
+        case NIX_ROOT: doNixRoot(POM.read(ctx, file)); break;
         }
 
         return 0;
     }
 
     public void doNix(Path file, boolean resolveRoots, Path outDir) throws IOException {
-        Model pom = Graph.readPOM(ctx, file);
+        POM pom = POM.read(ctx, file);
 
         List<org.eclipse.aether.graph.Dependency> initial = (resolveRoots
             // If this is a published package, then we don't care about build dependencies at all
-            ? Graph.runDependencies(ctx, pom).stream()
+            ? POM.runDependencies(pom).stream()
             // Otherwise we want to make sure this can do a full offline build
-            : Stream.concat(Graph.runDependencies(ctx, pom).stream(), Graph.buildDependencies(ctx, pom).stream())
+            : Stream.concat(POM.runDependencies(pom).stream(), POM.buildDependencies(pom).stream())
         )
             .collect(Collectors.toList());
 
         initial.addAll(getAdditionalDependencies());
 
         if (resolveRoots) {
-            initial.add(Graph.toAether(pom));
+            initial.add(Aether.of(pom.model));
         }
 
         Path localRepo = ctx.repositorySystemSession().getLocalRepository().getBasedir().getCanonicalFile().toPath();
@@ -173,9 +175,9 @@ public class Maven2nix implements Callable<Integer> {
                 initial.addAll(doNixRoot(pom).getValue());
             }
 
-            NixPackageSet.collectDir(localRepo, Graph.resolve(ctx, Graph.remoteRepositories(pom), initial)).write(outDir);
+            NixPackageSet.collectDir(localRepo, Graph.resolve(ctx, pom, initial)).write(outDir);
         } else {
-            Expr pkgs = NixPackageSet.collect(localRepo, Graph.resolve(ctx, Graph.remoteRepositories(pom), initial));
+            Expr pkgs = NixPackageSet.collect(localRepo, Graph.resolve(ctx, pom, initial));
 
             BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
 
@@ -186,9 +188,9 @@ public class Maven2nix implements Callable<Integer> {
     }
 
     public Map.Entry<org.eclipse.aether.artifact.Artifact, List<org.eclipse.aether.graph.Dependency>>
-        doNixRoot(Model pom) throws IOException
+        doNixRoot(POM pom) throws IOException
     {
-        Map.Entry<org.eclipse.aether.artifact.Artifact, List<org.eclipse.aether.graph.Dependency>> root = Graph.root(ctx, pom);
+        Map.Entry<org.eclipse.aether.artifact.Artifact, List<org.eclipse.aether.graph.Dependency>> root = Graph.root(pom);
 
         root.getValue().addAll(getAdditionalDependencies());
 
