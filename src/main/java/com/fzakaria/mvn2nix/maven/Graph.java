@@ -1,6 +1,5 @@
 package com.fzakaria.mvn2nix.maven;
 
-import com.fzakaria.mvn2nix.maven.MaybeResolvedArtifact;
 import eu.maveniverse.maven.mima.context.Context;
 import eu.maveniverse.maven.mima.context.Runtime;
 import eu.maveniverse.maven.mima.context.Runtimes;
