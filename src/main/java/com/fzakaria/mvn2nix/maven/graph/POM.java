@@ -38,10 +38,12 @@ import org.eclipse.aether.resolution.ArtifactResult;
 
 public class POM {
     public final Model model;
+    public final Node node;
     public final Map<Artifact, Node> walk;
     public final Optional<POM> parent;
-    public POM(Model m, Map<Artifact, Node> w, Optional<POM> p) {
+    public POM(Model m, Node n, Map<Artifact, Node> w, Optional<POM> p) {
         model = m;
+        node = n;
         walk = w;
         parent = p;
     }
@@ -72,13 +74,9 @@ public class POM {
 
             Read r = read(ctx, ctx.remoteRepositories(), m);
 
-            Artifact self = artifact(m);
+            ArtifactResult empty = new ArtifactResult(new ArtifactRequest(artifact(m), new ArrayList<>(), null));
 
-            Map<Artifact, Node> walk = new HashMap<>(r.walk);
-
-            walk.put(self, new Node(new ArtifactResult(new ArtifactRequest(self, new ArrayList<>(), null)), r.dependencies));
-
-            return new POM(m, walk, r.parent);
+            return new POM(m, new Node(empty, r.dependencies), r.walk, r.parent);
         } catch (ModelBuildingException e) {
             throw new IOException(e.getMessage(), (Throwable) e);
         }
@@ -107,11 +105,7 @@ public class POM {
 
             Read r = read(ctx, ctx.remoteRepositories(), m);
 
-            Map<Artifact, Node> walk = new HashMap<>(r.walk);
-
-            walk.put(res.getArtifact(), new Node(res, r.dependencies));
-
-            return new POM(r.model, walk, r.parent);
+            return new POM(r.model, new Node(res, r.dependencies), r.walk, r.parent);
         } catch (ArtifactResolutionException e) {
             throw new RuntimeException(e);
         }
@@ -136,11 +130,7 @@ public class POM {
 
             Read r = POM.read(ctx, repos.stream().collect(Collectors.toList()), m);
 
-            Map<Artifact, Node> walk = new HashMap<>(r.walk);
-
-            walk.put(res.getArtifact(), new Node(res, r.dependencies));
-
-            return new POM(r.model, walk, r.parent);
+            return new POM(r.model, new Node(res, r.dependencies), r.walk, r.parent);
         } catch (ArtifactResolutionException e) {
             throw new RuntimeException(e);
         }
