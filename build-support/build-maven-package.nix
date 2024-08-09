@@ -61,14 +61,14 @@ stdenv.mkDerivation ({
 
     mkdir -p $out/share/java
 
-    cp target/${name}-${version}.jar $out/share/java
+    cp target/${artifactId}-${version}.jar $out/share/java
   '' + (lib.optionalString patchClasspath ''
     # Date is to limited to DOS date range:
     # https://bugs.openjdk.org/browse/JDK-8184940
     # FIXME(jsoo1): This style should be dependent on java version
     # jar --update --date=1980-01-01T00:00:02Z --file=$filename --manifest=${manifest}
 
-     jar -ufm $out/share/java ${manifest}
+     jar -ufm $out/share/java/${artifactId}-${version}.jar ${manifest}
 
      mkdir -p $out/nix-support
 
