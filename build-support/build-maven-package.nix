@@ -46,14 +46,14 @@ stdenv.mkDerivation ({
     dependencies = dependencies;
   } // lib.optionalAttrs patchClasspath {
     inherit classpath manifest;
-  };
+  } // (args.passthru or { });
 
   nativeBuildInputs = [ jdk maven ] ++ (args.nativeBuildInputs or [ ]);
 
   buildPhase = ''
     echo "Using repository ${repository}"
     # 'maven.repo.local' must be writable so copy it out of nix store
-    ${maven}/bin/mvn package --offline -Duser.home=`pwd` -Dmaven.repo.local=${repository}
+    mvn package --offline -Duser.home=`pwd` -Dmaven.repo.local=${repository}
   '';
 
   installPhase = ''
@@ -78,4 +78,4 @@ stdenv.mkDerivation ({
     runHook postInstall
   '';
 
-} // lib.removeAttrs args [ "dependencies" ])
+} // lib.removeAttrs args [ "dependencies" "nativeBuildInputs" "passthru" ])
