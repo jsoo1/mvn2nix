@@ -31,6 +31,7 @@ let
     org_junit_jupiter__junit-jupiter__jar__5_6_2
     org_junit_jupiter__junit-jupiter-api__jar__5_6_2
     org_assertj__assertj-core__jar__3_16_1
+    org_apache_maven_surefire__surefire-junit-platform__jar__3_0_0-M5
     org_apache_maven_plugins__maven-compiler-plugin__jar__3_8_1
     org_apache_maven_plugins__maven-jar-plugin__jar__3_2_0
     org_apache_maven_plugins__maven-failsafe-plugin__jar__3_0_0-M5
@@ -160,6 +161,11 @@ buildMavenPackage {
     }
     {
       drv = org_assertj__assertj-core__jar__3_16_1;
+      scope = "test";
+      optional = false;
+    }
+    {
+      drv = org_apache_maven_surefire__surefire-junit-platform__jar__3_0_0-M5;
       scope = "test";
       optional = false;
     }

@@ -118,6 +118,12 @@
             <version>3.16.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-junit-platform</artifactId>
+            <version>${maven-failsafe-plugin-version}</version>
+            <scope>test</scope>
+        </dependency>
         <!-- TEST END -->
     </dependencies>
 
