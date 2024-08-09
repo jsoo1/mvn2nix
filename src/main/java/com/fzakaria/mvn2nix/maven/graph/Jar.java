@@ -41,8 +41,6 @@ public class Jar {
 
             dependencies.add(Aether.of(self));
 
-            self.parent.ifPresent(x -> dependencies.add(Aether.of(x.model)));
-
             return new Jar(new Node(res, dependencies), self.walk);
         } catch (ArtifactResolutionException e) {
             throw new RuntimeException(e);
