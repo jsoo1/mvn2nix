@@ -19,7 +19,7 @@
 , classifier ? null
 , dependencies
   # Whether or not to add the runtime dependencies of the
-  # package to the manifesh Class-Path field.
+  # package to the manifest Class-Path field.
 , patchClasspath ? false
 , ...
 }@args:

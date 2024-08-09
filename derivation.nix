@@ -59,6 +59,8 @@ buildMavenPackage {
 
   src = nix-gitignore.gitignoreSource [ ] ./.;
 
+  patchClasspath = true;
+
   nativeBuildInputs = [ makeWrapper ];
 
   postInstall = ''
