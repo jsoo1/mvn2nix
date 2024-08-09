@@ -72,7 +72,6 @@ buildMavenPackage {
           --set JAVA_HOME ${if stdenv.hostPlatform.isDarwin
            then "${jre}/jre"
            else "${jre.jre}/lib/openjdk/jre"}
-
   '';
 
   meta = with lib; {
