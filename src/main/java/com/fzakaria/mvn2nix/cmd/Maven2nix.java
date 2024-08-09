@@ -154,18 +154,16 @@ public class Maven2nix implements Callable<Integer> {
     public void doNix(Path file, boolean resolveRoots, Path outDir) throws IOException {
         POM pom = POM.read(ctx, file);
 
-        List<org.eclipse.aether.graph.Dependency> initial = (resolveRoots
-            // If this is a published package, then we don't care about build dependencies at all
-            ? POM.runDependencies(pom).stream()
-            // Otherwise we want to make sure this can do a full offline build
-            : Stream.concat(POM.runDependencies(pom).stream(), POM.buildDependencies(pom).stream())
-        )
-            .collect(Collectors.toList());
+        List<org.eclipse.aether.graph.Dependency> initial = POM.runDependencies(pom);
 
         initial.addAll(getAdditionalDependencies());
 
         if (resolveRoots) {
             initial.add(Aether.of(pom.model));
+        } else {
+            // If this is a published package, then we don't care about build dependencies at all
+            // Otherwise we want to make sure this can do a full offline build
+            initial.addAll(POM.buildDependencies(pom));
         }
 
         Path localRepo = ctx.repositorySystemSession().getLocalRepository().getBasedir().getCanonicalFile().toPath();
