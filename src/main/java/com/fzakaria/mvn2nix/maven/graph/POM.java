@@ -44,17 +44,12 @@ import org.eclipse.aether.resolution.ArtifactResult;
 
   The dependency graph of a pom should look like this:
 
-  It might have `n` imports and at most one parent.
-
-  Each parent recursively looks the same.
-
-  I.E. `self` has n imports and one parent and parent has m imports
-  and no parent:
+  Each parent recursively looks the same and each import looks the
+  same
 
   com.example:self:pom:0.2.0
-  |- import<0>
-  |- ...
-  |- import<n>
+  |- net.example:test-api:pom:1.0.0
+  |  `- net.example:parent:pom:10
   `- com.example:artifact:pom:0.0.1
      |- import<0>
      |- ...
@@ -274,9 +269,11 @@ public class POM {
 
             model.setDependencyManagement(imports.dependencyManagement);
 
-            dependencies.addAll(imports.dependencies);
+            imports.poms.forEach(pom -> {
+                dependencies.add(Aether.of(pom));
 
-            walk.putAll(imports.walk);
+                walk.putAll(pom.walk);
+            });
         });
 
         Optional<POM> parent = Optional.ofNullable(m.getParent()).map(x ->
@@ -307,12 +304,10 @@ public class POM {
 
     public static class Imports {
         public final DependencyManagement dependencyManagement;
-        public final Map<Artifact, Node> walk;
-        public final List<Dependency> dependencies;
-        public Imports(DependencyManagement dm, Map<Artifact, Node> w, List<Dependency> ds) {
+        public final List<POM> poms;
+        public Imports(DependencyManagement dm, List<POM> ps) {
             dependencyManagement = dm;
-            walk = w;
-            dependencies = ds;
+            poms = ps;
         }
 
         public static Imports fetch(Context ctx, List<RemoteRepository> repos, DependencyManagement dm) {
@@ -332,9 +327,9 @@ public class POM {
                     .repositorySystem()
                     .resolveArtifacts(ctx.repositorySystemSession(), reqs);
 
-                List<Dependency> dependencies = new ArrayList<>();
+                DependencyManagement clone = dm.clone();
 
-                Map<Artifact, Node> walk = new HashMap<>();
+                List<POM> imports = new ArrayList<>();
 
                 for (ArtifactResult ar : initial) {
                     Model m = readNoResolve(ctx, ar.getLocalArtifactResult().getFile());
@@ -347,18 +342,19 @@ public class POM {
 
                     Read r = read(ctx, rs.stream().collect(Collectors.toList()), m);
 
-                    dependencies.addAll(r.dependencies);
+                    Map<Artifact, Node> walk = new HashMap<>(r.walk);
 
-                    walk.putAll(r.walk);
+                    walk.put(ar.getArtifact(), new Node(ar, r.dependencies));
+
+                    imports.add(new POM(m, walk, r.parent));
+
+                    for (Dependency d : r.dependencies) {
+                        clone.getDependencies().add(Aether.toMaven(d));
+                    }
                 }
 
-                DependencyManagement clone = dm.clone();
 
-                for (Dependency d : dependencies) {
-                    clone.getDependencies().add(Aether.toMaven(d));
-                }
-
-                return new Imports(clone, walk, dependencies);
+                return new Imports(clone, imports);
             } catch (ArtifactResolutionException e ) {
                 throw new RuntimeException(e);
             }
