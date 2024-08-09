@@ -68,5 +68,5 @@ rec {
 
   # This is a mapping of maven scope to time of use
   isRuntime = configuration:
-    null != builtins.match "^default\\(compile\\)|provided|default|compile|runtime$" configuration;
+    null != builtins.match "^default\\(compile\\)|default|compile|runtime$" configuration;
 }
