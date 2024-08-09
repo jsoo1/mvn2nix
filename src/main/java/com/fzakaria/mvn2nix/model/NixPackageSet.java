@@ -88,7 +88,10 @@ public class NixPackageSet {
     }
 
     public static Expr sourceCallPackageFn(Map.Entry<Artifact, List<Dependency>> e) {
-        List<Dependency> dependencies = e.getValue();
+        List<Dependency> dependencies = e.getValue()
+            .stream()
+            .filter(d -> !d.getArtifact().toString().equals(e.getKey().toString()))
+            .collect(Collectors.toList());
 
         return new Fn(params(sourcePackageParams, dependencies), new App(new Var(MVN2NIX + ".buildMavenPackage"),
             new Attrs(Stream.concat(coordAttrs(e.getKey()), Stream.of(
@@ -100,13 +103,17 @@ public class NixPackageSet {
     public static Expr binaryCallPackageFn(Path localRepo, Map.Entry<Artifact, Node> e) {
         Node r = e.getValue();
 
+        List<Dependency> dependencies = r.dependencies.stream()
+            .filter(d -> !d.getArtifact().toString().equals(e.getKey().toString()))
+            .collect(Collectors.toList());
+
         Expr args = new App(new Var(PATCH_MAVEN_JAR), new Attrs(Stream.concat(coordAttrs(e.getKey()), Stream.of(
             pair("artifact", artifact(localRepo, r.artifact)),
-            pair("dependencies", new LitL(r.dependencies.stream().map(NixPackageSet::dep))),
+            pair("dependencies", new LitL(dependencies.stream().map(NixPackageSet::dep))),
             pair("meta.sourceProvenance", new LitL(new Expr[]{new Var(LIB + ".sourceTypes.binaryBytecode")}))
         ))));
 
-        return new Fn(params(binaryPackageParams, r.dependencies), args);
+        return new Fn(params(binaryPackageParams, dependencies), args);
     }
 
     public static Param params(String[] standardParams, List<Dependency> ds) {
