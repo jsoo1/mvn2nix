@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Predicate;
 import org.apache.maven.model.Model;
+import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,48 +113,56 @@ public class Maven2nix implements Callable<Integer> {
     public Integer call() throws Exception {
         LOGGER.debug("Reading {}", file);
 
+        Path mavenHome = getMavenHome();
+
+        POM self = POM.read(ctx, file);
+
+        // Don't record the walk or dependencies of the super-pom since it ships
+        // with maven itself
+        Model superPOM = POM.getSuper(ctx, mavenHome, self.model.getModelVersion());
+
         switch (outType) {
-        case JSON:
-            final Maven maven = Maven.withTemporaryLocalRepository();
-            maven.executeGoals(file.toFile(), javaHome.toFile(), goals);
+        case JSON: doJSON(); break;
 
-            Collection<Artifact> artifacts = maven.collectAllArtifactsInLocalRepository();
-            Map<String, MavenArtifact> dependencies = artifacts.parallelStream()
-                    .collect(Collectors.toMap(
-                                Artifact::getCanonicalName,
-                                artifact -> {
-                                    for (String repository : repositories) {
-                                        URL url = getRepositoryArtifactUrl(artifact, repository);
-                                        if (!doesUrlExist(url)) {
-                                            LOGGER.info("URL does not exist: {}", url);
-                                            continue;
-                                        }
+        case NIX: doNix(resolveRoots, superPOM, self, outDir); break;
 
-                                        File localArtifact = maven.findArtifactInLocalRepository(artifact)
-                                                .orElseThrow(() -> new IllegalStateException("Should never happen"));
-
-                                        String sha256 = calculateSha256OfFile(localArtifact);
-                                        return new MavenArtifact(url, artifact.getLayout(), sha256);
-                                    }
-                                    throw new RuntimeException(String.format("Could not find artifact %s in any repository", artifact));
-                                }
-                            ));
-
-            final MavenNixInformation information = new MavenNixInformation(dependencies);
-            spec.commandLine().getOut().println(toPrettyJson(information));
-            break;
-
-        case NIX: doNix(file, resolveRoots, outDir); break;
-
-        case NIX_ROOT: doNixRoot(POM.read(ctx, file)); break;
+        case NIX_ROOT: doNixRoot(superPOM, self); break;
         }
 
         return 0;
     }
 
-    public void doNix(Path file, boolean resolveRoots, Path outDir) throws IOException {
-        POM pom = POM.read(ctx, file);
+    public void doJSON() throws MavenInvocationException {
+        final Maven maven = Maven.withTemporaryLocalRepository();
+        maven.executeGoals(file.toFile(), javaHome.toFile(), goals);
 
+        Collection<Artifact> artifacts = maven.collectAllArtifactsInLocalRepository();
+        Map<String, MavenArtifact> dependencies = artifacts.parallelStream()
+                .collect(Collectors.toMap(
+                            Artifact::getCanonicalName,
+                            artifact -> {
+                                for (String repository : repositories) {
+                                    URL url = getRepositoryArtifactUrl(artifact, repository);
+                                    if (!doesUrlExist(url)) {
+                                        LOGGER.info("URL does not exist: {}", url);
+                                        continue;
+                                    }
+
+                                    File localArtifact = maven.findArtifactInLocalRepository(artifact)
+                                            .orElseThrow(() -> new IllegalStateException("Should never happen"));
+
+                                    String sha256 = calculateSha256OfFile(localArtifact);
+                                    return new MavenArtifact(url, artifact.getLayout(), sha256);
+                                }
+                                throw new RuntimeException(String.format("Could not find artifact %s in any repository", artifact));
+                            }
+                        ));
+
+        final MavenNixInformation information = new MavenNixInformation(dependencies);
+        spec.commandLine().getOut().println(toPrettyJson(information));
+    }
+
+    public void doNix(boolean resolveRoots, Model superPOM, POM pom, Path outDir) throws IOException {
         List<org.eclipse.aether.graph.Dependency> initial = POM.runDependencies(pom);
 
         initial.addAll(getAdditionalDependencies());
@@ -163,7 +172,7 @@ public class Maven2nix implements Callable<Integer> {
         } else {
             // If this is a published package, then we don't care about build dependencies at all
             // Otherwise we want to make sure this can do a full offline build
-            initial.addAll(POM.buildDependencies(pom));
+            initial.addAll(POM.buildDependencies(superPOM, pom));
 
             // Plus we won't have fetched the artifact from anywhere
             pom.walk.remove(POM.artifact(pom.model));
@@ -173,7 +182,7 @@ public class Maven2nix implements Callable<Integer> {
 
         if (outDir != null) {
             if (!resolveRoots) {
-                initial.addAll(doNixRoot(pom).getValue());
+                initial.addAll(doNixRoot(superPOM, pom).getValue());
             }
 
             NixPackageSet.collectDir(localRepo, Graph.resolve(ctx, pom, initial)).write(outDir);
@@ -189,9 +198,9 @@ public class Maven2nix implements Callable<Integer> {
     }
 
     public Map.Entry<org.eclipse.aether.artifact.Artifact, List<org.eclipse.aether.graph.Dependency>>
-        doNixRoot(POM pom) throws IOException
+        doNixRoot(Model superPOM, POM pom) throws IOException
     {
-        Map.Entry<org.eclipse.aether.artifact.Artifact, List<org.eclipse.aether.graph.Dependency>> root = Graph.root(pom);
+        Map.Entry<org.eclipse.aether.artifact.Artifact, List<org.eclipse.aether.graph.Dependency>> root = Graph.root(superPOM, pom);
 
         root.getValue().addAll(getAdditionalDependencies());
 
@@ -220,6 +229,18 @@ public class Maven2nix implements Callable<Integer> {
                 return new org.eclipse.aether.graph.Dependency(new DefaultArtifact(coord), scope);
             })
             .collect(Collectors.toList());
+    }
+
+    public static Path getMavenHome() {
+        Optional<String> maven_home = Optional.ofNullable(System.getenv("MAVEN_HOME"));
+
+        Optional<String> m2_home = Optional.ofNullable(System.getenv("M2_HOME"));
+
+        Optional<String> res = maven_home.isPresent() ? maven_home : m2_home;
+
+        assert res.isPresent() : "One of $MAVEN_HOME or $M2_HOME must be set";
+
+        return new File(res.get()).toPath();
     }
 
     /**

@@ -1,7 +1,12 @@
 package com.fzakaria.mvn2nix.maven.graph;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +17,8 @@ import java.util.Optional;
 
 import eu.maveniverse.maven.mima.context.Context;
 import java.util.Set;
+import java.util.jar.JarFile;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
@@ -132,7 +139,7 @@ public class POM {
             walk.put(res.getArtifact(), new Node(res, r.dependencies));
 
             return new POM(r.model, walk, r.parent);
-        } catch (ArtifactResolutionException e) {
+        } catch (ModelBuildingException | ArtifactResolutionException e) {
             throw new RuntimeException(e);
         }
     }
@@ -161,7 +168,7 @@ public class POM {
             walk.put(res.getArtifact(), new Node(res, r.dependencies));
 
             return new POM(r.model, walk, r.parent);
-        } catch (ArtifactResolutionException e) {
+        } catch (ModelBuildingException | ArtifactResolutionException e) {
             throw new RuntimeException(e);
         }
     }
@@ -184,8 +191,15 @@ public class POM {
             .collect(Collectors.toList());
     }
 
-    public static List<Dependency> buildDependencies(POM pom) {
+    public static List<Dependency> buildDependencies(Model superPOM, POM pom) {
         List<Dependency> buildDeps = new ArrayList<>();
+
+        Optional.ofNullable(superPOM.getBuild())
+            .flatMap(b -> Optional.ofNullable(b.getPluginManagement()))
+            .flatMap(pm -> Optional.ofNullable(pm.getPlugins()))
+            .stream()
+            .flatMap(ps -> ps.stream())
+            .forEach(p -> buildDeps.add(Aether.of(p)));
 
         pom.model.getDependencies()
             .stream()
@@ -230,7 +244,53 @@ public class POM {
         return buildDeps.stream().filter(d -> !Dep.isSystemScope(d.getScope())).collect(Collectors.toList());
     }
 
-    private static Model readNoResolve(Context ctx, File f) {
+    // Get the super pom from $MAVEN_HOME (or $M2_HOME as it might be)
+    public static Model getSuper(Context ctx, Path mavenHome, String modelVersion) {
+        Optional<Path> tmpPom = Optional.empty();
+        try {
+            tmpPom = Optional.of(Files.createTempFile("", "-super-pom-" + modelVersion + ".xml", new java.nio.file.attribute.FileAttribute[]{}));
+
+            File mavenModelBuilder = mavenHome.resolve("maven").resolve("lib").toFile().listFiles(
+                (d, n) -> Pattern.compile("maven-model-builder-[0-9.]+.jar").asPredicate().test(n)
+            )[0];
+
+            JarFile jar = new JarFile(mavenModelBuilder);
+
+            jar.getInputStream(jar.getJarEntry("org/apache/maven/model/pom-" + modelVersion + ".xml"))
+                .transferTo(new FileOutputStream(tmpPom.get().toFile()));
+
+            Model m;
+
+            try {
+                m = readNoResolve(ctx, tmpPom.get().toFile());
+            } catch (ModelBuildingException e) {
+                m = e.getModel();
+            }
+
+            Optional.ofNullable(m.getBuild())
+                .flatMap(b -> Optional.ofNullable(b.getPluginManagement()))
+                .flatMap(pm -> Optional.ofNullable(pm.getPlugins()))
+                .stream()
+                .flatMap(ps -> ps.stream())
+                .forEach(p -> {
+                    if (p.getGroupId() == null) {
+                        p.setGroupId("org.apache.maven.plugins");
+                    }
+                });
+
+            return m;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (tmpPom.isPresent()) Files.delete(tmpPom.get());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private static Model readNoResolve(Context ctx, File f) throws ModelBuildingException {
         RemoteRepositoryManager remoteRepositoryManager = ctx.lookup()
             .lookup(RemoteRepositoryManager.class)
             .orElseThrow(() -> new IllegalStateException("component not found"));
@@ -250,11 +310,7 @@ public class POM {
         req.setTwoPhaseBuilding(true);
 
         req.setPomFile(f).setModelResolver(resolver);
-        try {
-            return factory.newInstance().build(req).getEffectiveModel();
-        } catch (ModelBuildingException e) {
-            throw new RuntimeException(e.getMessage(), (Throwable) e);
-        }
+        return factory.newInstance().build(req).getEffectiveModel();
     }
 
     private static Read read(Context ctx, List<RemoteRepository> repos, Model m) {
@@ -361,7 +417,7 @@ public class POM {
 
 
                 return new Imports(clone, imports);
-            } catch (ArtifactResolutionException e ) {
+            } catch (ModelBuildingException | ArtifactResolutionException e ) {
                 throw new RuntimeException(e);
             }
         }

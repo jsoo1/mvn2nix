@@ -40,12 +40,12 @@ public class Graph {
     private static Logger LOGGER = LoggerFactory.getLogger(Graph.class.getClass());
 
     // FIXME(jsoo1): No parents handled
-    public static Map.Entry<Artifact, List<Dependency>> root(POM pom) {
+    public static Map.Entry<Artifact, List<Dependency>> root(Model superPOM, POM pom) {
         List<Dependency> dependencies = POM.runDependencies(pom)
             .stream()
             .collect(Collectors.toList());
 
-        dependencies.addAll(POM.buildDependencies(pom));
+        dependencies.addAll(POM.buildDependencies(superPOM, pom));
 
         return new AbstractMap.SimpleImmutableEntry<>(Aether.of(pom.model).getArtifact(), uniq(dependencies));
     }
