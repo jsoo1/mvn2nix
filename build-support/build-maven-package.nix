@@ -78,4 +78,4 @@ stdenv.mkDerivation ({
     runHook postInstall
   '';
 
-} // lib.removeAttrs args [ "dependencies" "nativeBuildInputs" "passthru" ])
+} // builtins.removeAttrs args [ "dependencies" "nativeBuildInputs" "passthru" ])
