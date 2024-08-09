@@ -65,21 +65,27 @@ public class Graph {
 
             LOGGER.trace("Considering {}", d.getArtifact());
 
-            if (walk.containsKey(d.getArtifact()) || d.getArtifact().getExtension().equals("pom")) {
+            if (walk.containsKey(d.getArtifact())) {
                 continue;
             }
 
             LOGGER.info("Adding {}", d.getArtifact());
 
-            Jar jar = Jar.fetch(ctx, POM.remoteRepositories(pom.model), d);
+            if (d.getArtifact().getExtension().equals("pom")) {
+                POM res = POM.fetch(ctx, d);
 
-            walk.putAll(jar.walk);
+                walk.putAll(res.walk);
+            } else {
+                Jar jar = Jar.fetch(ctx, POM.remoteRepositories(pom.model), d);
 
-            walk.put(d.getArtifact(), jar.node);
+                walk.putAll(jar.walk);
 
-            LOGGER.debug("Adding todos {}", jar.node.dependencies);
+                walk.put(d.getArtifact(), jar.node);
 
-            todos.addAll(jar.node.dependencies);
+                LOGGER.debug("Adding todos {}", jar.node.dependencies);
+
+                todos.addAll(jar.node.dependencies);
+            }
         }
 
         return walk;

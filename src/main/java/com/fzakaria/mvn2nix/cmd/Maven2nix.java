@@ -117,8 +117,6 @@ public class Maven2nix implements Callable<Integer> {
 
         POM self = POM.read(ctx, file);
 
-        // Don't record the walk or dependencies of the super-pom since it ships
-        // with maven itself
         Model superPOM = POM.getSuper(ctx, mavenHome, self.model.getModelVersion());
 
         switch (outType) {
