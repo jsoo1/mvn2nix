@@ -49,13 +49,13 @@ public class NixPackageSet {
     public static String NEW_SCOPE = "newScope";
     public static String PKGS = "pkgs";
     public static String PATCH_MAVEN_JAR = "patchMavenJar";
-    public static String MVN2NIX = "mvn2nix";
+    public static String BUILD_MAVEN_PACKAGE = "buildMavenPackage";
 
     public static String[] packageSetParams = new String[]{LIB, NEW_SCOPE};
 
     public static String[] binaryPackageParams = new String[]{LIB, PKGS, PATCH_MAVEN_JAR};
 
-    public static String[] sourcePackageParams = new String[]{MVN2NIX};
+    public static String[] sourcePackageParams = new String[]{BUILD_MAVEN_PACKAGE};
 
     public static Expr collect(Path localRepo, Map<Artifact, Node> resolved) {
         return packageSet(new Attrs(resolved.entrySet().stream().map(e -> callPackage(localRepo, e))));
@@ -93,7 +93,7 @@ public class NixPackageSet {
             .filter(d -> !d.getArtifact().toString().equals(e.getKey().toString()))
             .collect(Collectors.toList());
 
-        return new Fn(params(sourcePackageParams, dependencies), new App(new Var(MVN2NIX + ".buildMavenPackage"),
+        return new Fn(params(sourcePackageParams, dependencies), new App(new Var(BUILD_MAVEN_PACKAGE),
             new Attrs(Stream.concat(coordAttrs(e.getKey()), Stream.of(
                 pair("src", new Var("./.")),
                 pair("dependencies", new LitL(dependencies.stream().map(NixPackageSet::dep)))

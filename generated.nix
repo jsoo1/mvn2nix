@@ -1,5 +1,5 @@
 {
-  mvn2nix
+  buildMavenPackage
 , eu_maveniverse_maven_mima_runtime__standalone-static-uber__jar__2_4_15
 , commons-logging__commons-logging__jar__1_3_3
 , org_slf4j__slf4j-simple__jar__2_0_13
