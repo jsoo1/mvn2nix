@@ -72,7 +72,7 @@ public class POM {
 
             Read r = read(ctx, ctx.remoteRepositories(), m);
 
-            Artifact self = new DefaultArtifact(m.getGroupId(), m.getArtifactId(), "pom", m.getVersion());
+            Artifact self = artifact(m);
 
             Map<Artifact, Node> walk = new HashMap<>(r.walk);
 
@@ -84,18 +84,24 @@ public class POM {
         }
     }
 
-    public static POM fetch(Context ctx, Dependency d) {
-        Artifact pom = new DefaultArtifact(
+    public static Artifact artifact(Model m) {
+        return new DefaultArtifact(m.getGroupId(), m.getArtifactId(), "pom", m.getVersion());
+    }
+
+    public static Artifact artifact(Dependency d) {
+        return new DefaultArtifact(
             d.getArtifact().getGroupId(),
             d.getArtifact().getArtifactId(),
             "pom",
             d.getArtifact().getVersion()
         );
+    }
 
+    public static POM fetch(Context ctx, Dependency d) {
         try {
             ArtifactResult res = ctx
                 .repositorySystem()
-                .resolveArtifact(ctx.repositorySystemSession(), new ArtifactRequest(pom, ctx.remoteRepositories(), null));
+                .resolveArtifact(ctx.repositorySystemSession(), new ArtifactRequest(artifact(d), ctx.remoteRepositories(), null));
 
             Model m = readNoResolve(ctx, res.getLocalArtifactResult().getFile());
 
