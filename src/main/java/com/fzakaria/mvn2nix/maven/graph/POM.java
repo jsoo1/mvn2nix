@@ -38,12 +38,10 @@ import org.eclipse.aether.resolution.ArtifactResult;
 
 public class POM {
     public final Model model;
-    public final Node node;
     public final Map<Artifact, Node> walk;
     public final Optional<POM> parent;
-    public POM(Model m, Node n, Map<Artifact, Node> w, Optional<POM> p) {
+    public POM(Model m, Map<Artifact, Node> w, Optional<POM> p) {
         model = m;
-        node = n;
         walk = w;
         parent = p;
     }
@@ -74,13 +72,13 @@ public class POM {
 
             Read r = read(ctx, ctx.remoteRepositories(), m);
 
-            Optional<POM> parent = Optional.ofNullable(m.getParent()).map(x ->
-                fetch(ctx, ctx.remoteRepositories(), x)
-            );
+            Artifact self = new DefaultArtifact(m.getGroupId(), m.getArtifactId(), "pom", m.getVersion());
 
-            ArtifactResult res = new ArtifactResult(new ArtifactRequest(Aether.of(m).getArtifact(), new ArrayList<>(), null));
+            Map<Artifact, Node> walk = new HashMap<>(r.walk);
 
-            return new POM(m, new Node(res, r.dependencies), r.walk, parent);
+            walk.put(self, new Node(new ArtifactResult(new ArtifactRequest(self, new ArrayList<>(), null)), r.dependencies));
+
+            return new POM(m, walk, r.parent);
         } catch (ModelBuildingException e) {
             throw new IOException(e.getMessage(), (Throwable) e);
         }
@@ -103,11 +101,11 @@ public class POM {
 
             Read r = read(ctx, ctx.remoteRepositories(), m);
 
-            Optional<POM> parent = Optional.ofNullable(m.getParent()).map(x ->
-                fetch(ctx, ctx.remoteRepositories(), x)
-            );
+            Map<Artifact, Node> walk = new HashMap<>(r.walk);
 
-            return new POM(m, new Node(res, r.dependencies), r.walk, parent);
+            walk.put(res.getArtifact(), new Node(res, r.dependencies));
+
+            return new POM(r.model, walk, r.parent);
         } catch (ArtifactResolutionException e) {
             throw new RuntimeException(e);
         }
@@ -132,23 +130,11 @@ public class POM {
 
             Read r = POM.read(ctx, repos.stream().collect(Collectors.toList()), m);
 
-            Optional<POM> parent = Optional.ofNullable(m.getParent()).map(x ->
-                fetch(ctx, repos.stream().collect(Collectors.toList()), x)
-            );
-
             Map<Artifact, Node> walk = new HashMap<>(r.walk);
 
-            List<Dependency> dependencies = new ArrayList<>(r.dependencies);
+            walk.put(res.getArtifact(), new Node(res, r.dependencies));
 
-            parent.ifPresent(x -> {
-                dependencies.add(Aether.of(x.model));
-
-                walk.putAll(x.walk);
-            });
-
-            walk.put(Aether.of(p).getArtifact(), new Node(res, dependencies));
-
-            return new POM(m, new Node(res, dependencies), walk, parent);
+            return new POM(r.model, walk, r.parent);
         } catch (ArtifactResolutionException e) {
             throw new RuntimeException(e);
         }
@@ -250,25 +236,41 @@ public class POM {
 
         List<Dependency> dependencies = new ArrayList<>();
 
+        Model model = m.clone();
+
         Optional.ofNullable(m.getDependencyManagement()).ifPresent(dm -> {
             Imports imports = Imports.fetch(ctx, repos.stream().collect(Collectors.toList()), dm);
 
-            m.setDependencyManagement(imports.dependencyManagement);
+            model.setDependencyManagement(imports.dependencyManagement);
 
             dependencies.addAll(imports.dependencies);
 
             walk.putAll(imports.walk);
         });
 
-        return new Read(dependencies, walk);
+        Optional<POM> parent = Optional.ofNullable(m.getParent()).map(x ->
+            fetch(ctx, ctx.remoteRepositories(), x)
+        );
+
+        parent.ifPresent(p -> {
+            dependencies.add(Aether.of(p));
+
+            walk.putAll(p.walk);
+        });
+
+        return new Read(model, dependencies, walk, parent);
     }
 
     private static class Read {
+        public final Model model;
         public final List<Dependency> dependencies;
         public final Map<Artifact, Node> walk;
-        public Read(List<Dependency> ds, Map<Artifact, Node> w) {
+        public final Optional<POM> parent;
+        public Read(Model m, List<Dependency> ds, Map<Artifact, Node> w, Optional<POM> p) {
+            model = m;
             dependencies = ds;
             walk = w;
+            parent = p;
         }
     }
 
