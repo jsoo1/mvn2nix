@@ -28,7 +28,7 @@ public class Jar {
         List<Dependency> dependencies = Dep.resolve(ctx, pomRepos, dep)
             .getDependencies(true)
             .stream()
-            .filter(d -> !Dep.isSystemScope(d.getScope()))
+            .filter(d -> !Dep.isSystemScope(d.getScope()) && !d.isOptional())
             .collect(Collectors.toList());
 
         Set<RemoteRepository> repos = new HashSet<>(ctx.remoteRepositories());
