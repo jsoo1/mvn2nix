@@ -68,10 +68,11 @@ buildMavenPackage {
     # this should be the paths from the dependency derivation
     makeWrapper ${jre}/bin/java $out/bin/${artifactId} \
           --add-flags "-jar $out/share/java/${artifactId}-${version}.jar" \
-          --set M2_HOME ${maven} \
-          --set JAVA_HOME ${if stdenv.hostPlatform.isDarwin
-           then "${jre}/jre"
-           else "${jre.jre}/lib/openjdk/jre"}
+          --set-default M2_HOME ${maven} \
+          --set-default JAVA_HOME ${
+            if stdenv.hostPlatform.isDarwin
+            then "${jre}/jre"
+            else "${jre.jre}/lib/openjdk/jre"}
   '';
 
   meta = with lib; {
