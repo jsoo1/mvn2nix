@@ -92,7 +92,6 @@ public class Graph {
 
     public static List<Dependency> uniq(List<Dependency> ds) {
         return ds.stream()
-            // .filter(a_ -> !a.toString().equals(a_.getArtifact().toString()))
             .filter(distinctByKey(d_ -> d_.getArtifact().toString()))
             .collect(Collectors.toList());
     }

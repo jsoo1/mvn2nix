@@ -112,7 +112,7 @@ public class NixPackageSet {
     public static Param params(String[] standardParams, List<Dependency> ds) {
         return new AttrPattern(Stream.concat(
             Arrays.stream(standardParams),
-            ds.stream().map(d_ -> attrName(d_.getArtifact()))
+            Graph.uniq(ds).stream().map(d_ -> attrName(d_.getArtifact()))
         ).toArray(String[]::new));
     }
 
