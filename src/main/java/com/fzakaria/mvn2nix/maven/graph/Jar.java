@@ -39,6 +39,8 @@ public class Jar {
 
             POM self = POM.fetch(ctx, dep);
 
+            dependencies.add(Aether.of(self));
+
             self.parent.ifPresent(x -> dependencies.add(Aether.of(x.model)));
 
             return new Jar(new Node(res, dependencies), self.walk);

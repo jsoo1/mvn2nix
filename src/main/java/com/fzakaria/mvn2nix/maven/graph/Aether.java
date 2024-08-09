@@ -14,6 +14,18 @@ import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.repository.RemoteRepository;
 
 public class Aether {
+    public static Dependency of(POM pom) {
+        return new Dependency(
+            new DefaultArtifact(
+                pom.model.getGroupId(),
+                pom.model.getArtifactId(),
+                "pom",
+                pom.model.getVersion()
+            ),
+            "test"
+        );
+    }
+
     public static Dependency of(Parent p) {
         return new Dependency(
             new DefaultArtifact(
