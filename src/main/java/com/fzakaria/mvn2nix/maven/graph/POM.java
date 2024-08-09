@@ -36,6 +36,31 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 
+/*
+  The most complex bit of work we do since we really want a
+  ProjectBuilder but we can't have nice things.
+
+  We replicate maven's imports, and parents logic here.
+
+  The dependency graph of a pom should look like this:
+
+  It might have `n` imports and at most one parent.
+
+  Each parent recursively looks the same.
+
+  I.E. `self` has n imports and one parent and parent has m imports
+  and no parent:
+
+  com.example:self:pom:0.2.0
+  |- import<0>
+  |- ...
+  |- import<n>
+  `- com.example:artifact:pom:0.0.1
+     |- import<0>
+     |- ...
+     `- import<m>
+ */
+
 public class POM {
     public final Model model;
     public final Map<Artifact, Node> walk;
