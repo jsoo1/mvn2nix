@@ -180,7 +180,7 @@ public class POM {
             .map(Aether::of)
             .filter(d -> Dep.isRunScope(d.getScope()) && !d.isOptional())
             .map(d -> Dep.dominatingDependency(pom, d))
-            .filter(d -> !d.isOptional())
+            .filter(d -> !d.isOptional() && !Dep.isSystemScope(d.getScope()))
             .collect(Collectors.toList());
     }
 
@@ -227,7 +227,7 @@ public class POM {
             .map(Aether::of)
             .forEach(d -> buildDeps.add(d));
 
-        return buildDeps;
+        return buildDeps.stream().filter(d -> !Dep.isSystemScope(d.getScope())).collect(Collectors.toList());
     }
 
     private static Model readNoResolve(Context ctx, File f) {
@@ -286,7 +286,13 @@ public class POM {
             walk.putAll(p.walk);
         });
 
-        return new Read(model, dependencies, walk, parent);
+        Map<Boolean, List<Dependency>> parted = dependencies
+            .stream()
+            .collect(Collectors.partitioningBy(d -> d.getScope().equals("system")));
+
+        parted.get(true).stream().forEach(sys -> walk.remove(sys.getArtifact()));
+
+        return new Read(model, parted.get(false), walk, parent);
     }
 
     private static class Read {

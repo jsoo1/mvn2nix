@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import eu.maveniverse.maven.mima.context.Context;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -23,7 +25,11 @@ public class Jar {
     }
 
     public static Jar fetch(Context ctx, List<RemoteRepository> pomRepos, Dependency dep) {
-        List<Dependency> dependencies = Dep.resolve(ctx, pomRepos, dep).getDependencies(true);
+        List<Dependency> dependencies = Dep.resolve(ctx, pomRepos, dep)
+            .getDependencies(true)
+            .stream()
+            .filter(d -> !Dep.isSystemScope(d.getScope()))
+            .collect(Collectors.toList());
 
         Set<RemoteRepository> repos = new HashSet<>(ctx.remoteRepositories());
 

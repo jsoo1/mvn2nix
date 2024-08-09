@@ -19,6 +19,7 @@ import org.apache.maven.model.PluginManagement;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -38,7 +39,12 @@ public class Dep {
             DependencyNode root = ctx.repositorySystem()
                 .resolveDependencies(
                     ctx.repositorySystemSession(),
-                    new DependencyRequest(req, null)
+                    new DependencyRequest(req, new DependencyFilter() {
+                        @Override
+                        public boolean accept(DependencyNode n, List<DependencyNode> l) {
+                            return !isSystemScope(n.getDependency().getScope());
+                        }
+                    })
                 )
                 .getRoot();
 
@@ -148,5 +154,9 @@ public class Dep {
 
     public static boolean isRunScope(String scope) {
         return Pattern.compile("provided|runtime").asPredicate().test(scope);
+    }
+
+    public static boolean isSystemScope(String scope) {
+        return Pattern.compile("system").asPredicate().test(scope);
     }
 }
