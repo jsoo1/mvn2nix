@@ -65,7 +65,7 @@ public class Graph {
 
             LOGGER.trace("Considering {}", d.getArtifact());
 
-            if (walk.containsKey(d.getArtifact())) {
+            if (walk.containsKey(d.getArtifact()) || d.getArtifact().getExtension().equals("pom")) {
                 continue;
             }
 
