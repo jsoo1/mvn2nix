@@ -1,69 +1,83 @@
 self: super: {
-  mvn2nix = (self.callPackage ./derivation.nix {
-    jre = self.jre_headless;
-    buildMavenPackage = self.callPackage ./build-support/build-maven-package.nix { };
-  }).overrideAttrs (o: {
-    passthru.lib = self.callPackage ./lib.nix { };
+  mvn2nix =
+    let
+      buildMavenPackage = self.callPackage ./build-support/build-maven-package.nix { };
 
-    passthru.patchMavenJar = self.callPackage ./build-support/patch-maven-jar.nix { };
+      # Make a maven repository from `patchMavenJar.drv`s
+      #
+      # mkMavenRepository : [ patchMavenJar.drv ] -> drv
+      mkMavenRepository = dependencies:
+        let
+          # TODO(jsoo1): Use evalConfig?
 
-    passthru.buildMavenPackage = self.callPackage ./build-support/build-maven-package.nix { };
+          # go : attrs drv -> { drv: patchMavenJar.drv; ... } -> attrs drv
+          go = seen: { drv, ... }:
+            self.lib.foldl' visit (cons drv seen) drv.dependencies;
 
-    # Import a package set from the output directory created by:
-    #
-    # `mvn2nix --output-type NIX --output-dir <dir>`
-    # importPackageSet : path -> attrs
-    passthru.importPackageSet = dir: self.lib.makeScope self.newScope (final:
-      let
-        directory = builtins.readDir dir;
+          # visit : attrs drv -> { drv: patchMavenJar.drv; ... } -> attrs drv
+          visit = seen: x:
+            if seen ? ${x.drv.name}
+            then seen
+            else go (cons x.drv seen) x;
 
-        maybeCall = name: type: self.lib.optionalAttrs (type == "directory") {
-          ${name} = final.callPackage (dir + "/${name}") { };
+          # mkFarm : attrs drv -> patchMavenJar.drv -> attrs drv
+          cons = drv: seen:
+            { ${drv.name} = drv.maven-repository; } // seen;
+        in
+        self.symlinkJoin {
+          name = "maven-repository";
+          paths = self.lib.attrValues (self.lib.foldl' visit { } dependencies);
         };
-      in
-      { inherit (self.mvn2nix.passthru) patchMavenJar; }
-      // self.lib.concatMapAttrs maybeCall directory
-    );
 
-    # Make a maven repository from `patchMavenJar.drv`s
-    #
-    # mkMavenRepository : [ patchMavenJar.drv ] -> drv
-    passthru.mkMavenRepository = dependencies:
-      let
-        # TODO(jsoo1): Use evalConfig?
+      bootstrapPackages = importPackageSet ./bootstrap-packages;
 
-        # go : attrs drv -> { drv: patchMavenJar.drv; ... } -> attrs drv
-        go = seen: { drv, ... }:
-          self.lib.foldl' visit (cons drv seen) drv.dependencies;
+      # Import a package set from the output directory created by:
+      #
+      # `mvn2nix --output-type NIX --output-dir <dir>`
+      # importPackageSet : path -> attrs
+      importPackageSet = dir: self.lib.makeScope self.newScope (final:
+        let
+          directory = builtins.readDir dir;
 
-        # visit : attrs drv -> { drv: patchMavenJar.drv; ... } -> attrs drv
-        visit = seen: x:
-          if seen ? ${x.drv.name}
-          then seen
-          else go (cons x.drv seen) x;
+          maybeCall = name: type: self.lib.optionalAttrs (type == "directory") {
+            ${name} = final.callPackage (dir + "/${name}") { };
+          };
+        in
+        { inherit patchMavenJar; }
+        // self.lib.concatMapAttrs maybeCall directory
+      );
 
-        # mkFarm : attrs drv -> patchMavenJar.drv -> attrs drv
-        cons = drv: seen:
-          { ${drv.name} = drv.maven-repository; } // seen;
-      in
-      self.symlinkJoin {
-        name = "maven-repository";
-        paths = self.lib.attrValues (self.lib.foldl' visit { } dependencies);
+      patchMavenJar = self.callPackage ./build-support/patch-maven-jar.nix { };
+    in
+    (self.callPackage ./derivation.nix {
+      jre = self.jre_headless;
+      codegen = bootstrapPackages.callPackage ./generated.nix {
+        inherit buildMavenPackage;
       };
+    }).overrideAttrs (o: {
+      passthru = o.passthru // {
+        inherit
+          bootstrapPackages
+          patchMavenJar
+          importPackageSet
+          buildMavenPackage
+          mkMavenRepository
+          ;
 
-    passthru.shell = self.mkShell {
-      name = "mvn2nix-shell";
+        lib = self.callPackage ./lib.nix { };
 
-      inputsFrom = [ self.mvn2nix ];
+        shell = self.mkShell {
+          name = "mvn2nix-shell";
 
-      nativeBuildInputs = [
-        self.rlwrap # very handy for jdb
-        self.java-language-server
-      ];
-    };
+          inputsFrom = [ self.mvn2nix ];
 
-    passthru.bootstrapPackages = self.mvn2nix.importPackageSet ./bootstrap-packages;
-  });
+          nativeBuildInputs = [
+            self.rlwrap # very handy for jdb
+            self.java-language-server
+          ];
+        };
+      };
+    });
 
   mvn2nix-bootstrap =
     builtins.trace "the mvn2nix-bootstrap package is no longer different from `mvn2nix`"
