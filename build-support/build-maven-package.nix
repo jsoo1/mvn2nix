@@ -51,9 +51,13 @@ stdenv.mkDerivation ({
   nativeBuildInputs = [ jdk maven ] ++ (args.nativeBuildInputs or [ ]);
 
   buildPhase = ''
+    runHook preBuild
+
     echo "Using repository ${repository}"
     # 'maven.repo.local' must be writable so copy it out of nix store
     mvn package --offline -Duser.home=`pwd` -Dmaven.repo.local=${repository}
+
+    runHook postBuild
   '';
 
   installPhase = ''
