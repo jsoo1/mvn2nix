@@ -3,6 +3,10 @@
 , eu_maveniverse_maven_mima_runtime__standalone-static-uber__jar__2_4_15
 , commons-logging__commons-logging__jar__1_3_3
 , org_slf4j__slf4j-simple__jar__2_0_13
+, org_apache_maven_plugins__maven-antrun-plugin__jar__3_1_0
+, org_apache_maven_plugins__maven-assembly-plugin__jar__3_7_1
+, org_apache_maven_plugins__maven-dependency-plugin__jar__3_7_0
+, org_apache_maven_plugins__maven-release-plugin__jar__3_0_1
 , eu_maveniverse_maven_mima__context__jar__2_4_15
 , org_apache_maven_resolver__maven-resolver-api__jar__1_9_20
 , org_apache_maven_resolver__maven-resolver-util__jar__1_9_20
@@ -51,6 +55,26 @@ buildMavenPackage {
     {
       drv = org_slf4j__slf4j-simple__jar__2_0_13;
       scope = "runtime";
+      optional = false;
+    }
+    {
+      drv = org_apache_maven_plugins__maven-antrun-plugin__jar__3_1_0;
+      scope = "test";
+      optional = false;
+    }
+    {
+      drv = org_apache_maven_plugins__maven-assembly-plugin__jar__3_7_1;
+      scope = "test";
+      optional = false;
+    }
+    {
+      drv = org_apache_maven_plugins__maven-dependency-plugin__jar__3_7_0;
+      scope = "test";
+      optional = false;
+    }
+    {
+      drv = org_apache_maven_plugins__maven-release-plugin__jar__3_0_1;
+      scope = "test";
       optional = false;
     }
     {
