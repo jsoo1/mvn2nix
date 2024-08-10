@@ -69,4 +69,7 @@ rec {
   # This is a mapping of maven scope to time of use
   isRuntime = configuration:
     null != builtins.match "^default\\(compile\\)|default|compile|runtime$" configuration;
+
+  attrName = coords: builtins.replaceStrings [ ":" ] [ "__" ]
+    (builtins.replaceStrings [ "." ] [ "_" ] coords);
 }
