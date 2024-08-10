@@ -115,7 +115,7 @@ public class Maven2nix implements Callable<Integer> {
 
         Path mavenHome = getMavenHome();
 
-        POM self = POM.read(ctx, file);
+        POM self = POM.readFile(ctx, file);
 
         // We won't have fetched the artifact from anywhere
         self.walk.remove(POM.artifact(self.model));

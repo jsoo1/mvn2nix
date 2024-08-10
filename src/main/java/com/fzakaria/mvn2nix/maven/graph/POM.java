@@ -79,7 +79,9 @@ public class POM {
 
     public static DefaultModelBuilderFactory factory = new DefaultModelBuilderFactory();
 
-    public static POM read(Context ctx, Path pom) throws IOException {
+    public static enum Where { LOCAL, REMOTE };
+
+    public static POM readFile(Context ctx, Path pom) {
         RemoteRepositoryManager remoteRepositoryManager = ctx.lookup()
             .lookup(RemoteRepositoryManager.class)
             .orElseThrow(() -> new IllegalStateException("component not found"));
@@ -101,7 +103,7 @@ public class POM {
         try {
             Model m = factory.newInstance().build(req).getEffectiveModel();
 
-            Read r = read(ctx, ctx.remoteRepositories(), m);
+            Read r = read(ctx, ctx.remoteRepositories(), m, Where.LOCAL);
 
             ArtifactResult self = new ArtifactResult(new ArtifactRequest(artifact(m), new ArrayList<>(), null));
 
@@ -111,7 +113,7 @@ public class POM {
 
             return new POM(m, walk, r.parent);
         } catch (ModelBuildingException e) {
-            throw new IOException(e.getMessage(), (Throwable) e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -136,7 +138,7 @@ public class POM {
 
             Model m = readNoResolve(ctx, res.getLocalArtifactResult().getFile());
 
-            Read r = read(ctx, ctx.remoteRepositories(), m);
+            Read r = read(ctx, ctx.remoteRepositories(), m, Where.REMOTE);
 
             Map<Artifact, Node> walk = new HashMap<>(r.walk);
 
@@ -165,7 +167,7 @@ public class POM {
 
             repos.addAll(m.getRepositories().stream().map(Aether::of).collect(Collectors.toList()));
 
-            Read r = POM.read(ctx, repos.stream().collect(Collectors.toList()), m);
+            Read r = POM.read(ctx, repos.stream().collect(Collectors.toList()), m, Where.REMOTE);
 
             Map<Artifact, Node> walk = new HashMap<>(r.walk);
 
@@ -350,7 +352,7 @@ public class POM {
         return factory.newInstance().build(req).getEffectiveModel();
     }
 
-    private static Read read(Context ctx, List<RemoteRepository> repos, Model m) {
+    private static Read read(Context ctx, List<RemoteRepository> repos, Model m, Where where) {
         Map<Artifact, Node> walk = new HashMap<>();
 
         List<Dependency> dependencies = new ArrayList<>();
@@ -369,9 +371,31 @@ public class POM {
             });
         });
 
-        Optional<POM> parent = Optional.ofNullable(m.getParent()).map(x ->
-            fetch(ctx, ctx.remoteRepositories(), x)
-        );
+        Optional<POM> parent = Optional.ofNullable(m.getParent()).map(x -> {
+            switch (where) {
+            case LOCAL:
+                Optional<File> relPath = Optional.ofNullable(x.getRelativePath())
+                    .map(File::new);
+
+                if (relPath.map(f -> f.exists()).orElse(false)) {
+                    POM p = readFile(ctx, relPath.get().toPath());
+
+                    // We never want to make binary packages for locals
+                    // FIXME(jsoo1): Actually this is probably not true,
+                    // maybe we want to instead register it with the local
+                    // repository manager
+                    p.walk.remove(artifact(p.model));
+
+                    return p;
+                } else {
+                    return fetch(ctx, ctx.remoteRepositories(), x);
+                }
+            case REMOTE:
+                return fetch(ctx, ctx.remoteRepositories(), x);
+            default:
+                throw new RuntimeException("Unmatched locale for pom: " + where.toString());
+            }
+        });
 
         parent.ifPresent(p -> {
             dependencies.add(Aether.of(p));
@@ -439,7 +463,7 @@ public class POM {
 
                     rs.addAll(remoteRepositories(m));
 
-                    Read r = read(ctx, rs.stream().collect(Collectors.toList()), m);
+                    Read r = read(ctx, rs.stream().collect(Collectors.toList()), m, Where.REMOTE);
 
                     Map<Artifact, Node> walk = new HashMap<>(r.walk);
 
