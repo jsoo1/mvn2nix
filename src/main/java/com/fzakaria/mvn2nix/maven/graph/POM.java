@@ -1,11 +1,14 @@
 package com.fzakaria.mvn2nix.maven.graph;
 
-import java.io.BufferedWriter;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -22,7 +25,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
-import org.apache.maven.lifecycle.providers.packaging.PublicLifecycleMappings;
+import org.apache.maven.lifecycle.providers.packaging.DynamicLifecycleMappings;
+import org.apache.maven.lifecycle.providers.packaging.PlexusLifecycleMappings;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -191,7 +195,7 @@ public class POM {
             .collect(Collectors.toList());
     }
 
-    public static List<Dependency> buildDependencies(Model superPOM, POM pom) {
+    public static List<Dependency> buildDependencies(Path mavenHome, Model superPOM, POM pom) {
         List<Dependency> buildDeps = new ArrayList<>();
 
         Optional.ofNullable(superPOM.getBuild())
@@ -229,8 +233,10 @@ public class POM {
             .map(Aether::of)
             .forEach(d -> buildDeps.add(d));
 
-        LifecycleMapping lifecycles = PublicLifecycleMappings.getLifecycle(pom.model.getPackaging())
-            .orElseThrow(() -> new RuntimeException("Don't know how to handle packaging type provided by POM, got: " + pom.model.getPackaging()));
+        LifecycleMapping lifecycles = getLifecycleMapping(mavenHome, pom.model)
+            .orElseThrow(() -> new RuntimeException(
+                "Don't know how to handle packaging, got: " + pom.model.getPackaging()
+            ));
 
         // This might both over or under-report dependencies but we
         // don't want to get into the business of traversing plugin
@@ -287,6 +293,37 @@ public class POM {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    public static Optional<LifecycleMapping> getLifecycleMapping(Path mavenHome, Model m) {
+        try {
+            File mavenCore = mavenHome.resolve("maven").resolve("lib").toFile().listFiles(
+                (d, n) -> Pattern.compile("maven-core-[0-9.]+.jar").asPredicate().test(n)
+            )[0];
+
+            try {
+                // Post maven 4
+                ClassLoader cl = new URLClassLoader(
+                    new URL[]{mavenCore.toPath().toUri().toURL()},
+                    POM.class.getClassLoader().getParent()
+                );
+
+                return DynamicLifecycleMappings.getLifecycle(cl, m.getPackaging());
+            } catch (ClassNotFoundException e) {
+                // Pre maven 4
+                JarFile jar = new JarFile(mavenCore);
+
+                PlexusLifecycleMappings plex = PlexusLifecycleMappings.read(
+                    new InputStreamReader(new BufferedInputStream(
+                        jar.getInputStream(jar.getJarEntry("META-INF/plexus/default-bindings.xml"))
+                    ))
+                );
+
+                return Optional.ofNullable(plex.mappings.get(m.getPackaging())).map(x -> x.get());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

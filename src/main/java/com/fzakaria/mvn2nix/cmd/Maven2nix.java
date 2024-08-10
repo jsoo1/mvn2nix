@@ -122,9 +122,9 @@ public class Maven2nix implements Callable<Integer> {
         switch (outType) {
         case JSON: doJSON(); break;
 
-        case NIX: doNix(resolveRoots, superPOM, self, outDir); break;
+        case NIX: doNix(resolveRoots, mavenHome, superPOM, self, outDir); break;
 
-        case NIX_ROOT: doNixRoot(superPOM, self); break;
+        case NIX_ROOT: doNixRoot(mavenHome, superPOM, self); break;
         }
 
         return 0;
@@ -160,7 +160,7 @@ public class Maven2nix implements Callable<Integer> {
         spec.commandLine().getOut().println(toPrettyJson(information));
     }
 
-    public void doNix(boolean resolveRoots, Model superPOM, POM pom, Path outDir) throws IOException {
+    public void doNix(boolean resolveRoots, Path mavenHome, Model superPOM, POM pom, Path outDir) throws IOException {
         List<org.eclipse.aether.graph.Dependency> initial = POM.runDependencies(pom);
 
         initial.addAll(getAdditionalDependencies());
@@ -170,7 +170,7 @@ public class Maven2nix implements Callable<Integer> {
         } else {
             // If this is a published package, then we don't care about build dependencies at all
             // Otherwise we want to make sure this can do a full offline build
-            initial.addAll(POM.buildDependencies(superPOM, pom));
+            initial.addAll(POM.buildDependencies(mavenHome, superPOM, pom));
 
             // Plus we won't have fetched the artifact from anywhere
             pom.walk.remove(POM.artifact(pom.model));
@@ -180,7 +180,7 @@ public class Maven2nix implements Callable<Integer> {
 
         if (outDir != null) {
             if (!resolveRoots) {
-                initial.addAll(doNixRoot(superPOM, pom).getValue());
+                initial.addAll(doNixRoot(mavenHome, superPOM, pom).getValue());
             }
 
             NixPackageSet.collectDir(localRepo, Graph.resolve(ctx, pom, initial)).write(outDir);
@@ -196,9 +196,9 @@ public class Maven2nix implements Callable<Integer> {
     }
 
     public Map.Entry<org.eclipse.aether.artifact.Artifact, List<org.eclipse.aether.graph.Dependency>>
-        doNixRoot(Model superPOM, POM pom) throws IOException
+        doNixRoot(Path mavenHome, Model superPOM, POM pom) throws IOException
     {
-        Map.Entry<org.eclipse.aether.artifact.Artifact, List<org.eclipse.aether.graph.Dependency>> root = Graph.root(superPOM, pom);
+        Map.Entry<org.eclipse.aether.artifact.Artifact, List<org.eclipse.aether.graph.Dependency>> root = Graph.root(mavenHome, superPOM, pom);
 
         root.getValue().addAll(getAdditionalDependencies());
 

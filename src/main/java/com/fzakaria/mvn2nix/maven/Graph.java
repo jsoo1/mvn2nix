@@ -1,5 +1,6 @@
 package com.fzakaria.mvn2nix.maven;
 
+import java.nio.file.Path;
 import java.util.AbstractMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -40,12 +41,12 @@ public class Graph {
     private static Logger LOGGER = LoggerFactory.getLogger(Graph.class.getClass());
 
     // FIXME(jsoo1): No parents handled
-    public static Map.Entry<Artifact, List<Dependency>> root(Model superPOM, POM pom) {
+    public static Map.Entry<Artifact, List<Dependency>> root(Path mavenHome, Model superPOM, POM pom) {
         List<Dependency> dependencies = POM.runDependencies(pom)
             .stream()
             .collect(Collectors.toList());
 
-        dependencies.addAll(POM.buildDependencies(superPOM, pom));
+        dependencies.addAll(POM.buildDependencies(mavenHome, superPOM, pom));
 
         return new AbstractMap.SimpleImmutableEntry<>(Aether.of(pom.model).getArtifact(), uniq(dependencies));
     }
