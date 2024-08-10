@@ -117,6 +117,9 @@ public class Maven2nix implements Callable<Integer> {
 
         POM self = POM.read(ctx, file);
 
+        // We won't have fetched the artifact from anywhere
+        self.walk.remove(POM.artifact(self.model));
+
         Model superPOM = POM.getSuper(ctx, mavenHome, self.model.getModelVersion());
 
         switch (outType) {
@@ -171,9 +174,6 @@ public class Maven2nix implements Callable<Integer> {
             // If this is a published package, then we don't care about build dependencies at all
             // Otherwise we want to make sure this can do a full offline build
             initial.addAll(POM.buildDependencies(mavenHome, superPOM, pom));
-
-            // Plus we won't have fetched the artifact from anywhere
-            pom.walk.remove(POM.artifact(pom.model));
         }
 
         Path localRepo = ctx.repositorySystemSession().getLocalRepository().getBasedir().getCanonicalFile().toPath();
