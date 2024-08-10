@@ -30,8 +30,8 @@
 , org_apache_maven_plugins__maven-jar-plugin__jar__3_4_1
 , org_apache_maven_plugins__maven-compiler-plugin__jar__3_13_0
 , org_apache_maven_plugins__maven-surefire-plugin__jar__3_2_5
-, org_apache_maven_plugins__maven-install-plugin__jar__3_1_1
-, org_apache_maven_plugins__maven-deploy-plugin__jar__3_1_1
+, org_apache_maven_plugins__maven-install-plugin__jar__3_1_2
+, org_apache_maven_plugins__maven-deploy-plugin__jar__3_1_2
 , info_picocli__picocli-codegen__jar__4_5_0
 }:
 buildMavenPackage {
@@ -193,12 +193,12 @@ buildMavenPackage {
       optional = false;
     }
     {
-      drv = org_apache_maven_plugins__maven-install-plugin__jar__3_1_1;
+      drv = org_apache_maven_plugins__maven-install-plugin__jar__3_1_2;
       scope = "provided";
       optional = false;
     }
     {
-      drv = org_apache_maven_plugins__maven-deploy-plugin__jar__3_1_1;
+      drv = org_apache_maven_plugins__maven-deploy-plugin__jar__3_1_2;
       scope = "provided";
       optional = false;
     }
