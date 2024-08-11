@@ -79,6 +79,17 @@
             <artifactId>picocli</artifactId>
             <version>${picocli-version}</version>
         </dependency>
+        <!--
+             Bit of a hack, but we don't want to be in the business of
+             traversing all mojos. Put here because the annotationProcessorPaths
+             of the maven-compiler-plugin is not picked up by mvn2nix yet
+        -->
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli-codegen</artifactId>
+            <version>${picocli-version}</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- PICOCLI END -->
         <!-- LOGGING START -->
         <dependency>
