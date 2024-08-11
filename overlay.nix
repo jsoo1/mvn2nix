@@ -16,13 +16,13 @@ self: super: {
 
           # visit : attrs drv -> { drv: patchMavenJar.drv; ... } -> attrs drv
           visit = seen: x:
-            if seen ? ${x.drv.name}
+            if seen ? ${x.drv.coordinates}
             then seen
             else go (cons x.drv seen) x;
 
           # mkFarm : attrs drv -> patchMavenJar.drv -> attrs drv
           cons = drv: seen:
-            { ${drv.name} = drv.maven-repository; } // seen;
+            { ${drv.coordinates} = drv.maven-repository; } // seen;
         in
         self.symlinkJoin {
           name = "maven-repository";

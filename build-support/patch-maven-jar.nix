@@ -17,6 +17,7 @@
 #    need patching
 
 { name
+, coordinates
 , version
 , groupId
 , artifactId
@@ -41,7 +42,7 @@ let
   };
 
   self = stdenv.mkDerivation {
-    inherit name version groupId artifactId classifier meta;
+    inherit name coordinates version groupId artifactId classifier meta;
 
     # Things that can't be raw drv attributes because they are attrsets
     passthru = { inherit artifact dependencies classpath maven-repository; } // passthru;
