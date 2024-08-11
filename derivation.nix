@@ -18,7 +18,7 @@ codegen.overrideAttrs (o: {
     # create a wrapper that will automatically set the classpath
     # this should be the paths from the dependency derivation
     makeWrapper ${jre}/bin/java $out/bin/${o.artifactId} \
-          --add-flags "-jar $out/share/java/${o.artifactId}-${o.version}.jar" \
+          --add-flags "-Dmaven.home=\"\''${MAVEN_HOME:-\$M2_HOME}\" -jar $out/share/java/${o.artifactId}-${o.version}.jar" \
           --set-default M2_HOME ${maven} \
           --set-default JAVA_HOME ${
             if stdenv.hostPlatform.isDarwin
