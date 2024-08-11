@@ -99,9 +99,13 @@ public class Maven2nix implements Callable<Integer> {
             description = "Additional dependencies of root in as comma-separated maven coordinates prepended by scope=. i.e.: compile=info.picocli:picocli-codegen:4.5.0,test=org.junit:junit:5.11.0")
     private String additionalDependencies = "";
 
+    public final Path mavenHome;
+
     public final Context ctx;
 
     public Maven2nix() {
+        mavenHome = getMavenHome();
+
         ContextOverrides overrides = ContextOverrides.create()
             .withUserSettings(true)
             .build();
@@ -112,8 +116,6 @@ public class Maven2nix implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         LOGGER.debug("Reading {}", file);
-
-        Path mavenHome = getMavenHome();
 
         POM self = POM.readFile(ctx, file);
 
@@ -230,13 +232,15 @@ public class Maven2nix implements Callable<Integer> {
     }
 
     public static Path getMavenHome() {
+        Optional<String> prop = Optional.ofNullable(System.getProperty("maven.home"));
+
         Optional<String> maven_home = Optional.ofNullable(System.getenv("MAVEN_HOME"));
 
         Optional<String> m2_home = Optional.ofNullable(System.getenv("M2_HOME"));
 
-        Optional<String> res = maven_home.isPresent() ? maven_home : m2_home;
+        Optional<String> res = prop.isPresent() ? prop : maven_home.isPresent() ? maven_home : m2_home;
 
-        assert res.isPresent() : "One of $MAVEN_HOME or $M2_HOME must be set";
+        assert res.isPresent() : "One of maven.home $MAVEN_HOME or $M2_HOME must be set";
 
         return new File(res.get()).toPath();
     }

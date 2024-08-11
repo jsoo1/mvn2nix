@@ -258,7 +258,7 @@ public class POM {
         try {
             tmpPom = Optional.of(Files.createTempFile("", "-super-pom-" + modelVersion + ".xml", new java.nio.file.attribute.FileAttribute[]{}));
 
-            File mavenModelBuilder = mavenHome.resolve("maven").resolve("lib").toFile().listFiles(
+            File mavenModelBuilder = mavenHome.resolve("lib").toFile().listFiles(
                 (d, n) -> Pattern.compile("maven-model-builder-[0-9.]+.jar").asPredicate().test(n)
             )[0];
 
@@ -300,7 +300,7 @@ public class POM {
 
     public static Optional<LifecycleMapping> getLifecycleMapping(Path mavenHome, Model m) {
         try {
-            File mavenCore = mavenHome.resolve("maven").resolve("lib").toFile().listFiles(
+            File mavenCore = mavenHome.resolve("lib").toFile().listFiles(
                 (d, n) -> Pattern.compile("maven-core-[0-9.]+.jar").asPredicate().test(n)
             )[0];
 
