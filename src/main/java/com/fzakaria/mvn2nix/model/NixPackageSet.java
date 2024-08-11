@@ -125,7 +125,8 @@ public class NixPackageSet {
 
     public static Stream<Map.Entry<String, Expr>> coordAttrs(Artifact a) {
         return Stream.of(
-            pair("name", new LitS(a.toString())),
+            pair("name", new LitS(a.getArtifactId())),
+            pair("coordinates", new LitS(a.toString())),
             pair("groupId", new LitS(a.getGroupId())),
             pair("artifactId", new LitS(a.getArtifactId())),
             pair("version", new LitS(a.getVersion())),
