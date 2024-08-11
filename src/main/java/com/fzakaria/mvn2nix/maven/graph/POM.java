@@ -132,11 +132,17 @@ public class POM {
 
     public static POM fetch(Context ctx, Dependency d) {
         try {
+            ArtifactRequest req = new ArtifactRequest(artifact(d), ctx.remoteRepositories(), null);
+
             ArtifactResult res = ctx
                 .repositorySystem()
-                .resolveArtifact(ctx.repositorySystemSession(), new ArtifactRequest(artifact(d), ctx.remoteRepositories(), null));
+                .resolveArtifact(ctx.repositorySystemSession(), req);
 
-            Model m = readNoResolve(ctx, res.getLocalArtifactResult().getFile());
+            File f = Optional.ofNullable(res.getLocalArtifactResult())
+                .flatMap(r -> Optional.ofNullable(r.getFile()))
+                .orElseThrow(() -> new RuntimeException("Never got a result for " + res.toString()));
+
+            Model m = readNoResolve(ctx, f);
 
             Read r = read(ctx, ctx.remoteRepositories(), m, Where.REMOTE);
 
@@ -156,14 +162,20 @@ public class POM {
 
             repos.addAll(ctx.remoteRepositories());
 
+            ArtifactRequest req = new ArtifactRequest(Aether.of(p).getArtifact(), repos.stream().collect(Collectors.toList()), null);
+
             ArtifactResult res = ctx
                 .repositorySystem()
                 .resolveArtifact(
                     ctx.repositorySystemSession(),
-                    new ArtifactRequest(Aether.of(p).getArtifact(), repos.stream().collect(Collectors.toList()), null)
+                    req
                 );
 
-            Model m = readNoResolve(ctx, res.getLocalArtifactResult().getFile());
+            File f = Optional.ofNullable(res.getLocalArtifactResult())
+                .flatMap(r -> Optional.ofNullable(r.getFile()))
+                .orElseThrow(() -> new RuntimeException("Failed to fetch " + req.toString()));
+
+            Model m = readNoResolve(ctx, f);
 
             repos.addAll(m.getRepositories().stream().map(Aether::of).collect(Collectors.toList()));
 
@@ -349,6 +361,7 @@ public class POM {
         req.setTwoPhaseBuilding(true);
 
         req.setPomFile(f).setModelResolver(resolver);
+
         return factory.newInstance().build(req).getEffectiveModel();
     }
 
