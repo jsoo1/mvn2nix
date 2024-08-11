@@ -5,7 +5,8 @@
 , org_apache_jackrabbit__jackrabbit-parent__pom__1_5_0
 }:
 patchMavenJar {
-  name = "org.apache.jackrabbit:jackrabbit-webdav:pom:1.5.0";
+  name = "jackrabbit-webdav";
+  coordinates = "org.apache.jackrabbit:jackrabbit-webdav:pom:1.5.0";
   groupId = "org.apache.jackrabbit";
   artifactId = "jackrabbit-webdav";
   version = "1.5.0";

@@ -5,7 +5,8 @@
 , org_apache_maven__maven-parent__pom__9
 }:
 patchMavenJar {
-  name = "org.apache.maven.mercury:mercury:pom:1.0.0-alpha-2";
+  name = "mercury";
+  coordinates = "org.apache.maven.mercury:mercury:pom:1.0.0-alpha-2";
   groupId = "org.apache.maven.mercury";
   artifactId = "mercury";
   version = "1.0.0-alpha-2";

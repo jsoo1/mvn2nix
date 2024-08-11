@@ -5,7 +5,8 @@
 , org_sonatype_forge__forge-parent__pom__10
 }:
 patchMavenJar {
-  name = "org.sonatype.sisu.inject:guava-parent:pom:0.9.9";
+  name = "guava-parent";
+  coordinates = "org.sonatype.sisu.inject:guava-parent:pom:0.9.9";
   groupId = "org.sonatype.sisu.inject";
   artifactId = "guava-parent";
   version = "0.9.9";

@@ -10,7 +10,8 @@
 , commons-chain__commons-chain__pom__1_0
 }:
 patchMavenJar {
-  name = "commons-chain:commons-chain:jar:1.0";
+  name = "commons-chain";
+  coordinates = "commons-chain:commons-chain:jar:1.0";
   groupId = "commons-chain";
   artifactId = "commons-chain";
   version = "1.0";

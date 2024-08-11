@@ -5,7 +5,8 @@
 , net_java__jvnet-parent__pom__3
 }:
 patchMavenJar {
-  name = "javax.el:javax.el-api:pom:3.0.0";
+  name = "javax.el-api";
+  coordinates = "javax.el:javax.el-api:pom:3.0.0";
   groupId = "javax.el";
   artifactId = "javax.el-api";
   version = "3.0.0";

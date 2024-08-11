@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "commons-validator:commons-validator:pom:1.3.1";
+  name = "commons-validator";
+  coordinates = "commons-validator:commons-validator:pom:1.3.1";
   groupId = "commons-validator";
   artifactId = "commons-validator";
   version = "1.3.1";

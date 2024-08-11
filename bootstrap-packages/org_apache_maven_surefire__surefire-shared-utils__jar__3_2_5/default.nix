@@ -5,7 +5,8 @@
 , org_apache_maven_surefire__surefire-shared-utils__pom__3_2_5
 }:
 patchMavenJar {
-  name = "org.apache.maven.surefire:surefire-shared-utils:jar:3.2.5";
+  name = "surefire-shared-utils";
+  coordinates = "org.apache.maven.surefire:surefire-shared-utils:jar:3.2.5";
   groupId = "org.apache.maven.surefire";
   artifactId = "surefire-shared-utils";
   version = "3.2.5";

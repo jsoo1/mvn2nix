@@ -8,7 +8,8 @@
 , org_apache_httpcomponents__httpclient__pom__4_5_13
 }:
 patchMavenJar {
-  name = "org.apache.httpcomponents:httpclient:jar:4.5.13";
+  name = "httpclient";
+  coordinates = "org.apache.httpcomponents:httpclient:jar:4.5.13";
   groupId = "org.apache.httpcomponents";
   artifactId = "httpclient";
   version = "4.5.13";

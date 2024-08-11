@@ -8,7 +8,8 @@
 , org_eclipse_aether__aether-impl__pom__1_0_0_v20140518
 }:
 patchMavenJar {
-  name = "org.eclipse.aether:aether-impl:jar:1.0.0.v20140518";
+  name = "aether-impl";
+  coordinates = "org.eclipse.aether:aether-impl:jar:1.0.0.v20140518";
   groupId = "org.eclipse.aether";
   artifactId = "aether-impl";
   version = "1.0.0.v20140518";

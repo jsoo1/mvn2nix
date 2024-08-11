@@ -5,7 +5,8 @@
 , org_apache_maven__maven-parent__pom__34
 }:
 patchMavenJar {
-  name = "org.apache.maven.doxia:doxia-sitetools:pom:1.11.1";
+  name = "doxia-sitetools";
+  coordinates = "org.apache.maven.doxia:doxia-sitetools:pom:1.11.1";
   groupId = "org.apache.maven.doxia";
   artifactId = "doxia-sitetools";
   version = "1.11.1";

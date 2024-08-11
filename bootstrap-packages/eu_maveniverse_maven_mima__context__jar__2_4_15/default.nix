@@ -7,7 +7,8 @@
 , eu_maveniverse_maven_mima__context__pom__2_4_15
 }:
 patchMavenJar {
-  name = "eu.maveniverse.maven.mima:context:jar:2.4.15";
+  name = "context";
+  coordinates = "eu.maveniverse.maven.mima:context:jar:2.4.15";
   groupId = "eu.maveniverse.maven.mima";
   artifactId = "context";
   version = "2.4.15";

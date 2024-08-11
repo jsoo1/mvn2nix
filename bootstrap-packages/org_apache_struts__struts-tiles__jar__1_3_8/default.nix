@@ -13,7 +13,8 @@
 , org_apache_struts__struts-tiles__pom__1_3_8
 }:
 patchMavenJar {
-  name = "org.apache.struts:struts-tiles:jar:1.3.8";
+  name = "struts-tiles";
+  coordinates = "org.apache.struts:struts-tiles:jar:1.3.8";
   groupId = "org.apache.struts";
   artifactId = "struts-tiles";
   version = "1.3.8";

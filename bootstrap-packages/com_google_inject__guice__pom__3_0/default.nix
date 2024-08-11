@@ -5,7 +5,8 @@
 , com_google_inject__guice-parent__pom__3_0
 }:
 patchMavenJar {
-  name = "com.google.inject:guice:pom:3.0";
+  name = "guice";
+  coordinates = "com.google.inject:guice:pom:3.0";
   groupId = "com.google.inject";
   artifactId = "guice";
   version = "3.0";

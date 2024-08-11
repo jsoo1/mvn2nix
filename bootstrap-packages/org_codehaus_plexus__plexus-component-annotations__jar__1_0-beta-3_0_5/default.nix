@@ -6,7 +6,8 @@
 , org_codehaus_plexus__plexus-component-annotations__pom__1_0-beta-3_0_5
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-component-annotations:jar:1.0-beta-3.0.5";
+  name = "plexus-component-annotations";
+  coordinates = "org.codehaus.plexus:plexus-component-annotations:jar:1.0-beta-3.0.5";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-component-annotations";
   version = "1.0-beta-3.0.5";

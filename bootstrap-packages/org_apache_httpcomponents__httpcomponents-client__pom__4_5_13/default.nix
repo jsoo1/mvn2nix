@@ -5,7 +5,8 @@
 , org_apache_httpcomponents__httpcomponents-parent__pom__11
 }:
 patchMavenJar {
-  name = "org.apache.httpcomponents:httpcomponents-client:pom:4.5.13";
+  name = "httpcomponents-client";
+  coordinates = "org.apache.httpcomponents:httpcomponents-client:pom:4.5.13";
   groupId = "org.apache.httpcomponents";
   artifactId = "httpcomponents-client";
   version = "4.5.13";

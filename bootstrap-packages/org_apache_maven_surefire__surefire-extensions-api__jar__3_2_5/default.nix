@@ -6,7 +6,8 @@
 , org_apache_maven_surefire__surefire-extensions-api__pom__3_2_5
 }:
 patchMavenJar {
-  name = "org.apache.maven.surefire:surefire-extensions-api:jar:3.2.5";
+  name = "surefire-extensions-api";
+  coordinates = "org.apache.maven.surefire:surefire-extensions-api:jar:3.2.5";
   groupId = "org.apache.maven.surefire";
   artifactId = "surefire-extensions-api";
   version = "3.2.5";

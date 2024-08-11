@@ -6,7 +6,8 @@
 , org_codehaus_plexus__plexus__pom__16
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-interpolation:pom:1.27";
+  name = "plexus-interpolation";
+  coordinates = "org.codehaus.plexus:plexus-interpolation:pom:1.27";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-interpolation";
   version = "1.27";

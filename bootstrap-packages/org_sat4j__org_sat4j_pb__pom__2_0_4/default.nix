@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.sat4j:org.sat4j.pb:pom:2.0.4";
+  name = "org.sat4j.pb";
+  coordinates = "org.sat4j:org.sat4j.pb:pom:2.0.4";
   groupId = "org.sat4j";
   artifactId = "org.sat4j.pb";
   version = "2.0.4";

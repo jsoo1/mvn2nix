@@ -6,7 +6,8 @@
 , org_slf4j__slf4j-jdk14__pom__1_5_6
 }:
 patchMavenJar {
-  name = "org.slf4j:slf4j-jdk14:jar:1.5.6";
+  name = "slf4j-jdk14";
+  coordinates = "org.slf4j:slf4j-jdk14:jar:1.5.6";
   groupId = "org.slf4j";
   artifactId = "slf4j-jdk14";
   version = "1.5.6";

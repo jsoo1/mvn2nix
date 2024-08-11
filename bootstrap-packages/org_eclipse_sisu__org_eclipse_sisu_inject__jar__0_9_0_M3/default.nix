@@ -5,7 +5,8 @@
 , org_eclipse_sisu__org_eclipse_sisu_inject__pom__0_9_0_M3
 }:
 patchMavenJar {
-  name = "org.eclipse.sisu:org.eclipse.sisu.inject:jar:0.9.0.M3";
+  name = "org.eclipse.sisu.inject";
+  coordinates = "org.eclipse.sisu:org.eclipse.sisu.inject:jar:0.9.0.M3";
   groupId = "org.eclipse.sisu";
   artifactId = "org.eclipse.sisu.inject";
   version = "0.9.0.M3";

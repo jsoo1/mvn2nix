@@ -11,7 +11,8 @@
 , org_apache_maven__maven-profile__pom__2_2_1
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-profile:jar:2.2.1";
+  name = "maven-profile";
+  coordinates = "org.apache.maven:maven-profile:jar:2.2.1";
   groupId = "org.apache.maven";
   artifactId = "maven-profile";
   version = "2.2.1";

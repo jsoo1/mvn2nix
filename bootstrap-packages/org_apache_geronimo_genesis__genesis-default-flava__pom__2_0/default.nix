@@ -5,7 +5,8 @@
 , org_apache_geronimo_genesis__genesis__pom__2_0
 }:
 patchMavenJar {
-  name = "org.apache.geronimo.genesis:genesis-default-flava:pom:2.0";
+  name = "genesis-default-flava";
+  coordinates = "org.apache.geronimo.genesis:genesis-default-flava:pom:2.0";
   groupId = "org.apache.geronimo.genesis";
   artifactId = "genesis-default-flava";
   version = "2.0";

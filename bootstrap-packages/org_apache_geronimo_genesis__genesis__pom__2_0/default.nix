@@ -5,7 +5,8 @@
 , org_apache__apache__pom__6
 }:
 patchMavenJar {
-  name = "org.apache.geronimo.genesis:genesis:pom:2.0";
+  name = "genesis";
+  coordinates = "org.apache.geronimo.genesis:genesis:pom:2.0";
   groupId = "org.apache.geronimo.genesis";
   artifactId = "genesis";
   version = "2.0";

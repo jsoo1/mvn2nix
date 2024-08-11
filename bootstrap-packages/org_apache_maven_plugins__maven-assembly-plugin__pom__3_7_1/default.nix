@@ -5,7 +5,8 @@
 , org_apache_maven_plugins__maven-plugins__pom__41
 }:
 patchMavenJar {
-  name = "org.apache.maven.plugins:maven-assembly-plugin:pom:3.7.1";
+  name = "maven-assembly-plugin";
+  coordinates = "org.apache.maven.plugins:maven-assembly-plugin:pom:3.7.1";
   groupId = "org.apache.maven.plugins";
   artifactId = "maven-assembly-plugin";
   version = "3.7.1";

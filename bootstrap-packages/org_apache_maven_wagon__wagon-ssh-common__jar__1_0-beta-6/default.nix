@@ -8,7 +8,8 @@
 , org_apache_maven_wagon__wagon-ssh-common__pom__1_0-beta-6
 }:
 patchMavenJar {
-  name = "org.apache.maven.wagon:wagon-ssh-common:jar:1.0-beta-6";
+  name = "wagon-ssh-common";
+  coordinates = "org.apache.maven.wagon:wagon-ssh-common:jar:1.0-beta-6";
   groupId = "org.apache.maven.wagon";
   artifactId = "wagon-ssh-common";
   version = "1.0-beta-6";

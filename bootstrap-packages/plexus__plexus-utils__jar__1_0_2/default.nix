@@ -5,7 +5,8 @@
 , plexus__plexus-utils__pom__1_0_2
 }:
 patchMavenJar {
-  name = "plexus:plexus-utils:jar:1.0.2";
+  name = "plexus-utils";
+  coordinates = "plexus:plexus-utils:jar:1.0.2";
   groupId = "plexus";
   artifactId = "plexus-utils";
   version = "1.0.2";

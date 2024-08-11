@@ -5,7 +5,8 @@
 , eu_maveniverse_maven_mima_runtime__standalone-static-uber__pom__2_4_15
 }:
 patchMavenJar {
-  name = "eu.maveniverse.maven.mima.runtime:standalone-static-uber:jar:2.4.15";
+  name = "standalone-static-uber";
+  coordinates = "eu.maveniverse.maven.mima.runtime:standalone-static-uber:jar:2.4.15";
   groupId = "eu.maveniverse.maven.mima.runtime";
   artifactId = "standalone-static-uber";
   version = "2.4.15";

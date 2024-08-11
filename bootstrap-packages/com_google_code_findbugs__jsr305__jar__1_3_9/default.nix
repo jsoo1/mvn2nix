@@ -5,7 +5,8 @@
 , com_google_code_findbugs__jsr305__pom__1_3_9
 }:
 patchMavenJar {
-  name = "com.google.code.findbugs:jsr305:jar:1.3.9";
+  name = "jsr305";
+  coordinates = "com.google.code.findbugs:jsr305:jar:1.3.9";
   groupId = "com.google.code.findbugs";
   artifactId = "jsr305";
   version = "1.3.9";

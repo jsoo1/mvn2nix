@@ -6,7 +6,8 @@
 , org_apache_maven_resolver__maven-resolver-spi__pom__1_9_20
 }:
 patchMavenJar {
-  name = "org.apache.maven.resolver:maven-resolver-spi:jar:1.9.20";
+  name = "maven-resolver-spi";
+  coordinates = "org.apache.maven.resolver:maven-resolver-spi:jar:1.9.20";
   groupId = "org.apache.maven.resolver";
   artifactId = "maven-resolver-spi";
   version = "1.9.20";

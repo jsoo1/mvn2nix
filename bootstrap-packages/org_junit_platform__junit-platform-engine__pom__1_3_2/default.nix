@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.junit.platform:junit-platform-engine:pom:1.3.2";
+  name = "junit-platform-engine";
+  coordinates = "org.junit.platform:junit-platform-engine:pom:1.3.2";
   groupId = "org.junit.platform";
   artifactId = "junit-platform-engine";
   version = "1.3.2";

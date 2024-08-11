@@ -10,7 +10,8 @@
 , org_sonatype_sisu__sisu-inject-plexus__pom__1_4_2
 }:
 patchMavenJar {
-  name = "org.sonatype.sisu:sisu-inject-plexus:jar:1.4.2";
+  name = "sisu-inject-plexus";
+  coordinates = "org.sonatype.sisu:sisu-inject-plexus:jar:1.4.2";
   groupId = "org.sonatype.sisu";
   artifactId = "sisu-inject-plexus";
   version = "1.4.2";

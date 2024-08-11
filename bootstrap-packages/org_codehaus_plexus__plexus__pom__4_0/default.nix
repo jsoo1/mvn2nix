@@ -5,7 +5,8 @@
 , org_sonatype_forge__forge-parent__pom__10
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus:pom:4.0";
+  name = "plexus";
+  coordinates = "org.codehaus.plexus:plexus:pom:4.0";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus";
   version = "4.0";

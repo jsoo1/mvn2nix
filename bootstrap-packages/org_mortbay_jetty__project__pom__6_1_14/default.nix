@@ -5,7 +5,8 @@
 , org_mortbay_jetty__jetty-parent__pom__7
 }:
 patchMavenJar {
-  name = "org.mortbay.jetty:project:pom:6.1.14";
+  name = "project";
+  coordinates = "org.mortbay.jetty:project:pom:6.1.14";
   groupId = "org.mortbay.jetty";
   artifactId = "project";
   version = "6.1.14";

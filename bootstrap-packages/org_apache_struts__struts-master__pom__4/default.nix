@@ -5,7 +5,8 @@
 , org_apache__apache__pom__2
 }:
 patchMavenJar {
-  name = "org.apache.struts:struts-master:pom:4";
+  name = "struts-master";
+  coordinates = "org.apache.struts:struts-master:pom:4";
   groupId = "org.apache.struts";
   artifactId = "struts-master";
   version = "4";

@@ -5,7 +5,8 @@
 , org_sonatype_spice__spice-parent__pom__12
 }:
 patchMavenJar {
-  name = "org.sonatype.plexus:plexus-sec-dispatcher:pom:1.3";
+  name = "plexus-sec-dispatcher";
+  coordinates = "org.sonatype.plexus:plexus-sec-dispatcher:pom:1.3";
   groupId = "org.sonatype.plexus";
   artifactId = "plexus-sec-dispatcher";
   version = "1.3";

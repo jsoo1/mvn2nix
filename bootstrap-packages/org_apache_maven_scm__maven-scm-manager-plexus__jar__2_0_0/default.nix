@@ -9,7 +9,8 @@
 , org_apache_maven_scm__maven-scm-manager-plexus__pom__2_0_0
 }:
 patchMavenJar {
-  name = "org.apache.maven.scm:maven-scm-manager-plexus:jar:2.0.0";
+  name = "maven-scm-manager-plexus";
+  coordinates = "org.apache.maven.scm:maven-scm-manager-plexus:jar:2.0.0";
   groupId = "org.apache.maven.scm";
   artifactId = "maven-scm-manager-plexus";
   version = "2.0.0";

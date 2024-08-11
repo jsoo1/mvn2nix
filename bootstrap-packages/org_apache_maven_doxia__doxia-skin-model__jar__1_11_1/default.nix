@@ -6,7 +6,8 @@
 , org_apache_maven_doxia__doxia-skin-model__pom__1_11_1
 }:
 patchMavenJar {
-  name = "org.apache.maven.doxia:doxia-skin-model:jar:1.11.1";
+  name = "doxia-skin-model";
+  coordinates = "org.apache.maven.doxia:doxia-skin-model:jar:1.11.1";
   groupId = "org.apache.maven.doxia";
   artifactId = "doxia-skin-model";
   version = "1.11.1";

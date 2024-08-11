@@ -5,7 +5,8 @@
 , plexus__plexus-root__pom__1_0_3
 }:
 patchMavenJar {
-  name = "plexus:plexus-containers:pom:1.0.2";
+  name = "plexus-containers";
+  coordinates = "plexus:plexus-containers:pom:1.0.2";
   groupId = "plexus";
   artifactId = "plexus-containers";
   version = "1.0.2";

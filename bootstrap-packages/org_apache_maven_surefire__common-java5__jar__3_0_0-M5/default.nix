@@ -8,7 +8,8 @@
 , org_apache_maven_surefire__common-java5__pom__3_0_0-M5
 }:
 patchMavenJar {
-  name = "org.apache.maven.surefire:common-java5:jar:3.0.0-M5";
+  name = "common-java5";
+  coordinates = "org.apache.maven.surefire:common-java5:jar:3.0.0-M5";
   groupId = "org.apache.maven.surefire";
   artifactId = "common-java5";
   version = "3.0.0-M5";

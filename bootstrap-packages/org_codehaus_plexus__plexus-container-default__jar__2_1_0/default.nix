@@ -9,7 +9,8 @@
 , org_codehaus_plexus__plexus-container-default__pom__2_1_0
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-container-default:jar:2.1.0";
+  name = "plexus-container-default";
+  coordinates = "org.codehaus.plexus:plexus-container-default:jar:2.1.0";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-container-default";
   version = "2.1.0";

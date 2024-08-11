@@ -5,7 +5,8 @@
 , org_apache_maven_mercury__mercury-repo__pom__1_0_0-alpha-2
 }:
 patchMavenJar {
-  name = "org.apache.maven.mercury:mercury-repo-virtual:pom:1.0.0-alpha-2";
+  name = "mercury-repo-virtual";
+  coordinates = "org.apache.maven.mercury:mercury-repo-virtual:pom:1.0.0-alpha-2";
   groupId = "org.apache.maven.mercury";
   artifactId = "mercury-repo-virtual";
   version = "1.0.0-alpha-2";

@@ -6,7 +6,8 @@
 , org_apache_maven_resolver__maven-resolver-util__pom__1_4_1
 }:
 patchMavenJar {
-  name = "org.apache.maven.resolver:maven-resolver-util:jar:1.4.1";
+  name = "maven-resolver-util";
+  coordinates = "org.apache.maven.resolver:maven-resolver-util:jar:1.4.1";
   groupId = "org.apache.maven.resolver";
   artifactId = "maven-resolver-util";
   version = "1.4.1";

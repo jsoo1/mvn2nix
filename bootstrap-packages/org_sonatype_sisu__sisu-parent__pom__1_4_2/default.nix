@@ -5,7 +5,8 @@
 , org_sonatype_forge__forge-parent__pom__6
 }:
 patchMavenJar {
-  name = "org.sonatype.sisu:sisu-parent:pom:1.4.2";
+  name = "sisu-parent";
+  coordinates = "org.sonatype.sisu:sisu-parent:pom:1.4.2";
   groupId = "org.sonatype.sisu";
   artifactId = "sisu-parent";
   version = "1.4.2";

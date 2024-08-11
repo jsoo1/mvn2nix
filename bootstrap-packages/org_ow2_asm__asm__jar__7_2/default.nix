@@ -5,7 +5,8 @@
 , org_ow2_asm__asm__pom__7_2
 }:
 patchMavenJar {
-  name = "org.ow2.asm:asm:jar:7.2";
+  name = "asm";
+  coordinates = "org.ow2.asm:asm:jar:7.2";
   groupId = "org.ow2.asm";
   artifactId = "asm";
   version = "7.2";

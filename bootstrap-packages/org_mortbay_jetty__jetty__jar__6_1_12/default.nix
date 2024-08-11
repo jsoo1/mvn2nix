@@ -7,7 +7,8 @@
 , org_mortbay_jetty__jetty__pom__6_1_12
 }:
 patchMavenJar {
-  name = "org.mortbay.jetty:jetty:jar:6.1.12";
+  name = "jetty";
+  coordinates = "org.mortbay.jetty:jetty:jar:6.1.12";
   groupId = "org.mortbay.jetty";
   artifactId = "jetty";
   version = "6.1.12";

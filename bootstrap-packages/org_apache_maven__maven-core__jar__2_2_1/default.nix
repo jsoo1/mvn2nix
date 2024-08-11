@@ -51,7 +51,8 @@
 , org_apache_maven__maven-core__pom__2_2_1
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-core:jar:2.2.1";
+  name = "maven-core";
+  coordinates = "org.apache.maven:maven-core:jar:2.2.1";
   groupId = "org.apache.maven";
   artifactId = "maven-core";
   version = "2.2.1";

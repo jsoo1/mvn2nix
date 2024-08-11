@@ -5,7 +5,8 @@
 , org_codehaus_plexus__plexus__pom__8
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-sec-dispatcher:pom:2.0";
+  name = "plexus-sec-dispatcher";
+  coordinates = "org.codehaus.plexus:plexus-sec-dispatcher:pom:2.0";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-sec-dispatcher";
   version = "2.0";

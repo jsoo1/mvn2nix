@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "eu.maveniverse.maven.parent:parent:pom:15";
+  name = "parent";
+  coordinates = "eu.maveniverse.maven.parent:parent:pom:15";
   groupId = "eu.maveniverse.maven.parent";
   artifactId = "parent";
   version = "15";

@@ -5,7 +5,8 @@
 , org_apache_maven__maven-parent__pom__6
 }:
 patchMavenJar {
-  name = "org.apache.maven.doxia:doxia:pom:1.0-alpha-9";
+  name = "doxia";
+  coordinates = "org.apache.maven.doxia:doxia:pom:1.0-alpha-9";
   groupId = "org.apache.maven.doxia";
   artifactId = "doxia";
   version = "1.0-alpha-9";

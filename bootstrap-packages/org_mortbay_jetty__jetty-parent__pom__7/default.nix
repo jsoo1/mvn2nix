@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.mortbay.jetty:jetty-parent:pom:7";
+  name = "jetty-parent";
+  coordinates = "org.mortbay.jetty:jetty-parent:pom:7";
   groupId = "org.mortbay.jetty";
   artifactId = "jetty-parent";
   version = "7";

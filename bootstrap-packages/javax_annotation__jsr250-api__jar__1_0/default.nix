@@ -5,7 +5,8 @@
 , javax_annotation__jsr250-api__pom__1_0
 }:
 patchMavenJar {
-  name = "javax.annotation:jsr250-api:jar:1.0";
+  name = "jsr250-api";
+  coordinates = "javax.annotation:jsr250-api:jar:1.0";
   groupId = "javax.annotation";
   artifactId = "jsr250-api";
   version = "1.0";

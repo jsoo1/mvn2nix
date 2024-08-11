@@ -5,7 +5,8 @@
 , org_sonatype_spice__spice-parent__pom__10
 }:
 patchMavenJar {
-  name = "org.sonatype.plexus:plexus-plugin-manager:pom:1.0-alpha-1";
+  name = "plexus-plugin-manager";
+  coordinates = "org.sonatype.plexus:plexus-plugin-manager:pom:1.0-alpha-1";
   groupId = "org.sonatype.plexus";
   artifactId = "plexus-plugin-manager";
   version = "1.0-alpha-1";

@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "asm:asm-parent:pom:3.3.1";
+  name = "asm-parent";
+  coordinates = "asm:asm-parent:pom:3.3.1";
   groupId = "asm";
   artifactId = "asm-parent";
   version = "3.3.1";

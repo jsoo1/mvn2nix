@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "commons-digester:commons-digester:pom:1.8";
+  name = "commons-digester";
+  coordinates = "commons-digester:commons-digester:pom:1.8";
   groupId = "commons-digester";
   artifactId = "commons-digester";
   version = "1.8";

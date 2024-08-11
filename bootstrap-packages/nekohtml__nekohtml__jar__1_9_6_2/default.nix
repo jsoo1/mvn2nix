@@ -7,7 +7,8 @@
 , nekohtml__nekohtml__pom__1_9_6_2
 }:
 patchMavenJar {
-  name = "nekohtml:nekohtml:jar:1.9.6.2";
+  name = "nekohtml";
+  coordinates = "nekohtml:nekohtml:jar:1.9.6.2";
   groupId = "nekohtml";
   artifactId = "nekohtml";
   version = "1.9.6.2";

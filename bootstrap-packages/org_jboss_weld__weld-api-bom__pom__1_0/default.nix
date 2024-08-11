@@ -5,7 +5,8 @@
 , org_jboss_weld__weld-parent__pom__6
 }:
 patchMavenJar {
-  name = "org.jboss.weld:weld-api-bom:pom:1.0";
+  name = "weld-api-bom";
+  coordinates = "org.jboss.weld:weld-api-bom:pom:1.0";
   groupId = "org.jboss.weld";
   artifactId = "weld-api-bom";
   version = "1.0";

@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.checkerframework:checker-qual:pom:3.5.0";
+  name = "checker-qual";
+  coordinates = "org.checkerframework:checker-qual:pom:3.5.0";
   groupId = "org.checkerframework";
   artifactId = "checker-qual";
   version = "3.5.0";

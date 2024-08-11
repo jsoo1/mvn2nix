@@ -17,7 +17,8 @@
 , myfaces__myfaces-api__pom__1_1_0
 }:
 patchMavenJar {
-  name = "myfaces:myfaces-api:jar:1.1.0";
+  name = "myfaces-api";
+  coordinates = "myfaces:myfaces-api:jar:1.1.0";
   groupId = "myfaces";
   artifactId = "myfaces-api";
   version = "1.1.0";

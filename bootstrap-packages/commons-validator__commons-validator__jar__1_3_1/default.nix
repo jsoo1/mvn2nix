@@ -10,7 +10,8 @@
 , commons-validator__commons-validator__pom__1_3_1
 }:
 patchMavenJar {
-  name = "commons-validator:commons-validator:jar:1.3.1";
+  name = "commons-validator";
+  coordinates = "commons-validator:commons-validator:jar:1.3.1";
   groupId = "commons-validator";
   artifactId = "commons-validator";
   version = "1.3.1";

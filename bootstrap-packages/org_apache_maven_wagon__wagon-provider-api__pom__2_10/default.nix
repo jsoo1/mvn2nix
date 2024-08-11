@@ -5,7 +5,8 @@
 , org_apache_maven_wagon__wagon__pom__2_10
 }:
 patchMavenJar {
-  name = "org.apache.maven.wagon:wagon-provider-api:pom:2.10";
+  name = "wagon-provider-api";
+  coordinates = "org.apache.maven.wagon:wagon-provider-api:pom:2.10";
   groupId = "org.apache.maven.wagon";
   artifactId = "wagon-provider-api";
   version = "2.10";

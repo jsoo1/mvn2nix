@@ -5,7 +5,8 @@
 , com_thoughtworks_qdox__qdox__pom__2_0-M9
 }:
 patchMavenJar {
-  name = "com.thoughtworks.qdox:qdox:jar:2.0-M9";
+  name = "qdox";
+  coordinates = "com.thoughtworks.qdox:qdox:jar:2.0-M9";
   groupId = "com.thoughtworks.qdox";
   artifactId = "qdox";
   version = "2.0-M9";

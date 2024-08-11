@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.junit:junit-bom:pom:5.11.0-M2";
+  name = "junit-bom";
+  coordinates = "org.junit:junit-bom:pom:5.11.0-M2";
   groupId = "org.junit";
   artifactId = "junit-bom";
   version = "5.11.0-M2";

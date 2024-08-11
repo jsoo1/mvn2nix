@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "commons-lang:commons-lang:pom:2.1";
+  name = "commons-lang";
+  coordinates = "commons-lang:commons-lang:pom:2.1";
   groupId = "commons-lang";
   artifactId = "commons-lang";
   version = "2.1";

@@ -5,7 +5,8 @@
 , org_codehaus_plexus__plexus__pom__1_0_12
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-utils:pom:1.5.6";
+  name = "plexus-utils";
+  coordinates = "org.codehaus.plexus:plexus-utils:pom:1.5.6";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-utils";
   version = "1.5.6";

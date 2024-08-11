@@ -5,7 +5,8 @@
 , org_junit__junit-bom__pom__5_9_3
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus:pom:14";
+  name = "plexus";
+  coordinates = "org.codehaus.plexus:plexus:pom:14";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus";
   version = "14";

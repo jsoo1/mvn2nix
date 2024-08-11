@@ -5,7 +5,8 @@
 , org_apache_maven_mercury__mercury-util__pom__1_0_0-alpha-2
 }:
 patchMavenJar {
-  name = "org.apache.maven.mercury:mercury-util:jar:1.0.0-alpha-2";
+  name = "mercury-util";
+  coordinates = "org.apache.maven.mercury:mercury-util:jar:1.0.0-alpha-2";
   groupId = "org.apache.maven.mercury";
   artifactId = "mercury-util";
   version = "1.0.0-alpha-2";

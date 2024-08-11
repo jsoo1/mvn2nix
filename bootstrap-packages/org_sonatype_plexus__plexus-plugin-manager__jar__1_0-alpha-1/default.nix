@@ -42,7 +42,8 @@
 , org_sonatype_plexus__plexus-plugin-manager__pom__1_0-alpha-1
 }:
 patchMavenJar {
-  name = "org.sonatype.plexus:plexus-plugin-manager:jar:1.0-alpha-1";
+  name = "plexus-plugin-manager";
+  coordinates = "org.sonatype.plexus:plexus-plugin-manager:jar:1.0-alpha-1";
   groupId = "org.sonatype.plexus";
   artifactId = "plexus-plugin-manager";
   version = "1.0-alpha-1";

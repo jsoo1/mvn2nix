@@ -5,7 +5,8 @@
 , stax__stax-api__pom__1_0_1
 }:
 patchMavenJar {
-  name = "stax:stax-api:jar:1.0.1";
+  name = "stax-api";
+  coordinates = "stax:stax-api:jar:1.0.1";
   groupId = "stax";
   artifactId = "stax-api";
   version = "1.0.1";

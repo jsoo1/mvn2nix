@@ -5,7 +5,8 @@
 , org_apache_commons__commons-parent__pom__11
 }:
 patchMavenJar {
-  name = "commons-cli:commons-cli:pom:1.2";
+  name = "commons-cli";
+  coordinates = "commons-cli:commons-cli:pom:1.2";
   groupId = "commons-cli";
   artifactId = "commons-cli";
   version = "1.2";

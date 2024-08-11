@@ -5,7 +5,8 @@
 , org_codehaus_plexus__plexus-xml__pom__3_0_0
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-xml:jar:3.0.0";
+  name = "plexus-xml";
+  coordinates = "org.codehaus.plexus:plexus-xml:jar:3.0.0";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-xml";
   version = "3.0.0";

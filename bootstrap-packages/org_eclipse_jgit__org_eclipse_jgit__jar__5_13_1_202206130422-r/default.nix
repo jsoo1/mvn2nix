@@ -7,7 +7,8 @@
 , org_eclipse_jgit__org_eclipse_jgit__pom__5_13_1_202206130422-r
 }:
 patchMavenJar {
-  name = "org.eclipse.jgit:org.eclipse.jgit:jar:5.13.1.202206130422-r";
+  name = "org.eclipse.jgit";
+  coordinates = "org.eclipse.jgit:org.eclipse.jgit:jar:5.13.1.202206130422-r";
   groupId = "org.eclipse.jgit";
   artifactId = "org.eclipse.jgit";
   version = "5.13.1.202206130422-r";

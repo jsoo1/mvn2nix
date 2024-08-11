@@ -5,7 +5,8 @@
 , org_sonatype_oss__oss-parent__pom__7
 }:
 patchMavenJar {
-  name = "com.google.guava:guava-parent:pom:13.0.1";
+  name = "guava-parent";
+  coordinates = "com.google.guava:guava-parent:pom:13.0.1";
   groupId = "com.google.guava";
   artifactId = "guava-parent";
   version = "13.0.1";

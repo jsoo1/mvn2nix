@@ -5,7 +5,8 @@
 , org_apache_maven__maven__pom__3_0-alpha-2
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-reporting-api:pom:3.0-alpha-2";
+  name = "maven-reporting-api";
+  coordinates = "org.apache.maven:maven-reporting-api:pom:3.0-alpha-2";
   groupId = "org.apache.maven";
   artifactId = "maven-reporting-api";
   version = "3.0-alpha-2";

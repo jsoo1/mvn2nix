@@ -5,7 +5,8 @@
 , javax_servlet__servlet-api__pom__2_3
 }:
 patchMavenJar {
-  name = "javax.servlet:servlet-api:jar:2.3";
+  name = "servlet-api";
+  coordinates = "javax.servlet:servlet-api:jar:2.3";
   groupId = "javax.servlet";
   artifactId = "servlet-api";
   version = "2.3";

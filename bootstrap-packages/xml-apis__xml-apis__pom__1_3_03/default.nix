@@ -5,7 +5,8 @@
 , org_apache__apache__pom__1
 }:
 patchMavenJar {
-  name = "xml-apis:xml-apis:pom:1.3.03";
+  name = "xml-apis";
+  coordinates = "xml-apis:xml-apis:pom:1.3.03";
   groupId = "xml-apis";
   artifactId = "xml-apis";
   version = "1.3.03";

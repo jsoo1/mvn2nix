@@ -5,7 +5,8 @@
 , org_apache_commons__commons-compress__pom__1_19
 }:
 patchMavenJar {
-  name = "org.apache.commons:commons-compress:jar:1.19";
+  name = "commons-compress";
+  coordinates = "org.apache.commons:commons-compress:jar:1.19";
   groupId = "org.apache.commons";
   artifactId = "commons-compress";
   version = "1.19";

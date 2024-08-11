@@ -5,7 +5,8 @@
 , org_sonatype_sisu_inject__guice-parent__pom__3_2_3
 }:
 patchMavenJar {
-  name = "org.sonatype.sisu:sisu-guice:pom:3.2.3";
+  name = "sisu-guice";
+  coordinates = "org.sonatype.sisu:sisu-guice:pom:3.2.3";
   groupId = "org.sonatype.sisu";
   artifactId = "sisu-guice";
   version = "3.2.3";

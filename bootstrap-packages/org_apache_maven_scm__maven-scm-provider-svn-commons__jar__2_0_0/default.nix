@@ -8,7 +8,8 @@
 , org_apache_maven_scm__maven-scm-provider-svn-commons__pom__2_0_0
 }:
 patchMavenJar {
-  name = "org.apache.maven.scm:maven-scm-provider-svn-commons:jar:2.0.0";
+  name = "maven-scm-provider-svn-commons";
+  coordinates = "org.apache.maven.scm:maven-scm-provider-svn-commons:jar:2.0.0";
   groupId = "org.apache.maven.scm";
   artifactId = "maven-scm-provider-svn-commons";
   version = "2.0.0";

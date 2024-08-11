@@ -5,7 +5,8 @@
 , org_sat4j__org_sat4j_core__pom__2_0_4
 }:
 patchMavenJar {
-  name = "org.sat4j:org.sat4j.core:jar:2.0.4";
+  name = "org.sat4j.core";
+  coordinates = "org.sat4j:org.sat4j.core:jar:2.0.4";
   groupId = "org.sat4j";
   artifactId = "org.sat4j.core";
   version = "2.0.4";

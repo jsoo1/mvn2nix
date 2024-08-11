@@ -7,7 +7,8 @@
 , org_apache_sshd__sshd-osgi__pom__2_7_0
 }:
 patchMavenJar {
-  name = "org.apache.sshd:sshd-osgi:jar:2.7.0";
+  name = "sshd-osgi";
+  coordinates = "org.apache.sshd:sshd-osgi:jar:2.7.0";
   groupId = "org.apache.sshd";
   artifactId = "sshd-osgi";
   version = "2.7.0";

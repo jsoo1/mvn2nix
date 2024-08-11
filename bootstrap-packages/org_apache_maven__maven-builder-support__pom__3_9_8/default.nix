@@ -6,7 +6,8 @@
 , org_apache_maven__maven__pom__3_9_8
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-builder-support:pom:3.9.8";
+  name = "maven-builder-support";
+  coordinates = "org.apache.maven:maven-builder-support:pom:3.9.8";
   groupId = "org.apache.maven";
   artifactId = "maven-builder-support";
   version = "3.9.8";

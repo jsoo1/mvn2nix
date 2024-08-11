@@ -5,7 +5,8 @@
 , org_apache_maven__maven-parent__pom__34
 }:
 patchMavenJar {
-  name = "org.apache.maven.surefire:surefire:pom:3.0.0-M5";
+  name = "surefire";
+  coordinates = "org.apache.maven.surefire:surefire:pom:3.0.0-M5";
   groupId = "org.apache.maven.surefire";
   artifactId = "surefire";
   version = "3.0.0-M5";

@@ -9,7 +9,8 @@
 , org_codehaus_plexus__plexus-i18n__pom__1_0-beta-10
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-i18n:jar:1.0-beta-10";
+  name = "plexus-i18n";
+  coordinates = "org.codehaus.plexus:plexus-i18n:jar:1.0-beta-10";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-i18n";
   version = "1.0-beta-10";

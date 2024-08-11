@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "com.google.j2objc:j2objc-annotations:pom:3.0.0";
+  name = "j2objc-annotations";
+  coordinates = "com.google.j2objc:j2objc-annotations:pom:3.0.0";
   groupId = "com.google.j2objc";
   artifactId = "j2objc-annotations";
   version = "3.0.0";

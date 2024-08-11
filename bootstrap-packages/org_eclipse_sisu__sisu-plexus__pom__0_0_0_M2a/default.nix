@@ -5,7 +5,8 @@
 , org_sonatype_oss__oss-parent__pom__7
 }:
 patchMavenJar {
-  name = "org.eclipse.sisu:sisu-plexus:pom:0.0.0.M2a";
+  name = "sisu-plexus";
+  coordinates = "org.eclipse.sisu:sisu-plexus:pom:0.0.0.M2a";
   groupId = "org.eclipse.sisu";
   artifactId = "sisu-plexus";
   version = "0.0.0.M2a";

@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "backport-util-concurrent:backport-util-concurrent:pom:3.1";
+  name = "backport-util-concurrent";
+  coordinates = "backport-util-concurrent:backport-util-concurrent:pom:3.1";
   groupId = "backport-util-concurrent";
   artifactId = "backport-util-concurrent";
   version = "3.1";

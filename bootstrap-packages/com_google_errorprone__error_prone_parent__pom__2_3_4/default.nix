@@ -5,7 +5,8 @@
 , org_sonatype_oss__oss-parent__pom__7
 }:
 patchMavenJar {
-  name = "com.google.errorprone:error_prone_parent:pom:2.3.4";
+  name = "error_prone_parent";
+  coordinates = "com.google.errorprone:error_prone_parent:pom:2.3.4";
   groupId = "com.google.errorprone";
   artifactId = "error_prone_parent";
   version = "2.3.4";

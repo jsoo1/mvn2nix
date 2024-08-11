@@ -5,7 +5,8 @@
 , javax_interceptor__javax_interceptor-api__pom__1_2
 }:
 patchMavenJar {
-  name = "javax.interceptor:javax.interceptor-api:jar:1.2";
+  name = "javax.interceptor-api";
+  coordinates = "javax.interceptor:javax.interceptor-api:jar:1.2";
   groupId = "javax.interceptor";
   artifactId = "javax.interceptor-api";
   version = "1.2";

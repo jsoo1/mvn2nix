@@ -15,7 +15,8 @@
 , org_apache_maven_mercury__mercury-external__pom__1_0_0-alpha-2
 }:
 patchMavenJar {
-  name = "org.apache.maven.mercury:mercury-external:jar:1.0.0-alpha-2";
+  name = "mercury-external";
+  coordinates = "org.apache.maven.mercury:mercury-external:jar:1.0.0-alpha-2";
   groupId = "org.apache.maven.mercury";
   artifactId = "mercury-external";
   version = "1.0.0-alpha-2";

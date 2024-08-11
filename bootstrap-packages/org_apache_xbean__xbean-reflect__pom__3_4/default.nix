@@ -5,7 +5,8 @@
 , org_apache_xbean__xbean__pom__3_4
 }:
 patchMavenJar {
-  name = "org.apache.xbean:xbean-reflect:pom:3.4";
+  name = "xbean-reflect";
+  coordinates = "org.apache.xbean:xbean-reflect:pom:3.4";
   groupId = "org.apache.xbean";
   artifactId = "xbean-reflect";
   version = "3.4";

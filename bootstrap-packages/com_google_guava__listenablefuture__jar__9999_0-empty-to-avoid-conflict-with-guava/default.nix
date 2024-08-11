@@ -5,7 +5,8 @@
 , com_google_guava__listenablefuture__pom__9999_0-empty-to-avoid-conflict-with-guava
 }:
 patchMavenJar {
-  name = "com.google.guava:listenablefuture:jar:9999.0-empty-to-avoid-conflict-with-guava";
+  name = "listenablefuture";
+  coordinates = "com.google.guava:listenablefuture:jar:9999.0-empty-to-avoid-conflict-with-guava";
   groupId = "com.google.guava";
   artifactId = "listenablefuture";
   version = "9999.0-empty-to-avoid-conflict-with-guava";

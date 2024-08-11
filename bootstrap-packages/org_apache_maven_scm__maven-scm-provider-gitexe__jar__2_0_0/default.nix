@@ -11,7 +11,8 @@
 , org_apache_maven_scm__maven-scm-provider-gitexe__pom__2_0_0
 }:
 patchMavenJar {
-  name = "org.apache.maven.scm:maven-scm-provider-gitexe:jar:2.0.0";
+  name = "maven-scm-provider-gitexe";
+  coordinates = "org.apache.maven.scm:maven-scm-provider-gitexe:jar:2.0.0";
   groupId = "org.apache.maven.scm";
   artifactId = "maven-scm-provider-gitexe";
   version = "2.0.0";

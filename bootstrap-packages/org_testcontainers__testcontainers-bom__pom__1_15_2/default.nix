@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.testcontainers:testcontainers-bom:pom:1.15.2";
+  name = "testcontainers-bom";
+  coordinates = "org.testcontainers:testcontainers-bom:pom:1.15.2";
   groupId = "org.testcontainers";
   artifactId = "testcontainers-bom";
   version = "1.15.2";

@@ -5,7 +5,8 @@
 , org_codehaus_plexus__plexus-component-annotations__pom__2_0_0
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-component-annotations:jar:2.0.0";
+  name = "plexus-component-annotations";
+  coordinates = "org.codehaus.plexus:plexus-component-annotations:jar:2.0.0";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-component-annotations";
   version = "2.0.0";

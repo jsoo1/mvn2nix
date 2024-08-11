@@ -5,7 +5,8 @@
 , org_apache_maven__maven-parent__pom__26
 }:
 patchMavenJar {
-  name = "org.apache.maven.wagon:wagon:pom:2.10";
+  name = "wagon";
+  coordinates = "org.apache.maven.wagon:wagon:pom:2.10";
   groupId = "org.apache.maven.wagon";
   artifactId = "wagon";
   version = "2.10";

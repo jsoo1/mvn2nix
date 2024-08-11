@@ -7,7 +7,8 @@
 , org_apache_velocity__velocity__pom__1_7
 }:
 patchMavenJar {
-  name = "org.apache.velocity:velocity:jar:1.7";
+  name = "velocity";
+  coordinates = "org.apache.velocity:velocity:jar:1.7";
   groupId = "org.apache.velocity";
   artifactId = "velocity";
   version = "1.7";

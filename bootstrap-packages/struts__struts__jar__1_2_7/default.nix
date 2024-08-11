@@ -15,7 +15,8 @@
 , struts__struts__pom__1_2_7
 }:
 patchMavenJar {
-  name = "struts:struts:jar:1.2.7";
+  name = "struts";
+  coordinates = "struts:struts:jar:1.2.7";
   groupId = "struts";
   artifactId = "struts";
   version = "1.2.7";

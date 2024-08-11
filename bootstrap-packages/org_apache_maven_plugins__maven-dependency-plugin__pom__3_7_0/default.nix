@@ -6,7 +6,8 @@
 , org_apache_maven_plugins__maven-plugins__pom__42
 }:
 patchMavenJar {
-  name = "org.apache.maven.plugins:maven-dependency-plugin:pom:3.7.0";
+  name = "maven-dependency-plugin";
+  coordinates = "org.apache.maven.plugins:maven-dependency-plugin:pom:3.7.0";
   groupId = "org.apache.maven.plugins";
   artifactId = "maven-dependency-plugin";
   version = "3.7.0";

@@ -5,7 +5,8 @@
 , org_tukaani__xz__pom__1_8
 }:
 patchMavenJar {
-  name = "org.tukaani:xz:jar:1.8";
+  name = "xz";
+  coordinates = "org.tukaani:xz:jar:1.8";
   groupId = "org.tukaani";
   artifactId = "xz";
   version = "1.8";

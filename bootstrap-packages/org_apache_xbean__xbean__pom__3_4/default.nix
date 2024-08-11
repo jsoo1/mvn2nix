@@ -5,7 +5,8 @@
 , org_apache__apache__pom__4
 }:
 patchMavenJar {
-  name = "org.apache.xbean:xbean:pom:3.4";
+  name = "xbean";
+  coordinates = "org.apache.xbean:xbean:pom:3.4";
   groupId = "org.apache.xbean";
   artifactId = "xbean";
   version = "3.4";

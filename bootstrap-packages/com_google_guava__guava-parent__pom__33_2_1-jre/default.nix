@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "com.google.guava:guava-parent:pom:33.2.1-jre";
+  name = "guava-parent";
+  coordinates = "com.google.guava:guava-parent:pom:33.2.1-jre";
   groupId = "com.google.guava";
   artifactId = "guava-parent";
   version = "33.2.1-jre";

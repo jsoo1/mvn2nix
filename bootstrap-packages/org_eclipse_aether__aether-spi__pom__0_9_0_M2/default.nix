@@ -5,7 +5,8 @@
 , org_eclipse_aether__aether__pom__0_9_0_M2
 }:
 patchMavenJar {
-  name = "org.eclipse.aether:aether-spi:pom:0.9.0.M2";
+  name = "aether-spi";
+  coordinates = "org.eclipse.aether:aether-spi:pom:0.9.0.M2";
   groupId = "org.eclipse.aether";
   artifactId = "aether-spi";
   version = "0.9.0.M2";

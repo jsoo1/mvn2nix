@@ -7,7 +7,8 @@
 , org_codehaus_plexus__plexus-compiler-javac__pom__2_8_4
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-compiler-javac:jar:2.8.4";
+  name = "plexus-compiler-javac";
+  coordinates = "org.codehaus.plexus:plexus-compiler-javac:jar:2.8.4";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-compiler-javac";
   version = "2.8.4";

@@ -5,7 +5,8 @@
 , eu_maveniverse_maven_parent__parent__pom__15
 }:
 patchMavenJar {
-  name = "eu.maveniverse.maven.mima:mima:pom:2.4.15";
+  name = "mima";
+  coordinates = "eu.maveniverse.maven.mima:mima:pom:2.4.15";
   groupId = "eu.maveniverse.maven.mima";
   artifactId = "mima";
   version = "2.4.15";

@@ -5,7 +5,8 @@
 , org_apache_geronimo_genesis__genesis-java5-flava__pom__2_0
 }:
 patchMavenJar {
-  name = "org.apache.xbean:xbean:pom:3.7";
+  name = "xbean";
+  coordinates = "org.apache.xbean:xbean:pom:3.7";
   groupId = "org.apache.xbean";
   artifactId = "xbean";
   version = "3.7";

@@ -5,7 +5,8 @@
 , org_apache_maven_shared__maven-shared-components__pom__34
 }:
 patchMavenJar {
-  name = "org.apache.maven.reporting:maven-reporting-impl:pom:3.2.0";
+  name = "maven-reporting-impl";
+  coordinates = "org.apache.maven.reporting:maven-reporting-impl:pom:3.2.0";
   groupId = "org.apache.maven.reporting";
   artifactId = "maven-reporting-impl";
   version = "3.2.0";

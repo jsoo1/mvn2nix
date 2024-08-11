@@ -5,7 +5,8 @@
 , com_google_errorprone__error_prone_annotations__pom__2_3_4
 }:
 patchMavenJar {
-  name = "com.google.errorprone:error_prone_annotations:jar:2.3.4";
+  name = "error_prone_annotations";
+  coordinates = "com.google.errorprone:error_prone_annotations:jar:2.3.4";
   groupId = "com.google.errorprone";
   artifactId = "error_prone_annotations";
   version = "2.3.4";

@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.jboss.weld:weld-parent:pom:26";
+  name = "weld-parent";
+  coordinates = "org.jboss.weld:weld-parent:pom:26";
   groupId = "org.jboss.weld";
   artifactId = "weld-parent";
   version = "26";

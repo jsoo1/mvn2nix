@@ -6,7 +6,8 @@
 , commons-el__commons-el__pom__1_0
 }:
 patchMavenJar {
-  name = "commons-el:commons-el:jar:1.0";
+  name = "commons-el";
+  coordinates = "commons-el:commons-el:jar:1.0";
   groupId = "commons-el";
   artifactId = "commons-el";
   version = "1.0";

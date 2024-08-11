@@ -5,7 +5,8 @@
 , org_sonatype_sisu__sisu-inject__pom__1_4_2
 }:
 patchMavenJar {
-  name = "org.sonatype.sisu.inject:guice-bean:pom:1.4.2";
+  name = "guice-bean";
+  coordinates = "org.sonatype.sisu.inject:guice-bean:pom:1.4.2";
   groupId = "org.sonatype.sisu.inject";
   artifactId = "guice-bean";
   version = "1.4.2";

@@ -5,7 +5,8 @@
 , org_sonatype_spice__spice-parent__pom__15
 }:
 patchMavenJar {
-  name = "org.sonatype.plexus:plexus-build-api:pom:0.0.7";
+  name = "plexus-build-api";
+  coordinates = "org.sonatype.plexus:plexus-build-api:pom:0.0.7";
   groupId = "org.sonatype.plexus";
   artifactId = "plexus-build-api";
   version = "0.0.7";

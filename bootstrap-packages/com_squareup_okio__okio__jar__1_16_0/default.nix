@@ -5,7 +5,8 @@
 , com_squareup_okio__okio__pom__1_16_0
 }:
 patchMavenJar {
-  name = "com.squareup.okio:okio:jar:1.16.0";
+  name = "okio";
+  coordinates = "com.squareup.okio:okio:jar:1.16.0";
   groupId = "com.squareup.okio";
   artifactId = "okio";
   version = "1.16.0";

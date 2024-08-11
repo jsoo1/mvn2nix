@@ -6,7 +6,8 @@
 , org_apache_maven_surefire__surefire__pom__3_2_5
 }:
 patchMavenJar {
-  name = "org.apache.maven.surefire:surefire-logger-api:pom:3.2.5";
+  name = "surefire-logger-api";
+  coordinates = "org.apache.maven.surefire:surefire-logger-api:pom:3.2.5";
   groupId = "org.apache.maven.surefire";
   artifactId = "surefire-logger-api";
   version = "3.2.5";

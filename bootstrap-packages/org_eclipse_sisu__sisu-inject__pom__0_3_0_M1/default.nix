@@ -5,7 +5,8 @@
 , org_sonatype_oss__oss-parent__pom__7
 }:
 patchMavenJar {
-  name = "org.eclipse.sisu:sisu-inject:pom:0.3.0.M1";
+  name = "sisu-inject";
+  coordinates = "org.eclipse.sisu:sisu-inject:pom:0.3.0.M1";
   groupId = "org.eclipse.sisu";
   artifactId = "sisu-inject";
   version = "0.3.0.M1";

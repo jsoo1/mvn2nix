@@ -6,7 +6,8 @@
 , org_apache_maven_shared__maven-dependency-analyzer__pom__1_14_1
 }:
 patchMavenJar {
-  name = "org.apache.maven.shared:maven-dependency-analyzer:jar:1.14.1";
+  name = "maven-dependency-analyzer";
+  coordinates = "org.apache.maven.shared:maven-dependency-analyzer:jar:1.14.1";
   groupId = "org.apache.maven.shared";
   artifactId = "maven-dependency-analyzer";
   version = "1.14.1";

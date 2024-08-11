@@ -6,7 +6,8 @@
 , org_apache_maven_plugin-tools__maven-plugin-tools__pom__3_7_0
 }:
 patchMavenJar {
-  name = "org.apache.maven.plugin-tools:maven-plugin-annotations:pom:3.7.0";
+  name = "maven-plugin-annotations";
+  coordinates = "org.apache.maven.plugin-tools:maven-plugin-annotations:pom:3.7.0";
   groupId = "org.apache.maven.plugin-tools";
   artifactId = "maven-plugin-annotations";
   version = "3.7.0";

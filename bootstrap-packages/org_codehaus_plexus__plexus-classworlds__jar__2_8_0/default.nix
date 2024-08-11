@@ -5,7 +5,8 @@
 , org_codehaus_plexus__plexus-classworlds__pom__2_8_0
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-classworlds:jar:2.8.0";
+  name = "plexus-classworlds";
+  coordinates = "org.codehaus.plexus:plexus-classworlds:jar:2.8.0";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-classworlds";
   version = "2.8.0";

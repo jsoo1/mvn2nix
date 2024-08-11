@@ -5,7 +5,8 @@
 , net_java__jvnet-parent__pom__3
 }:
 patchMavenJar {
-  name = "javax.annotation:javax.annotation-api:pom:1.2";
+  name = "javax.annotation-api";
+  coordinates = "javax.annotation:javax.annotation-api:pom:1.2";
   groupId = "javax.annotation";
   artifactId = "javax.annotation-api";
   version = "1.2";

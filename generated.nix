@@ -35,7 +35,8 @@
 , info_picocli__picocli-codegen__jar__4_5_0
 }:
 buildMavenPackage {
-  name = "com.fzakaria:mvn2nix:jar:0.1";
+  name = "mvn2nix";
+  coordinates = "com.fzakaria:mvn2nix:jar:0.1";
   groupId = "com.fzakaria";
   artifactId = "mvn2nix";
   version = "0.1";

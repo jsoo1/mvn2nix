@@ -7,7 +7,8 @@
 , org_apache_sshd__sshd-common__pom__2_7_0
 }:
 patchMavenJar {
-  name = "org.apache.sshd:sshd-common:jar:2.7.0";
+  name = "sshd-common";
+  coordinates = "org.apache.sshd:sshd-common:jar:2.7.0";
   groupId = "org.apache.sshd";
   artifactId = "sshd-common";
   version = "2.7.0";

@@ -6,7 +6,8 @@
 , org_codehaus_plexus__plexus-cipher__pom__2_0
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-cipher:jar:2.0";
+  name = "plexus-cipher";
+  coordinates = "org.codehaus.plexus:plexus-cipher:jar:2.0";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-cipher";
   version = "2.0";

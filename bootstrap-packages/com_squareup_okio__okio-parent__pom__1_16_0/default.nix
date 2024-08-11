@@ -5,7 +5,8 @@
 , org_sonatype_oss__oss-parent__pom__7
 }:
 patchMavenJar {
-  name = "com.squareup.okio:okio-parent:pom:1.16.0";
+  name = "okio-parent";
+  coordinates = "com.squareup.okio:okio-parent:pom:1.16.0";
   groupId = "com.squareup.okio";
   artifactId = "okio-parent";
   version = "1.16.0";

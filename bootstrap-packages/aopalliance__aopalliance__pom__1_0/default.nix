@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "aopalliance:aopalliance:pom:1.0";
+  name = "aopalliance";
+  coordinates = "aopalliance:aopalliance:pom:1.0";
   groupId = "aopalliance";
   artifactId = "aopalliance";
   version = "1.0";

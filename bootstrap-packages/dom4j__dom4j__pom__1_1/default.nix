@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "dom4j:dom4j:pom:1.1";
+  name = "dom4j";
+  coordinates = "dom4j:dom4j:pom:1.1";
   groupId = "dom4j";
   artifactId = "dom4j";
   version = "1.1";

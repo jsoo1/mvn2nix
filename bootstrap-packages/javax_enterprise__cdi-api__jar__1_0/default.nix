@@ -8,7 +8,8 @@
 , javax_enterprise__cdi-api__pom__1_0
 }:
 patchMavenJar {
-  name = "javax.enterprise:cdi-api:jar:1.0";
+  name = "cdi-api";
+  coordinates = "javax.enterprise:cdi-api:jar:1.0";
   groupId = "javax.enterprise";
   artifactId = "cdi-api";
   version = "1.0";

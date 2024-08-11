@@ -5,7 +5,8 @@
 , org_sonatype_forge__forge-parent__pom__6
 }:
 patchMavenJar {
-  name = "org.sonatype.aether:aether-parent:pom:1.7";
+  name = "aether-parent";
+  coordinates = "org.sonatype.aether:aether-parent:pom:1.7";
   groupId = "org.sonatype.aether";
   artifactId = "aether-parent";
   version = "1.7";

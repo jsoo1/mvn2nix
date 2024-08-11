@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.apache.maven.shared:maven-filtering:pom:3.3.2";
+  name = "maven-filtering";
+  coordinates = "org.apache.maven.shared:maven-filtering:pom:3.3.2";
   groupId = "org.apache.maven.shared";
   artifactId = "maven-filtering";
   version = "3.3.2";

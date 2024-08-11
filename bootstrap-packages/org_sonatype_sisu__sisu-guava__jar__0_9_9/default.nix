@@ -5,7 +5,8 @@
 , org_sonatype_sisu__sisu-guava__pom__0_9_9
 }:
 patchMavenJar {
-  name = "org.sonatype.sisu:sisu-guava:jar:0.9.9";
+  name = "sisu-guava";
+  coordinates = "org.sonatype.sisu:sisu-guava:jar:0.9.9";
   groupId = "org.sonatype.sisu";
   artifactId = "sisu-guava";
   version = "0.9.9";

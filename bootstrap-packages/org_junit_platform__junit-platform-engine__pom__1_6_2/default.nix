@@ -5,7 +5,8 @@
 , org_junit__junit-bom__pom__5_6_2
 }:
 patchMavenJar {
-  name = "org.junit.platform:junit-platform-engine:pom:1.6.2";
+  name = "junit-platform-engine";
+  coordinates = "org.junit.platform:junit-platform-engine:pom:1.6.2";
   groupId = "org.junit.platform";
   artifactId = "junit-platform-engine";
   version = "1.6.2";

@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "sslext:sslext:pom:1.2-0";
+  name = "sslext";
+  coordinates = "sslext:sslext:pom:1.2-0";
   groupId = "sslext";
   artifactId = "sslext";
   version = "1.2-0";

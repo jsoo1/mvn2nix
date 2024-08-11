@@ -5,7 +5,8 @@
 , org_jboss_weld__weld-api-parent__pom__1_0
 }:
 patchMavenJar {
-  name = "javax.enterprise:cdi-api:pom:1.0";
+  name = "cdi-api";
+  coordinates = "javax.enterprise:cdi-api:pom:1.0";
   groupId = "javax.enterprise";
   artifactId = "cdi-api";
   version = "1.0";

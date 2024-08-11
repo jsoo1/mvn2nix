@@ -6,7 +6,8 @@
 , org_apache_maven_resolver__maven-resolver__pom__1_9_20
 }:
 patchMavenJar {
-  name = "org.apache.maven.resolver:maven-resolver-named-locks:pom:1.9.20";
+  name = "maven-resolver-named-locks";
+  coordinates = "org.apache.maven.resolver:maven-resolver-named-locks:pom:1.9.20";
   groupId = "org.apache.maven.resolver";
   artifactId = "maven-resolver-named-locks";
   version = "1.9.20";

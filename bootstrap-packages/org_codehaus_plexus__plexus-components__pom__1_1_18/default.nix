@@ -5,7 +5,8 @@
 , org_codehaus_plexus__plexus__pom__2_0_7
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-components:pom:1.1.18";
+  name = "plexus-components";
+  coordinates = "org.codehaus.plexus:plexus-components:pom:1.1.18";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-components";
   version = "1.1.18";

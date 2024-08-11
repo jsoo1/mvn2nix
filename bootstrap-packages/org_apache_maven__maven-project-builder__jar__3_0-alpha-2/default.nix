@@ -8,7 +8,8 @@
 , org_apache_maven__maven-project-builder__pom__3_0-alpha-2
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-project-builder:jar:3.0-alpha-2";
+  name = "maven-project-builder";
+  coordinates = "org.apache.maven:maven-project-builder:jar:3.0-alpha-2";
   groupId = "org.apache.maven";
   artifactId = "maven-project-builder";
   version = "3.0-alpha-2";

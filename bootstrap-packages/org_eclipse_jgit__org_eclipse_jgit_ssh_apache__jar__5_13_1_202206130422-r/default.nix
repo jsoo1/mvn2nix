@@ -14,7 +14,8 @@
 , org_eclipse_jgit__org_eclipse_jgit_ssh_apache__pom__5_13_1_202206130422-r
 }:
 patchMavenJar {
-  name = "org.eclipse.jgit:org.eclipse.jgit.ssh.apache:jar:5.13.1.202206130422-r";
+  name = "org.eclipse.jgit.ssh.apache";
+  coordinates = "org.eclipse.jgit:org.eclipse.jgit.ssh.apache:jar:5.13.1.202206130422-r";
   groupId = "org.eclipse.jgit";
   artifactId = "org.eclipse.jgit.ssh.apache";
   version = "5.13.1.202206130422-r";

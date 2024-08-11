@@ -5,7 +5,8 @@
 , org_codehaus_plexus__plexus__pom__4_0
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-languages:pom:0.9.10";
+  name = "plexus-languages";
+  coordinates = "org.codehaus.plexus:plexus-languages:pom:0.9.10";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-languages";
   version = "0.9.10";

@@ -5,7 +5,8 @@
 , org_apache_commons__commons-parent__pom__45
 }:
 patchMavenJar {
-  name = "org.apache.commons:commons-text:pom:1.3";
+  name = "commons-text";
+  coordinates = "org.apache.commons:commons-text:pom:1.3";
   groupId = "org.apache.commons";
   artifactId = "commons-text";
   version = "1.3";

@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "net.java:jvnet-parent:pom:3";
+  name = "jvnet-parent";
+  coordinates = "net.java:jvnet-parent:pom:3";
   groupId = "net.java";
   artifactId = "jvnet-parent";
   version = "3";

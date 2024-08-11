@@ -5,7 +5,8 @@
 , org_apache_maven__maven__pom__2_2_1
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-plugin-parameter-documenter:pom:2.2.1";
+  name = "maven-plugin-parameter-documenter";
+  coordinates = "org.apache.maven:maven-plugin-parameter-documenter:pom:2.2.1";
   groupId = "org.apache.maven";
   artifactId = "maven-plugin-parameter-documenter";
   version = "2.2.1";

@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "antlr:antlr:pom:2.7.2";
+  name = "antlr";
+  coordinates = "antlr:antlr:pom:2.7.2";
   groupId = "antlr";
   artifactId = "antlr";
   version = "2.7.2";

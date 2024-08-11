@@ -5,7 +5,8 @@
 , org_apache_struts__struts-master__pom__4
 }:
 patchMavenJar {
-  name = "org.apache.struts:struts-parent:pom:1.3.8";
+  name = "struts-parent";
+  coordinates = "org.apache.struts:struts-parent:pom:1.3.8";
   groupId = "org.apache.struts";
   artifactId = "struts-parent";
   version = "1.3.8";

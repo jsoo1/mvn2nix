@@ -5,7 +5,8 @@
 , junit__junit__pom__3_7
 }:
 patchMavenJar {
-  name = "junit:junit:jar:3.7";
+  name = "junit";
+  coordinates = "junit:junit:jar:3.7";
   groupId = "junit";
   artifactId = "junit";
   version = "3.7";

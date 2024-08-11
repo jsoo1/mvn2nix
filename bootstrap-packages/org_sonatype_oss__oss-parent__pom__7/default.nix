@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.sonatype.oss:oss-parent:pom:7";
+  name = "oss-parent";
+  coordinates = "org.sonatype.oss:oss-parent:pom:7";
   groupId = "org.sonatype.oss";
   artifactId = "oss-parent";
   version = "7";

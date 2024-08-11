@@ -6,7 +6,8 @@
 , org_apache_commons__commons-parent__pom__66
 }:
 patchMavenJar {
-  name = "org.apache.commons:commons-compress:pom:1.26.1";
+  name = "commons-compress";
+  coordinates = "org.apache.commons:commons-compress:pom:1.26.1";
   groupId = "org.apache.commons";
   artifactId = "commons-compress";
   version = "1.26.1";

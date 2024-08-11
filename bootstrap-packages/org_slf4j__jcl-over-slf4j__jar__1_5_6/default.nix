@@ -5,7 +5,8 @@
 , org_slf4j__jcl-over-slf4j__pom__1_5_6
 }:
 patchMavenJar {
-  name = "org.slf4j:jcl-over-slf4j:jar:1.5.6";
+  name = "jcl-over-slf4j";
+  coordinates = "org.slf4j:jcl-over-slf4j:jar:1.5.6";
   groupId = "org.slf4j";
   artifactId = "jcl-over-slf4j";
   version = "1.5.6";

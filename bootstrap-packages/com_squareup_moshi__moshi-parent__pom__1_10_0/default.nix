@@ -5,7 +5,8 @@
 , org_sonatype_oss__oss-parent__pom__7
 }:
 patchMavenJar {
-  name = "com.squareup.moshi:moshi-parent:pom:1.10.0";
+  name = "moshi-parent";
+  coordinates = "com.squareup.moshi:moshi-parent:pom:1.10.0";
   groupId = "com.squareup.moshi";
   artifactId = "moshi-parent";
   version = "1.10.0";

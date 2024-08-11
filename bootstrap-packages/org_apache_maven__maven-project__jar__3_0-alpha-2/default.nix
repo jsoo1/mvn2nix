@@ -22,7 +22,8 @@
 , org_apache_maven__maven-project__pom__3_0-alpha-2
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-project:jar:3.0-alpha-2";
+  name = "maven-project";
+  coordinates = "org.apache.maven:maven-project:jar:3.0-alpha-2";
   groupId = "org.apache.maven";
   artifactId = "maven-project";
   version = "3.0-alpha-2";

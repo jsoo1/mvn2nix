@@ -5,7 +5,8 @@
 , org_apache_commons__commons-parent__pom__9
 }:
 patchMavenJar {
-  name = "commons-lang:commons-lang:pom:2.4";
+  name = "commons-lang";
+  coordinates = "commons-lang:commons-lang:pom:2.4";
   groupId = "commons-lang";
   artifactId = "commons-lang";
   version = "2.4";

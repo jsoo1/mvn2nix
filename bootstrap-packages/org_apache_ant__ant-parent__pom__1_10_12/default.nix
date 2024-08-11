@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.apache.ant:ant-parent:pom:1.10.12";
+  name = "ant-parent";
+  coordinates = "org.apache.ant:ant-parent:pom:1.10.12";
   groupId = "org.apache.ant";
   artifactId = "ant-parent";
   version = "1.10.12";

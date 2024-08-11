@@ -5,7 +5,8 @@
 , org_apache_maven_shared__maven-shared-components__pom__19
 }:
 patchMavenJar {
-  name = "org.apache.maven.shared:maven-shared-incremental:pom:1.1";
+  name = "maven-shared-incremental";
+  coordinates = "org.apache.maven.shared:maven-shared-incremental:pom:1.1";
   groupId = "org.apache.maven.shared";
   artifactId = "maven-shared-incremental";
   version = "1.1";

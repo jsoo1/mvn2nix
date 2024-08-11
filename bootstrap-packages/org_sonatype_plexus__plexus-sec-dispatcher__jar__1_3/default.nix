@@ -7,7 +7,8 @@
 , org_sonatype_plexus__plexus-sec-dispatcher__pom__1_3
 }:
 patchMavenJar {
-  name = "org.sonatype.plexus:plexus-sec-dispatcher:jar:1.3";
+  name = "plexus-sec-dispatcher";
+  coordinates = "org.sonatype.plexus:plexus-sec-dispatcher:jar:1.3";
   groupId = "org.sonatype.plexus";
   artifactId = "plexus-sec-dispatcher";
   version = "1.3";

@@ -5,7 +5,8 @@
 , org_slf4j__slf4j-parent__pom__1_7_5
 }:
 patchMavenJar {
-  name = "org.slf4j:slf4j-api:pom:1.7.5";
+  name = "slf4j-api";
+  coordinates = "org.slf4j:slf4j-api:pom:1.7.5";
   groupId = "org.slf4j";
   artifactId = "slf4j-api";
   version = "1.7.5";

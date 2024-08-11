@@ -20,7 +20,8 @@
 , org_apache_maven__maven-resolver-provider__pom__3_9_8
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-resolver-provider:jar:3.9.8";
+  name = "maven-resolver-provider";
+  coordinates = "org.apache.maven:maven-resolver-provider:jar:3.9.8";
   groupId = "org.apache.maven";
   artifactId = "maven-resolver-provider";
   version = "3.9.8";

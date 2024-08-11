@@ -5,7 +5,8 @@
 , com_jcraft__jsch__pom__0_1_38
 }:
 patchMavenJar {
-  name = "com.jcraft:jsch:jar:0.1.38";
+  name = "jsch";
+  coordinates = "com.jcraft:jsch:jar:0.1.38";
   groupId = "com.jcraft";
   artifactId = "jsch";
   version = "0.1.38";

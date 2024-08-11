@@ -5,7 +5,8 @@
 , org_apache_commons__commons-parent__pom__39
 }:
 patchMavenJar {
-  name = "commons-collections:commons-collections:pom:3.2.2";
+  name = "commons-collections";
+  coordinates = "commons-collections:commons-collections:pom:3.2.2";
   groupId = "commons-collections";
   artifactId = "commons-collections";
   version = "3.2.2";

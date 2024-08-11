@@ -9,7 +9,8 @@
 , commons-logging__commons-logging__pom__1_1
 }:
 patchMavenJar {
-  name = "commons-logging:commons-logging:jar:1.1";
+  name = "commons-logging";
+  coordinates = "commons-logging:commons-logging:jar:1.1";
   groupId = "commons-logging";
   artifactId = "commons-logging";
   version = "1.1";

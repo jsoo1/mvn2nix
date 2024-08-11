@@ -5,7 +5,8 @@
 , org_sonatype_aether__aether-api__pom__1_7
 }:
 patchMavenJar {
-  name = "org.sonatype.aether:aether-api:jar:1.7";
+  name = "aether-api";
+  coordinates = "org.sonatype.aether:aether-api:jar:1.7";
   groupId = "org.sonatype.aether";
   artifactId = "aether-api";
   version = "1.7";

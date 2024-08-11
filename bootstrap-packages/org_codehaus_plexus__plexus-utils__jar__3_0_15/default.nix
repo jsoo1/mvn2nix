@@ -5,7 +5,8 @@
 , org_codehaus_plexus__plexus-utils__pom__3_0_15
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-utils:jar:3.0.15";
+  name = "plexus-utils";
+  coordinates = "org.codehaus.plexus:plexus-utils:jar:3.0.15";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-utils";
   version = "3.0.15";

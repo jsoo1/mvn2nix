@@ -28,7 +28,8 @@
 , org_apache_maven__maven-compat__pom__3_0
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-compat:jar:3.0";
+  name = "maven-compat";
+  coordinates = "org.apache.maven:maven-compat:jar:3.0";
   groupId = "org.apache.maven";
   artifactId = "maven-compat";
   version = "3.0";

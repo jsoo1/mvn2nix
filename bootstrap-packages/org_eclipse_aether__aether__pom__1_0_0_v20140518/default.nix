@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.eclipse.aether:aether:pom:1.0.0.v20140518";
+  name = "aether";
+  coordinates = "org.eclipse.aether:aether:pom:1.0.0.v20140518";
   groupId = "org.eclipse.aether";
   artifactId = "aether";
   version = "1.0.0.v20140518";

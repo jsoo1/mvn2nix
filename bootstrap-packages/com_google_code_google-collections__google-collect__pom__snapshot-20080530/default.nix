@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "com.google.code.google-collections:google-collect:pom:snapshot-20080530";
+  name = "google-collect";
+  coordinates = "com.google.code.google-collections:google-collect:pom:snapshot-20080530";
   groupId = "com.google.code.google-collections";
   artifactId = "google-collect";
   version = "snapshot-20080530";

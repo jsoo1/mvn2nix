@@ -32,7 +32,8 @@
 , org_apache_maven_shared__maven-shared-io__pom__3_0_0
 }:
 patchMavenJar {
-  name = "org.apache.maven.shared:maven-shared-io:jar:3.0.0";
+  name = "maven-shared-io";
+  coordinates = "org.apache.maven.shared:maven-shared-io:jar:3.0.0";
   groupId = "org.apache.maven.shared";
   artifactId = "maven-shared-io";
   version = "3.0.0";

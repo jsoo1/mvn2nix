@@ -5,7 +5,8 @@
 , org_codehaus_plexus__plexus-components__pom__6_5
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-interactivity:pom:1.1";
+  name = "plexus-interactivity";
+  coordinates = "org.codehaus.plexus:plexus-interactivity:pom:1.1";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-interactivity";
   version = "1.1";

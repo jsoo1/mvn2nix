@@ -5,7 +5,8 @@
 , org_apache_jackrabbit__jackrabbit-parent__pom__1_5_0
 }:
 patchMavenJar {
-  name = "org.apache.jackrabbit:jackrabbit-jcr-commons:pom:1.5.0";
+  name = "jackrabbit-jcr-commons";
+  coordinates = "org.apache.jackrabbit:jackrabbit-jcr-commons:pom:1.5.0";
   groupId = "org.apache.jackrabbit";
   artifactId = "jackrabbit-jcr-commons";
   version = "1.5.0";

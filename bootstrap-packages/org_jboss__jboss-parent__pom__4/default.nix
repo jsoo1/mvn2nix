@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.jboss:jboss-parent:pom:4";
+  name = "jboss-parent";
+  coordinates = "org.jboss:jboss-parent:pom:4";
   groupId = "org.jboss";
   artifactId = "jboss-parent";
   version = "4";

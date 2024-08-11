@@ -5,7 +5,8 @@
 , com_google_guava__failureaccess__pom__1_0_1
 }:
 patchMavenJar {
-  name = "com.google.guava:failureaccess:jar:1.0.1";
+  name = "failureaccess";
+  coordinates = "com.google.guava:failureaccess:jar:1.0.1";
   groupId = "com.google.guava";
   artifactId = "failureaccess";
   version = "1.0.1";

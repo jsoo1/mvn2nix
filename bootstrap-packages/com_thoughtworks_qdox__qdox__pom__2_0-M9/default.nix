@@ -5,7 +5,8 @@
 , org_sonatype_oss__oss-parent__pom__9
 }:
 patchMavenJar {
-  name = "com.thoughtworks.qdox:qdox:pom:2.0-M9";
+  name = "qdox";
+  coordinates = "com.thoughtworks.qdox:qdox:pom:2.0-M9";
   groupId = "com.thoughtworks.qdox";
   artifactId = "qdox";
   version = "2.0-M9";

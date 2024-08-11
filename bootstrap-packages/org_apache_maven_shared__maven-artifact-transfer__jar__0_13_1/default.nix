@@ -31,7 +31,8 @@
 , org_apache_maven_shared__maven-artifact-transfer__pom__0_13_1
 }:
 patchMavenJar {
-  name = "org.apache.maven.shared:maven-artifact-transfer:jar:0.13.1";
+  name = "maven-artifact-transfer";
+  coordinates = "org.apache.maven.shared:maven-artifact-transfer:jar:0.13.1";
   groupId = "org.apache.maven.shared";
   artifactId = "maven-artifact-transfer";
   version = "0.13.1";

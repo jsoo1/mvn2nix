@@ -8,7 +8,8 @@
 , org_apache_sshd__sshd-core__pom__2_7_0
 }:
 patchMavenJar {
-  name = "org.apache.sshd:sshd-core:jar:2.7.0";
+  name = "sshd-core";
+  coordinates = "org.apache.sshd:sshd-core:jar:2.7.0";
   groupId = "org.apache.sshd";
   artifactId = "sshd-core";
   version = "2.7.0";

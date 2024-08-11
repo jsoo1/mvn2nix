@@ -5,7 +5,8 @@
 , classworlds__classworlds__pom__1_1-alpha-2
 }:
 patchMavenJar {
-  name = "classworlds:classworlds:jar:1.1-alpha-2";
+  name = "classworlds";
+  coordinates = "classworlds:classworlds:jar:1.1-alpha-2";
   groupId = "classworlds";
   artifactId = "classworlds";
   version = "1.1-alpha-2";

@@ -6,7 +6,8 @@
 , xerces__xercesImpl__pom__2_8_1
 }:
 patchMavenJar {
-  name = "xerces:xercesImpl:jar:2.8.1";
+  name = "xercesImpl";
+  coordinates = "xerces:xercesImpl:jar:2.8.1";
   groupId = "xerces";
   artifactId = "xercesImpl";
   version = "2.8.1";

@@ -5,7 +5,8 @@
 , org_apache_maven_plugins__maven-plugins__pom__34
 }:
 patchMavenJar {
-  name = "org.apache.maven.plugins:maven-antrun-plugin:pom:3.1.0";
+  name = "maven-antrun-plugin";
+  coordinates = "org.apache.maven.plugins:maven-antrun-plugin:pom:3.1.0";
   groupId = "org.apache.maven.plugins";
   artifactId = "maven-antrun-plugin";
   version = "3.1.0";

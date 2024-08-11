@@ -5,7 +5,8 @@
 , org_mortbay_jetty__project__pom__6_1_14
 }:
 patchMavenJar {
-  name = "org.mortbay.jetty:servlet-api-2.5:pom:6.1.14";
+  name = "servlet-api-2.5";
+  coordinates = "org.mortbay.jetty:servlet-api-2.5:pom:6.1.14";
   groupId = "org.mortbay.jetty";
   artifactId = "servlet-api-2.5";
   version = "6.1.14";

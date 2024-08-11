@@ -5,7 +5,8 @@
 , com_google_guava__guava-parent__pom__16_0_1
 }:
 patchMavenJar {
-  name = "com.google.guava:guava:pom:16.0.1";
+  name = "guava";
+  coordinates = "com.google.guava:guava:pom:16.0.1";
   groupId = "com.google.guava";
   artifactId = "guava";
   version = "16.0.1";

@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.assertj:assertj-bom:pom:3.25.3";
+  name = "assertj-bom";
+  coordinates = "org.assertj:assertj-bom:pom:3.25.3";
   groupId = "org.assertj";
   artifactId = "assertj-bom";
   version = "3.25.3";

@@ -9,7 +9,8 @@
 , org_apache_sshd__sshd-sftp__pom__2_7_0
 }:
 patchMavenJar {
-  name = "org.apache.sshd:sshd-sftp:jar:2.7.0";
+  name = "sshd-sftp";
+  coordinates = "org.apache.sshd:sshd-sftp:jar:2.7.0";
   groupId = "org.apache.sshd";
   artifactId = "sshd-sftp";
   version = "2.7.0";

@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.eclipse.jgit:org.eclipse.jgit-parent:pom:5.13.1.202206130422-r";
+  name = "org.eclipse.jgit-parent";
+  coordinates = "org.eclipse.jgit:org.eclipse.jgit-parent:pom:5.13.1.202206130422-r";
   groupId = "org.eclipse.jgit";
   artifactId = "org.eclipse.jgit-parent";
   version = "5.13.1.202206130422-r";

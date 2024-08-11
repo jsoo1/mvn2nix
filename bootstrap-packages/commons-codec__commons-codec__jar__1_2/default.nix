@@ -5,7 +5,8 @@
 , commons-codec__commons-codec__pom__1_2
 }:
 patchMavenJar {
-  name = "commons-codec:commons-codec:jar:1.2";
+  name = "commons-codec";
+  coordinates = "commons-codec:commons-codec:jar:1.2";
   groupId = "commons-codec";
   artifactId = "commons-codec";
   version = "1.2";

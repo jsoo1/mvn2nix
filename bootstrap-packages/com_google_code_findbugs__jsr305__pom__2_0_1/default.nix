@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "com.google.code.findbugs:jsr305:pom:2.0.1";
+  name = "jsr305";
+  coordinates = "com.google.code.findbugs:jsr305:pom:2.0.1";
   groupId = "com.google.code.findbugs";
   artifactId = "jsr305";
   version = "2.0.1";

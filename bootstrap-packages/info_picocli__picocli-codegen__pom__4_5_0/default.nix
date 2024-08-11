@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "info.picocli:picocli-codegen:pom:4.5.0";
+  name = "picocli-codegen";
+  coordinates = "info.picocli:picocli-codegen:pom:4.5.0";
   groupId = "info.picocli";
   artifactId = "picocli-codegen";
   version = "4.5.0";

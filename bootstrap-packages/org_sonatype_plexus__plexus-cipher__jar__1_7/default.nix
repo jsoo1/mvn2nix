@@ -5,7 +5,8 @@
 , org_sonatype_plexus__plexus-cipher__pom__1_7
 }:
 patchMavenJar {
-  name = "org.sonatype.plexus:plexus-cipher:jar:1.7";
+  name = "plexus-cipher";
+  coordinates = "org.sonatype.plexus:plexus-cipher:jar:1.7";
   groupId = "org.sonatype.plexus";
   artifactId = "plexus-cipher";
   version = "1.7";

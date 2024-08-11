@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "commons-httpclient:commons-httpclient:pom:3.1";
+  name = "commons-httpclient";
+  coordinates = "commons-httpclient:commons-httpclient:pom:3.1";
   groupId = "commons-httpclient";
   artifactId = "commons-httpclient";
   version = "3.1";

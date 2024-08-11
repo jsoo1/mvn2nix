@@ -5,7 +5,8 @@
 , org_slf4j__slf4j-bom__pom__2_0_13
 }:
 patchMavenJar {
-  name = "org.slf4j:slf4j-parent:pom:2.0.13";
+  name = "slf4j-parent";
+  coordinates = "org.slf4j:slf4j-parent:pom:2.0.13";
   groupId = "org.slf4j";
   artifactId = "slf4j-parent";
   version = "2.0.13";

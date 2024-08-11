@@ -5,7 +5,8 @@
 , org_codehaus_plexus__plexus-containers__pom__1_5_4
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-component-annotations:pom:1.5.4";
+  name = "plexus-component-annotations";
+  coordinates = "org.codehaus.plexus:plexus-component-annotations:pom:1.5.4";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-component-annotations";
   version = "1.5.4";

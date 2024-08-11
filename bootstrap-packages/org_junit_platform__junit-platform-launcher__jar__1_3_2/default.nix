@@ -9,7 +9,8 @@
 , org_junit_platform__junit-platform-launcher__pom__1_3_2
 }:
 patchMavenJar {
-  name = "org.junit.platform:junit-platform-launcher:jar:1.3.2";
+  name = "junit-platform-launcher";
+  coordinates = "org.junit.platform:junit-platform-launcher:jar:1.3.2";
   groupId = "org.junit.platform";
   artifactId = "junit-platform-launcher";
   version = "1.3.2";

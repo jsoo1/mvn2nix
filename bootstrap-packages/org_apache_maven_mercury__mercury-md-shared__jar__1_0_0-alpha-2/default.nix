@@ -23,7 +23,8 @@
 , org_apache_maven_mercury__mercury-md-shared__pom__1_0_0-alpha-2
 }:
 patchMavenJar {
-  name = "org.apache.maven.mercury:mercury-md-shared:jar:1.0.0-alpha-2";
+  name = "mercury-md-shared";
+  coordinates = "org.apache.maven.mercury:mercury-md-shared:jar:1.0.0-alpha-2";
   groupId = "org.apache.maven.mercury";
   artifactId = "mercury-md-shared";
   version = "1.0.0-alpha-2";

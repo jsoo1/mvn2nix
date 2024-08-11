@@ -5,7 +5,8 @@
 , org_codehaus_plexus__plexus__pom__5_1
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-containers:pom:2.0.0";
+  name = "plexus-containers";
+  coordinates = "org.codehaus.plexus:plexus-containers:pom:2.0.0";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-containers";
   version = "2.0.0";

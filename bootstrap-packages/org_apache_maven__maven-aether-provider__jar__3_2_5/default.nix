@@ -15,7 +15,8 @@
 , org_apache_maven__maven-aether-provider__pom__3_2_5
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-aether-provider:jar:3.2.5";
+  name = "maven-aether-provider";
+  coordinates = "org.apache.maven:maven-aether-provider:jar:3.2.5";
   groupId = "org.apache.maven";
   artifactId = "maven-aether-provider";
   version = "3.2.5";

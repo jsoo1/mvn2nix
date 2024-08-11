@@ -5,7 +5,8 @@
 , org_jboss_interceptor__jboss-interceptor-api__pom__1_1
 }:
 patchMavenJar {
-  name = "org.jboss.interceptor:jboss-interceptor-api:jar:1.1";
+  name = "jboss-interceptor-api";
+  coordinates = "org.jboss.interceptor:jboss-interceptor-api:jar:1.1";
   groupId = "org.jboss.interceptor";
   artifactId = "jboss-interceptor-api";
   version = "1.1";

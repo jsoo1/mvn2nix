@@ -5,7 +5,8 @@
 , org_apiguardian__apiguardian-api__pom__1_0_0
 }:
 patchMavenJar {
-  name = "org.apiguardian:apiguardian-api:jar:1.0.0";
+  name = "apiguardian-api";
+  coordinates = "org.apiguardian:apiguardian-api:jar:1.0.0";
   groupId = "org.apiguardian";
   artifactId = "apiguardian-api";
   version = "1.0.0";

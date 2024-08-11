@@ -8,7 +8,8 @@
 , org_codehaus_plexus__plexus-io__pom__3_4_2
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-io:jar:3.4.2";
+  name = "plexus-io";
+  coordinates = "org.codehaus.plexus:plexus-io:jar:3.4.2";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-io";
   version = "3.4.2";

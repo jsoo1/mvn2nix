@@ -9,7 +9,8 @@
 , org_apache_maven_plugins__maven-deploy-plugin__pom__3_1_2
 }:
 patchMavenJar {
-  name = "org.apache.maven.plugins:maven-deploy-plugin:jar:3.1.2";
+  name = "maven-deploy-plugin";
+  coordinates = "org.apache.maven.plugins:maven-deploy-plugin:jar:3.1.2";
   groupId = "org.apache.maven.plugins";
   artifactId = "maven-deploy-plugin";
   version = "3.1.2";

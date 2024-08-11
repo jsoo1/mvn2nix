@@ -5,7 +5,8 @@
 , commons-lang__commons-lang__pom__2_1
 }:
 patchMavenJar {
-  name = "commons-lang:commons-lang:jar:2.1";
+  name = "commons-lang";
+  coordinates = "commons-lang:commons-lang:jar:2.1";
   groupId = "commons-lang";
   artifactId = "commons-lang";
   version = "2.1";

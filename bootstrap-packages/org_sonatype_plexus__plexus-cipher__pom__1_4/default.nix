@@ -5,7 +5,8 @@
 , org_sonatype_spice__spice-parent__pom__12
 }:
 patchMavenJar {
-  name = "org.sonatype.plexus:plexus-cipher:pom:1.4";
+  name = "plexus-cipher";
+  coordinates = "org.sonatype.plexus:plexus-cipher:pom:1.4";
   groupId = "org.sonatype.plexus";
   artifactId = "plexus-cipher";
   version = "1.4";

@@ -20,7 +20,8 @@
 , org_apache_velocity__velocity-tools__pom__2_0
 }:
 patchMavenJar {
-  name = "org.apache.velocity:velocity-tools:jar:2.0";
+  name = "velocity-tools";
+  coordinates = "org.apache.velocity:velocity-tools:jar:2.0";
   groupId = "org.apache.velocity";
   artifactId = "velocity-tools";
   version = "2.0";

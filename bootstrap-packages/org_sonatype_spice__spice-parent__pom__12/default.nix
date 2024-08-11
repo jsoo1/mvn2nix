@@ -5,7 +5,8 @@
 , org_sonatype_forge__forge-parent__pom__4
 }:
 patchMavenJar {
-  name = "org.sonatype.spice:spice-parent:pom:12";
+  name = "spice-parent";
+  coordinates = "org.sonatype.spice:spice-parent:pom:12";
   groupId = "org.sonatype.spice";
   artifactId = "spice-parent";
   version = "12";

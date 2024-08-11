@@ -5,7 +5,8 @@
 , antlr__antlr__pom__2_7_2
 }:
 patchMavenJar {
-  name = "antlr:antlr:jar:2.7.2";
+  name = "antlr";
+  coordinates = "antlr:antlr:jar:2.7.2";
   groupId = "antlr";
   artifactId = "antlr";
   version = "2.7.2";

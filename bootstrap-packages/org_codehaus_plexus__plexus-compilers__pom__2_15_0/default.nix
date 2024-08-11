@@ -6,7 +6,8 @@
 , org_codehaus_plexus__plexus-compiler__pom__2_15_0
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-compilers:pom:2.15.0";
+  name = "plexus-compilers";
+  coordinates = "org.codehaus.plexus:plexus-compilers:pom:2.15.0";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-compilers";
   version = "2.15.0";

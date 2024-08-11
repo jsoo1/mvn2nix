@@ -21,7 +21,8 @@
 , org_apache_maven__maven-mercury__pom__3_0-alpha-2
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-mercury:jar:3.0-alpha-2";
+  name = "maven-mercury";
+  coordinates = "org.apache.maven:maven-mercury:jar:3.0-alpha-2";
   groupId = "org.apache.maven";
   artifactId = "maven-mercury";
   version = "3.0-alpha-2";

@@ -11,7 +11,8 @@
 , org_apache_maven__maven-plugin-descriptor__pom__2_2_1
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-plugin-descriptor:jar:2.2.1";
+  name = "maven-plugin-descriptor";
+  coordinates = "org.apache.maven:maven-plugin-descriptor:jar:2.2.1";
   groupId = "org.apache.maven";
   artifactId = "maven-plugin-descriptor";
   version = "2.2.1";

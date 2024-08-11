@@ -5,7 +5,8 @@
 , org_apache_maven__maven-parent__pom__35
 }:
 patchMavenJar {
-  name = "org.apache.maven.shared:maven-shared-components:pom:35";
+  name = "maven-shared-components";
+  coordinates = "org.apache.maven.shared:maven-shared-components:pom:35";
   groupId = "org.apache.maven.shared";
   artifactId = "maven-shared-components";
   version = "35";

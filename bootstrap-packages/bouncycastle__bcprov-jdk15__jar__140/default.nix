@@ -5,7 +5,8 @@
 , bouncycastle__bcprov-jdk15__pom__140
 }:
 patchMavenJar {
-  name = "bouncycastle:bcprov-jdk15:jar:140";
+  name = "bcprov-jdk15";
+  coordinates = "bouncycastle:bcprov-jdk15:jar:140";
   groupId = "bouncycastle";
   artifactId = "bcprov-jdk15";
   version = "140";

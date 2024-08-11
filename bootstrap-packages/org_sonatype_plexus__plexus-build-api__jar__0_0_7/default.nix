@@ -6,7 +6,8 @@
 , org_sonatype_plexus__plexus-build-api__pom__0_0_7
 }:
 patchMavenJar {
-  name = "org.sonatype.plexus:plexus-build-api:jar:0.0.7";
+  name = "plexus-build-api";
+  coordinates = "org.sonatype.plexus:plexus-build-api:jar:0.0.7";
   groupId = "org.sonatype.plexus";
   artifactId = "plexus-build-api";
   version = "0.0.7";

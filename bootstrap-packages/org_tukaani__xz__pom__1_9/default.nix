@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.tukaani:xz:pom:1.9";
+  name = "xz";
+  coordinates = "org.tukaani:xz:pom:1.9";
   groupId = "org.tukaani";
   artifactId = "xz";
   version = "1.9";

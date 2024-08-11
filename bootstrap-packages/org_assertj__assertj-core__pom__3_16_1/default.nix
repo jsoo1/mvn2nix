@@ -6,7 +6,8 @@
 , org_assertj__assertj-parent-pom__pom__2_2_7
 }:
 patchMavenJar {
-  name = "org.assertj:assertj-core:pom:3.16.1";
+  name = "assertj-core";
+  coordinates = "org.assertj:assertj-core:pom:3.16.1";
   groupId = "org.assertj";
   artifactId = "assertj-core";
   version = "3.16.1";

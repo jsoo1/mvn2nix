@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.sonatype.forge:forge-parent:pom:5";
+  name = "forge-parent";
+  coordinates = "org.sonatype.forge:forge-parent:pom:5";
   groupId = "org.sonatype.forge";
   artifactId = "forge-parent";
   version = "5";

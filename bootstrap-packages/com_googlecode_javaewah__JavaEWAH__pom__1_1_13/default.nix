@@ -5,7 +5,8 @@
 , org_sonatype_oss__oss-parent__pom__5
 }:
 patchMavenJar {
-  name = "com.googlecode.javaewah:JavaEWAH:pom:1.1.13";
+  name = "JavaEWAH";
+  coordinates = "com.googlecode.javaewah:JavaEWAH:pom:1.1.13";
   groupId = "com.googlecode.javaewah";
   artifactId = "JavaEWAH";
   version = "1.1.13";

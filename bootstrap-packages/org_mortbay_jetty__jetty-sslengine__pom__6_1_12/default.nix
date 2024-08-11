@@ -5,7 +5,8 @@
 , org_mortbay_jetty__project__pom__6_1_12
 }:
 patchMavenJar {
-  name = "org.mortbay.jetty:jetty-sslengine:pom:6.1.12";
+  name = "jetty-sslengine";
+  coordinates = "org.mortbay.jetty:jetty-sslengine:pom:6.1.12";
   groupId = "org.mortbay.jetty";
   artifactId = "jetty-sslengine";
   version = "6.1.12";

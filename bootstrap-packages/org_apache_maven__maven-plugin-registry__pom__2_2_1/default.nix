@@ -5,7 +5,8 @@
 , org_apache_maven__maven__pom__2_2_1
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-plugin-registry:pom:2.2.1";
+  name = "maven-plugin-registry";
+  coordinates = "org.apache.maven:maven-plugin-registry:pom:2.2.1";
   groupId = "org.apache.maven";
   artifactId = "maven-plugin-registry";
   version = "2.2.1";

@@ -5,7 +5,8 @@
 , com_google__google__pom__1
 }:
 patchMavenJar {
-  name = "com.google.collections:google-collections:pom:1.0";
+  name = "google-collections";
+  coordinates = "com.google.collections:google-collections:pom:1.0";
   groupId = "com.google.collections";
   artifactId = "google-collections";
   version = "1.0";

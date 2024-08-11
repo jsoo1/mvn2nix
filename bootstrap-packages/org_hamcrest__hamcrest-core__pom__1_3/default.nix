@@ -5,7 +5,8 @@
 , org_hamcrest__hamcrest-parent__pom__1_3
 }:
 patchMavenJar {
-  name = "org.hamcrest:hamcrest-core:pom:1.3";
+  name = "hamcrest-core";
+  coordinates = "org.hamcrest:hamcrest-core:pom:1.3";
   groupId = "org.hamcrest";
   artifactId = "hamcrest-core";
   version = "1.3";

@@ -36,7 +36,8 @@
 , org_apache_maven_plugins__maven-compiler-plugin__pom__3_8_1
 }:
 patchMavenJar {
-  name = "org.apache.maven.plugins:maven-compiler-plugin:jar:3.8.1";
+  name = "maven-compiler-plugin";
+  coordinates = "org.apache.maven.plugins:maven-compiler-plugin:jar:3.8.1";
   groupId = "org.apache.maven.plugins";
   artifactId = "maven-compiler-plugin";
   version = "3.8.1";

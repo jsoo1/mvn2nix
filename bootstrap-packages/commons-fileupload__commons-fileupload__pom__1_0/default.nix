@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "commons-fileupload:commons-fileupload:pom:1.0";
+  name = "commons-fileupload";
+  coordinates = "commons-fileupload:commons-fileupload:pom:1.0";
   groupId = "commons-fileupload";
   artifactId = "commons-fileupload";
   version = "1.0";

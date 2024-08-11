@@ -6,7 +6,8 @@
 , org_sonatype_sisu__sisu-inject-bean__pom__1_4_2
 }:
 patchMavenJar {
-  name = "org.sonatype.sisu:sisu-inject-bean:jar:1.4.2";
+  name = "sisu-inject-bean";
+  coordinates = "org.sonatype.sisu:sisu-inject-bean:jar:1.4.2";
   groupId = "org.sonatype.sisu";
   artifactId = "sisu-inject-bean";
   version = "1.4.2";

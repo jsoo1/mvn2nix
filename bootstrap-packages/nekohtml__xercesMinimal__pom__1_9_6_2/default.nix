@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "nekohtml:xercesMinimal:pom:1.9.6.2";
+  name = "xercesMinimal";
+  coordinates = "nekohtml:xercesMinimal:pom:1.9.6.2";
   groupId = "nekohtml";
   artifactId = "xercesMinimal";
   version = "1.9.6.2";

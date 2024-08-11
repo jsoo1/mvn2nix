@@ -13,7 +13,8 @@
 , org_apache_maven__maven-plugin-api__pom__3_9_8
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-plugin-api:jar:3.9.8";
+  name = "maven-plugin-api";
+  coordinates = "org.apache.maven:maven-plugin-api:jar:3.9.8";
   groupId = "org.apache.maven";
   artifactId = "maven-plugin-api";
   version = "3.9.8";

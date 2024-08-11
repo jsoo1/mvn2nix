@@ -5,7 +5,8 @@
 , org_apache_maven_doxia__doxia__pom__1_1
 }:
 patchMavenJar {
-  name = "org.apache.maven.doxia:doxia-sink-api:pom:1.1";
+  name = "doxia-sink-api";
+  coordinates = "org.apache.maven.doxia:doxia-sink-api:pom:1.1";
   groupId = "org.apache.maven.doxia";
   artifactId = "doxia-sink-api";
   version = "1.1";

@@ -5,7 +5,8 @@
 , org_apache__apache__pom__4
 }:
 patchMavenJar {
-  name = "org.apache.commons:commons-parent:pom:11";
+  name = "commons-parent";
+  coordinates = "org.apache.commons:commons-parent:pom:11";
   groupId = "org.apache.commons";
   artifactId = "commons-parent";
   version = "11";

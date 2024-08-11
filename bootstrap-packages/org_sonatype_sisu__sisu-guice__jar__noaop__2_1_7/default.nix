@@ -7,7 +7,8 @@
 , org_sonatype_sisu__sisu-guice__pom__2_1_7
 }:
 patchMavenJar {
-  name = "org.sonatype.sisu:sisu-guice:jar:noaop:2.1.7";
+  name = "sisu-guice";
+  coordinates = "org.sonatype.sisu:sisu-guice:jar:noaop:2.1.7";
   groupId = "org.sonatype.sisu";
   artifactId = "sisu-guice";
   version = "2.1.7";

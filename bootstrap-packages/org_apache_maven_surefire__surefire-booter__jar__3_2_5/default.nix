@@ -9,7 +9,8 @@
 , org_apache_maven_surefire__surefire-booter__pom__3_2_5
 }:
 patchMavenJar {
-  name = "org.apache.maven.surefire:surefire-booter:jar:3.2.5";
+  name = "surefire-booter";
+  coordinates = "org.apache.maven.surefire:surefire-booter:jar:3.2.5";
   groupId = "org.apache.maven.surefire";
   artifactId = "surefire-booter";
   version = "3.2.5";

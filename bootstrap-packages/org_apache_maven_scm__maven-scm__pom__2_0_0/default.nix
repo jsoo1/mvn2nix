@@ -5,7 +5,8 @@
 , org_apache_maven__maven-parent__pom__39
 }:
 patchMavenJar {
-  name = "org.apache.maven.scm:maven-scm:pom:2.0.0";
+  name = "maven-scm";
+  coordinates = "org.apache.maven.scm:maven-scm:pom:2.0.0";
   groupId = "org.apache.maven.scm";
   artifactId = "maven-scm";
   version = "2.0.0";

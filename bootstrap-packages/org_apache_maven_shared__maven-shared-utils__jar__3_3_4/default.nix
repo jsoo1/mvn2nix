@@ -6,7 +6,8 @@
 , org_apache_maven_shared__maven-shared-utils__pom__3_3_4
 }:
 patchMavenJar {
-  name = "org.apache.maven.shared:maven-shared-utils:jar:3.3.4";
+  name = "maven-shared-utils";
+  coordinates = "org.apache.maven.shared:maven-shared-utils:jar:3.3.4";
   groupId = "org.apache.maven.shared";
   artifactId = "maven-shared-utils";
   version = "3.3.4";

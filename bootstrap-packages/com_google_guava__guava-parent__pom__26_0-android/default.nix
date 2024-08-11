@@ -5,7 +5,8 @@
 , org_sonatype_oss__oss-parent__pom__9
 }:
 patchMavenJar {
-  name = "com.google.guava:guava-parent:pom:26.0-android";
+  name = "guava-parent";
+  coordinates = "com.google.guava:guava-parent:pom:26.0-android";
   groupId = "com.google.guava";
   artifactId = "guava-parent";
   version = "26.0-android";

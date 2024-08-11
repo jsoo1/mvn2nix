@@ -5,7 +5,8 @@
 , org_sonatype_forge__forge-parent__pom__10
 }:
 patchMavenJar {
-  name = "org.sonatype.sisu.inject:guice-parent:pom:3.1.0";
+  name = "guice-parent";
+  coordinates = "org.sonatype.sisu.inject:guice-parent:pom:3.1.0";
   groupId = "org.sonatype.sisu.inject";
   artifactId = "guice-parent";
   version = "3.1.0";

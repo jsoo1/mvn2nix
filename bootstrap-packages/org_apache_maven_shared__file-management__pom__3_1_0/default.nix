@@ -5,7 +5,8 @@
 , org_apache_maven_shared__maven-shared-components__pom__36
 }:
 patchMavenJar {
-  name = "org.apache.maven.shared:file-management:pom:3.1.0";
+  name = "file-management";
+  coordinates = "org.apache.maven.shared:file-management:pom:3.1.0";
   groupId = "org.apache.maven.shared";
   artifactId = "file-management";
   version = "3.1.0";

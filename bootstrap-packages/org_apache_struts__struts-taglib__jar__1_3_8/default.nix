@@ -13,7 +13,8 @@
 , org_apache_struts__struts-taglib__pom__1_3_8
 }:
 patchMavenJar {
-  name = "org.apache.struts:struts-taglib:jar:1.3.8";
+  name = "struts-taglib";
+  coordinates = "org.apache.struts:struts-taglib:jar:1.3.8";
   groupId = "org.apache.struts";
   artifactId = "struts-taglib";
   version = "1.3.8";

@@ -6,7 +6,8 @@
 , org_codehaus_woodstox__wstx-asl__pom__3_2_6
 }:
 patchMavenJar {
-  name = "org.codehaus.woodstox:wstx-asl:jar:3.2.6";
+  name = "wstx-asl";
+  coordinates = "org.codehaus.woodstox:wstx-asl:jar:3.2.6";
   groupId = "org.codehaus.woodstox";
   artifactId = "wstx-asl";
   version = "3.2.6";

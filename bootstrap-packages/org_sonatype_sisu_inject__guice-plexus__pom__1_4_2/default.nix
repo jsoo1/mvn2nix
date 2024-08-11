@@ -5,7 +5,8 @@
 , org_sonatype_sisu_inject__guice-bean__pom__1_4_2
 }:
 patchMavenJar {
-  name = "org.sonatype.sisu.inject:guice-plexus:pom:1.4.2";
+  name = "guice-plexus";
+  coordinates = "org.sonatype.sisu.inject:guice-plexus:pom:1.4.2";
   groupId = "org.sonatype.sisu.inject";
   artifactId = "guice-plexus";
   version = "1.4.2";

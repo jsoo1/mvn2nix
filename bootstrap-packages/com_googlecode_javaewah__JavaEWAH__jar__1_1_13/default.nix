@@ -5,7 +5,8 @@
 , com_googlecode_javaewah__JavaEWAH__pom__1_1_13
 }:
 patchMavenJar {
-  name = "com.googlecode.javaewah:JavaEWAH:jar:1.1.13";
+  name = "JavaEWAH";
+  coordinates = "com.googlecode.javaewah:JavaEWAH:jar:1.1.13";
   groupId = "com.googlecode.javaewah";
   artifactId = "JavaEWAH";
   version = "1.1.13";

@@ -35,7 +35,8 @@
 , org_apache_maven__maven-core__pom__3_9_8
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-core:jar:3.9.8";
+  name = "maven-core";
+  coordinates = "org.apache.maven:maven-core:jar:3.9.8";
   groupId = "org.apache.maven";
   artifactId = "maven-core";
   version = "3.9.8";

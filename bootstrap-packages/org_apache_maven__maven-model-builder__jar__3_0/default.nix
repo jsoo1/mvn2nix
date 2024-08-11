@@ -9,7 +9,8 @@
 , org_apache_maven__maven-model-builder__pom__3_0
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-model-builder:jar:3.0";
+  name = "maven-model-builder";
+  coordinates = "org.apache.maven:maven-model-builder:jar:3.0";
   groupId = "org.apache.maven";
   artifactId = "maven-model-builder";
   version = "3.0";

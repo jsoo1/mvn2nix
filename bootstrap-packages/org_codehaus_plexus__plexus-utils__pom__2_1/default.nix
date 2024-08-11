@@ -5,7 +5,8 @@
 , org_sonatype_spice__spice-parent__pom__16
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-utils:pom:2.1";
+  name = "plexus-utils";
+  coordinates = "org.codehaus.plexus:plexus-utils:pom:2.1";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-utils";
   version = "2.1";

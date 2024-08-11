@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.iq80.snappy:snappy:pom:0.4";
+  name = "snappy";
+  coordinates = "org.iq80.snappy:snappy:pom:0.4";
   groupId = "org.iq80.snappy";
   artifactId = "snappy";
   version = "0.4";

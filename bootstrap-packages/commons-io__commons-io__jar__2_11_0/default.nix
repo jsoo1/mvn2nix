@@ -5,7 +5,8 @@
 , commons-io__commons-io__pom__2_11_0
 }:
 patchMavenJar {
-  name = "commons-io:commons-io:jar:2.11.0";
+  name = "commons-io";
+  coordinates = "commons-io:commons-io:jar:2.11.0";
   groupId = "commons-io";
   artifactId = "commons-io";
   version = "2.11.0";

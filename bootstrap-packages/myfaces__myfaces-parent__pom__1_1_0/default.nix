@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "myfaces:myfaces-parent:pom:1.1.0";
+  name = "myfaces-parent";
+  coordinates = "myfaces:myfaces-parent:pom:1.1.0";
   groupId = "myfaces";
   artifactId = "myfaces-parent";
   version = "1.1.0";

@@ -11,7 +11,8 @@
 , org_apache_maven__maven-settings__pom__2_2_1
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-settings:jar:2.2.1";
+  name = "maven-settings";
+  coordinates = "org.apache.maven:maven-settings:jar:2.2.1";
   groupId = "org.apache.maven";
   artifactId = "maven-settings";
   version = "2.2.1";

@@ -5,7 +5,8 @@
 , org_apache_maven_shared__maven-shared-components__pom__30
 }:
 patchMavenJar {
-  name = "org.apache.maven.shared:maven-common-artifact-filters:pom:3.0.1";
+  name = "maven-common-artifact-filters";
+  coordinates = "org.apache.maven.shared:maven-common-artifact-filters:pom:3.0.1";
   groupId = "org.apache.maven.shared";
   artifactId = "maven-common-artifact-filters";
   version = "3.0.1";

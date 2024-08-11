@@ -5,7 +5,8 @@
 , net_i2p_crypto__eddsa__pom__0_3_0
 }:
 patchMavenJar {
-  name = "net.i2p.crypto:eddsa:jar:0.3.0";
+  name = "eddsa";
+  coordinates = "net.i2p.crypto:eddsa:jar:0.3.0";
   groupId = "net.i2p.crypto";
   artifactId = "eddsa";
   version = "0.3.0";

@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.springframework:spring-framework-bom:pom:5.3.6";
+  name = "spring-framework-bom";
+  coordinates = "org.springframework:spring-framework-bom:pom:5.3.6";
   groupId = "org.springframework";
   artifactId = "spring-framework-bom";
   version = "5.3.6";

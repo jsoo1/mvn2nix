@@ -5,7 +5,8 @@
 , org_sonatype_oss__oss-parent__pom__7
 }:
 patchMavenJar {
-  name = "com.google.code.findbugs:jsr305:pom:3.0.2";
+  name = "jsr305";
+  coordinates = "com.google.code.findbugs:jsr305:pom:3.0.2";
   groupId = "com.google.code.findbugs";
   artifactId = "jsr305";
   version = "3.0.2";

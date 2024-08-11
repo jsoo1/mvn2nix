@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "commons-cli:commons-cli:pom:1.1";
+  name = "commons-cli";
+  coordinates = "commons-cli:commons-cli:pom:1.1";
   groupId = "commons-cli";
   artifactId = "commons-cli";
   version = "1.1";

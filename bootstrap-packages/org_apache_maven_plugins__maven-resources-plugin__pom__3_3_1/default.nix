@@ -5,7 +5,8 @@
 , org_apache_maven_plugins__maven-plugins__pom__39
 }:
 patchMavenJar {
-  name = "org.apache.maven.plugins:maven-resources-plugin:pom:3.3.1";
+  name = "maven-resources-plugin";
+  coordinates = "org.apache.maven.plugins:maven-resources-plugin:pom:3.3.1";
   groupId = "org.apache.maven.plugins";
   artifactId = "maven-resources-plugin";
   version = "3.3.1";

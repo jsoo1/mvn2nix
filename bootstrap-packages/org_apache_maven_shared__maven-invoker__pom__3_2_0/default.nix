@@ -5,7 +5,8 @@
 , org_apache_maven_shared__maven-shared-components__pom__35
 }:
 patchMavenJar {
-  name = "org.apache.maven.shared:maven-invoker:pom:3.2.0";
+  name = "maven-invoker";
+  coordinates = "org.apache.maven.shared:maven-invoker:pom:3.2.0";
   groupId = "org.apache.maven.shared";
   artifactId = "maven-invoker";
   version = "3.2.0";

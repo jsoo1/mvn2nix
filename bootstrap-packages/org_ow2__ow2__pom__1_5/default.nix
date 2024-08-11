@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.ow2:ow2:pom:1.5";
+  name = "ow2";
+  coordinates = "org.ow2:ow2:pom:1.5";
   groupId = "org.ow2";
   artifactId = "ow2";
   version = "1.5";

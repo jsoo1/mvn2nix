@@ -5,7 +5,8 @@
 , org_codehaus_plexus__plexus-interpolation__pom__1_25
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-interpolation:jar:1.25";
+  name = "plexus-interpolation";
+  coordinates = "org.codehaus.plexus:plexus-interpolation:jar:1.25";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-interpolation";
   version = "1.25";

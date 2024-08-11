@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "javax.inject:javax.inject:pom:1";
+  name = "javax.inject";
+  coordinates = "javax.inject:javax.inject:pom:1";
   groupId = "javax.inject";
   artifactId = "javax.inject";
   version = "1";

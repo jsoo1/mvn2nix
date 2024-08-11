@@ -5,7 +5,8 @@
 , eu_maveniverse_maven_mima__mima__pom__2_4_15
 }:
 patchMavenJar {
-  name = "eu.maveniverse.maven.mima.runtime:runtime:pom:2.4.15";
+  name = "runtime";
+  coordinates = "eu.maveniverse.maven.mima.runtime:runtime:pom:2.4.15";
   groupId = "eu.maveniverse.maven.mima.runtime";
   artifactId = "runtime";
   version = "2.4.15";

@@ -5,7 +5,8 @@
 , javax_inject__javax_inject__pom__1
 }:
 patchMavenJar {
-  name = "javax.inject:javax.inject:jar:1";
+  name = "javax.inject";
+  coordinates = "javax.inject:javax.inject:jar:1";
   groupId = "javax.inject";
   artifactId = "javax.inject";
   version = "1";

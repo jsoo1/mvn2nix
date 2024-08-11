@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "log4j:log4j:pom:1.2.12";
+  name = "log4j";
+  coordinates = "log4j:log4j:pom:1.2.12";
   groupId = "log4j";
   artifactId = "log4j";
   version = "1.2.12";

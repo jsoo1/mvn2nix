@@ -6,7 +6,8 @@
 , commons-beanutils__commons-beanutils__pom__1_7_0
 }:
 patchMavenJar {
-  name = "commons-beanutils:commons-beanutils:jar:1.7.0";
+  name = "commons-beanutils";
+  coordinates = "commons-beanutils:commons-beanutils:jar:1.7.0";
   groupId = "commons-beanutils";
   artifactId = "commons-beanutils";
   version = "1.7.0";

@@ -5,7 +5,8 @@
 , org_apache_commons__commons-parent__pom__42
 }:
 patchMavenJar {
-  name = "commons-io:commons-io:pom:2.6";
+  name = "commons-io";
+  coordinates = "commons-io:commons-io:pom:2.6";
   groupId = "commons-io";
   artifactId = "commons-io";
   version = "2.6";

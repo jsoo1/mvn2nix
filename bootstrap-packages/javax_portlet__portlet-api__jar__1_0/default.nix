@@ -5,7 +5,8 @@
 , javax_portlet__portlet-api__pom__1_0
 }:
 patchMavenJar {
-  name = "javax.portlet:portlet-api:jar:1.0";
+  name = "portlet-api";
+  coordinates = "javax.portlet:portlet-api:jar:1.0";
   groupId = "javax.portlet";
   artifactId = "portlet-api";
   version = "1.0";

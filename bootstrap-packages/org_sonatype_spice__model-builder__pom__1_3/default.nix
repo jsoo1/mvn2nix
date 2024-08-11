@@ -5,7 +5,8 @@
 , org_sonatype_spice__spice-parent__pom__10
 }:
 patchMavenJar {
-  name = "org.sonatype.spice:model-builder:pom:1.3";
+  name = "model-builder";
+  coordinates = "org.sonatype.spice:model-builder:pom:1.3";
   groupId = "org.sonatype.spice";
   artifactId = "model-builder";
   version = "1.3";

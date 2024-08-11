@@ -10,7 +10,8 @@
 , org_apache_maven_scm__maven-scm-provider-svnexe__pom__2_0_0
 }:
 patchMavenJar {
-  name = "org.apache.maven.scm:maven-scm-provider-svnexe:jar:2.0.0";
+  name = "maven-scm-provider-svnexe";
+  coordinates = "org.apache.maven.scm:maven-scm-provider-svnexe:jar:2.0.0";
   groupId = "org.apache.maven.scm";
   artifactId = "maven-scm-provider-svnexe";
   version = "2.0.0";

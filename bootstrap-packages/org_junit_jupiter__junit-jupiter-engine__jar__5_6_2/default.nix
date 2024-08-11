@@ -10,7 +10,8 @@
 , org_junit_jupiter__junit-jupiter-engine__pom__5_6_2
 }:
 patchMavenJar {
-  name = "org.junit.jupiter:junit-jupiter-engine:jar:5.6.2";
+  name = "junit-jupiter-engine";
+  coordinates = "org.junit.jupiter:junit-jupiter-engine:jar:5.6.2";
   groupId = "org.junit.jupiter";
   artifactId = "junit-jupiter-engine";
   version = "5.6.2";

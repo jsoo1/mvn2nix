@@ -16,7 +16,8 @@
 , org_apache_maven_mercury__mercury-transport-api__pom__1_0_0-alpha-2
 }:
 patchMavenJar {
-  name = "org.apache.maven.mercury:mercury-transport-api:jar:1.0.0-alpha-2";
+  name = "mercury-transport-api";
+  coordinates = "org.apache.maven.mercury:mercury-transport-api:jar:1.0.0-alpha-2";
   groupId = "org.apache.maven.mercury";
   artifactId = "mercury-transport-api";
   version = "1.0.0-alpha-2";

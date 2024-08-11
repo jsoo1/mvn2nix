@@ -5,7 +5,8 @@
 , org_apache_maven_mercury__mercury-crypto__pom__1_0_0-alpha-2
 }:
 patchMavenJar {
-  name = "org.apache.maven.mercury:mercury-crypto-basic:pom:1.0.0-alpha-2";
+  name = "mercury-crypto-basic";
+  coordinates = "org.apache.maven.mercury:mercury-crypto-basic:pom:1.0.0-alpha-2";
   groupId = "org.apache.maven.mercury";
   artifactId = "mercury-crypto-basic";
   version = "1.0.0-alpha-2";

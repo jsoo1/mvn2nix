@@ -5,7 +5,8 @@
 , commons-logging__commons-logging-api__pom__1_1
 }:
 patchMavenJar {
-  name = "commons-logging:commons-logging-api:jar:1.1";
+  name = "commons-logging-api";
+  coordinates = "commons-logging:commons-logging-api:jar:1.1";
   groupId = "commons-logging";
   artifactId = "commons-logging-api";
   version = "1.1";

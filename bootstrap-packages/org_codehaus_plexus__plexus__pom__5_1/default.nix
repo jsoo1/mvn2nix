@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus:pom:5.1";
+  name = "plexus";
+  coordinates = "org.codehaus.plexus:plexus:pom:5.1";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus";
   version = "5.1";

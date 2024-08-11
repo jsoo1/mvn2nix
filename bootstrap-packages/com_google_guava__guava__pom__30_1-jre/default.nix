@@ -5,7 +5,8 @@
 , com_google_guava__guava-parent__pom__30_1-jre
 }:
 patchMavenJar {
-  name = "com.google.guava:guava:pom:30.1-jre";
+  name = "guava";
+  coordinates = "com.google.guava:guava:pom:30.1-jre";
   groupId = "com.google.guava";
   artifactId = "guava";
   version = "30.1-jre";

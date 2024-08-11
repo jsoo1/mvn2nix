@@ -11,7 +11,8 @@
 , org_codehaus_plexus__plexus-archiver__pom__4_2_1
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-archiver:jar:4.2.1";
+  name = "plexus-archiver";
+  coordinates = "org.codehaus.plexus:plexus-archiver:jar:4.2.1";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-archiver";
   version = "4.2.1";

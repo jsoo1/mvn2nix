@@ -5,7 +5,8 @@
 , org_apache__apache__pom__5
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-parent:pom:11";
+  name = "maven-parent";
+  coordinates = "org.apache.maven:maven-parent:pom:11";
   groupId = "org.apache.maven";
   artifactId = "maven-parent";
   version = "11";

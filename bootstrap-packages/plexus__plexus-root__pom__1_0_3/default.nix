@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "plexus:plexus-root:pom:1.0.3";
+  name = "plexus-root";
+  coordinates = "plexus:plexus-root:pom:1.0.3";
   groupId = "plexus";
   artifactId = "plexus-root";
   version = "1.0.3";

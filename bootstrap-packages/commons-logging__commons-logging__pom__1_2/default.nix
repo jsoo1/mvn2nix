@@ -5,7 +5,8 @@
 , org_apache_commons__commons-parent__pom__34
 }:
 patchMavenJar {
-  name = "commons-logging:commons-logging:pom:1.2";
+  name = "commons-logging";
+  coordinates = "commons-logging:commons-logging:pom:1.2";
   groupId = "commons-logging";
   artifactId = "commons-logging";
   version = "1.2";

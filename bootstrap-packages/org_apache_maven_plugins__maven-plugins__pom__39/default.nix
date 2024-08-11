@@ -5,7 +5,8 @@
 , org_apache_maven__maven-parent__pom__39
 }:
 patchMavenJar {
-  name = "org.apache.maven.plugins:maven-plugins:pom:39";
+  name = "maven-plugins";
+  coordinates = "org.apache.maven.plugins:maven-plugins:pom:39";
   groupId = "org.apache.maven.plugins";
   artifactId = "maven-plugins";
   version = "39";

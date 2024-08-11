@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "com.google.errorprone:error_prone_parent:pom:2.26.1";
+  name = "error_prone_parent";
+  coordinates = "com.google.errorprone:error_prone_parent:pom:2.26.1";
   groupId = "com.google.errorprone";
   artifactId = "error_prone_parent";
   version = "2.26.1";

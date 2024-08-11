@@ -5,7 +5,8 @@
 , org_apache_commons__commons-parent__pom__47
 }:
 patchMavenJar {
-  name = "org.apache.commons:commons-lang3:pom:3.8.1";
+  name = "commons-lang3";
+  coordinates = "org.apache.commons:commons-lang3:pom:3.8.1";
   groupId = "org.apache.commons";
   artifactId = "commons-lang3";
   version = "3.8.1";

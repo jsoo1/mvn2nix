@@ -5,7 +5,8 @@
 , logkit__logkit__pom__1_0_1
 }:
 patchMavenJar {
-  name = "logkit:logkit:jar:1.0.1";
+  name = "logkit";
+  coordinates = "logkit:logkit:jar:1.0.1";
   groupId = "logkit";
   artifactId = "logkit";
   version = "1.0.1";

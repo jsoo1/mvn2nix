@@ -18,7 +18,8 @@
 , org_apache_maven__maven-archiver__pom__3_6_2
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-archiver:jar:3.6.2";
+  name = "maven-archiver";
+  coordinates = "org.apache.maven:maven-archiver:jar:3.6.2";
   groupId = "org.apache.maven";
   artifactId = "maven-archiver";
   version = "3.6.2";

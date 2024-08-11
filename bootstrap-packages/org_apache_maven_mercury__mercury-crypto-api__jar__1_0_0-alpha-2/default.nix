@@ -14,7 +14,8 @@
 , org_apache_maven_mercury__mercury-crypto-api__pom__1_0_0-alpha-2
 }:
 patchMavenJar {
-  name = "org.apache.maven.mercury:mercury-crypto-api:jar:1.0.0-alpha-2";
+  name = "mercury-crypto-api";
+  coordinates = "org.apache.maven.mercury:mercury-crypto-api:jar:1.0.0-alpha-2";
   groupId = "org.apache.maven.mercury";
   artifactId = "mercury-crypto-api";
   version = "1.0.0-alpha-2";

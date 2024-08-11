@@ -5,7 +5,8 @@
 , dom4j__dom4j__pom__1_1
 }:
 patchMavenJar {
-  name = "dom4j:dom4j:jar:1.1";
+  name = "dom4j";
+  coordinates = "dom4j:dom4j:jar:1.1";
   groupId = "dom4j";
   artifactId = "dom4j";
   version = "1.1";

@@ -5,7 +5,8 @@
 , org_apache_maven__maven__pom__3_1_0
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-model:pom:3.1.0";
+  name = "maven-model";
+  coordinates = "org.apache.maven:maven-model:pom:3.1.0";
   groupId = "org.apache.maven";
   artifactId = "maven-model";
   version = "3.1.0";

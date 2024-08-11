@@ -5,7 +5,8 @@
 , info_picocli__picocli__pom__4_5_0
 }:
 patchMavenJar {
-  name = "info.picocli:picocli:jar:4.5.0";
+  name = "picocli";
+  coordinates = "info.picocli:picocli:jar:4.5.0";
   groupId = "info.picocli";
   artifactId = "picocli";
   version = "4.5.0";

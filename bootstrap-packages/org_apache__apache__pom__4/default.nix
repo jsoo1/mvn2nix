@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.apache:apache:pom:4";
+  name = "apache";
+  coordinates = "org.apache:apache:pom:4";
   groupId = "org.apache";
   artifactId = "apache";
   version = "4";

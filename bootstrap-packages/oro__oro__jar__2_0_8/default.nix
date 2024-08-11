@@ -5,7 +5,8 @@
 , oro__oro__pom__2_0_8
 }:
 patchMavenJar {
-  name = "oro:oro:jar:2.0.8";
+  name = "oro";
+  coordinates = "oro:oro:jar:2.0.8";
   groupId = "oro";
   artifactId = "oro";
   version = "2.0.8";

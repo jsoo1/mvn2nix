@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "com.google:google:pom:1";
+  name = "google";
+  coordinates = "com.google:google:pom:1";
   groupId = "com.google";
   artifactId = "google";
   version = "1";

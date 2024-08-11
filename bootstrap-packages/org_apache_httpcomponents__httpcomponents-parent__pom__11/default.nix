@@ -5,7 +5,8 @@
 , org_apache__apache__pom__21
 }:
 patchMavenJar {
-  name = "org.apache.httpcomponents:httpcomponents-parent:pom:11";
+  name = "httpcomponents-parent";
+  coordinates = "org.apache.httpcomponents:httpcomponents-parent:pom:11";
   groupId = "org.apache.httpcomponents";
   artifactId = "httpcomponents-parent";
   version = "11";

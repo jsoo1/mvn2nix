@@ -8,7 +8,8 @@
 , org_apache_maven_shared__maven-dependency-tree__pom__3_3_0
 }:
 patchMavenJar {
-  name = "org.apache.maven.shared:maven-dependency-tree:jar:3.3.0";
+  name = "maven-dependency-tree";
+  coordinates = "org.apache.maven.shared:maven-dependency-tree:jar:3.3.0";
   groupId = "org.apache.maven.shared";
   artifactId = "maven-dependency-tree";
   version = "3.3.0";

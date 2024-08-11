@@ -12,7 +12,8 @@
 , org_apache_maven__maven-settings-builder__pom__3_9_8
 }:
 patchMavenJar {
-  name = "org.apache.maven:maven-settings-builder:jar:3.9.8";
+  name = "maven-settings-builder";
+  coordinates = "org.apache.maven:maven-settings-builder:jar:3.9.8";
   groupId = "org.apache.maven";
   artifactId = "maven-settings-builder";
   version = "3.9.8";

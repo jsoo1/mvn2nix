@@ -9,7 +9,8 @@
 , org_apache_maven_doxia__doxia-logging-api__pom__1_1
 }:
 patchMavenJar {
-  name = "org.apache.maven.doxia:doxia-logging-api:jar:1.1";
+  name = "doxia-logging-api";
+  coordinates = "org.apache.maven.doxia:doxia-logging-api:jar:1.1";
   groupId = "org.apache.maven.doxia";
   artifactId = "doxia-logging-api";
   version = "1.1";

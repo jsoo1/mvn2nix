@@ -5,7 +5,8 @@
 , com_github_luben__zstd-jni__pom__1_5_5-5
 }:
 patchMavenJar {
-  name = "com.github.luben:zstd-jni:jar:1.5.5-5";
+  name = "zstd-jni";
+  coordinates = "com.github.luben:zstd-jni:jar:1.5.5-5";
   groupId = "com.github.luben";
   artifactId = "zstd-jni";
   version = "1.5.5-5";

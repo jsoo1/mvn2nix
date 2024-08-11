@@ -5,7 +5,8 @@
 , org_jdom__jdom2__pom__2_0_6_1
 }:
 patchMavenJar {
-  name = "org.jdom:jdom2:jar:2.0.6.1";
+  name = "jdom2";
+  coordinates = "org.jdom:jdom2:jar:2.0.6.1";
   groupId = "org.jdom";
   artifactId = "jdom2";
   version = "2.0.6.1";

@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "avalon-framework:avalon-framework:pom:4.1.3";
+  name = "avalon-framework";
+  coordinates = "avalon-framework:avalon-framework:pom:4.1.3";
   groupId = "avalon-framework";
   artifactId = "avalon-framework";
   version = "4.1.3";

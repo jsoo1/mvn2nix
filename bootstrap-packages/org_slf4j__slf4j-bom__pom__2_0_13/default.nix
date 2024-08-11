@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.slf4j:slf4j-bom:pom:2.0.13";
+  name = "slf4j-bom";
+  coordinates = "org.slf4j:slf4j-bom:pom:2.0.13";
   groupId = "org.slf4j";
   artifactId = "slf4j-bom";
   version = "2.0.13";

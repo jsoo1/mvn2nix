@@ -5,7 +5,8 @@
 , org_apache_httpcomponents__httpcomponents-parent__pom__11
 }:
 patchMavenJar {
-  name = "org.apache.httpcomponents:httpcomponents-core:pom:4.4.14";
+  name = "httpcomponents-core";
+  coordinates = "org.apache.httpcomponents:httpcomponents-core:pom:4.4.14";
   groupId = "org.apache.httpcomponents";
   artifactId = "httpcomponents-core";
   version = "4.4.14";

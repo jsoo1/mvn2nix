@@ -5,7 +5,8 @@
 , org_apache_maven_surefire__surefire__pom__3_0_0-M5
 }:
 patchMavenJar {
-  name = "org.apache.maven.plugins:maven-failsafe-plugin:pom:3.0.0-M5";
+  name = "maven-failsafe-plugin";
+  coordinates = "org.apache.maven.plugins:maven-failsafe-plugin:pom:3.0.0-M5";
   groupId = "org.apache.maven.plugins";
   artifactId = "maven-failsafe-plugin";
   version = "3.0.0-M5";

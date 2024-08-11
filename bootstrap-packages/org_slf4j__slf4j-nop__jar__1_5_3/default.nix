@@ -6,7 +6,8 @@
 , org_slf4j__slf4j-nop__pom__1_5_3
 }:
 patchMavenJar {
-  name = "org.slf4j:slf4j-nop:jar:1.5.3";
+  name = "slf4j-nop";
+  coordinates = "org.slf4j:slf4j-nop:jar:1.5.3";
   groupId = "org.slf4j";
   artifactId = "slf4j-nop";
   version = "1.5.3";

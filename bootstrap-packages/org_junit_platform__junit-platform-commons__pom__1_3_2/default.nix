@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "org.junit.platform:junit-platform-commons:pom:1.3.2";
+  name = "junit-platform-commons";
+  coordinates = "org.junit.platform:junit-platform-commons:pom:1.3.2";
   groupId = "org.junit.platform";
   artifactId = "junit-platform-commons";
   version = "1.3.2";

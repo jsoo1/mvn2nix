@@ -26,7 +26,8 @@
 , org_apache_maven_mercury__mercury-repo-api__pom__1_0_0-alpha-2
 }:
 patchMavenJar {
-  name = "org.apache.maven.mercury:mercury-repo-api:jar:1.0.0-alpha-2";
+  name = "mercury-repo-api";
+  coordinates = "org.apache.maven.mercury:mercury-repo-api:jar:1.0.0-alpha-2";
   groupId = "org.apache.maven.mercury";
   artifactId = "mercury-repo-api";
   version = "1.0.0-alpha-2";

@@ -12,7 +12,8 @@
 , org_codehaus_plexus__plexus-velocity__pom__1_2
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus-velocity:jar:1.2";
+  name = "plexus-velocity";
+  coordinates = "org.codehaus.plexus:plexus-velocity:jar:1.2";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus-velocity";
   version = "1.2";

@@ -4,7 +4,8 @@
 , patchMavenJar
 }:
 patchMavenJar {
-  name = "javax.servlet:jstl:pom:1.1.2";
+  name = "jstl";
+  coordinates = "javax.servlet:jstl:pom:1.1.2";
   groupId = "javax.servlet";
   artifactId = "jstl";
   version = "1.1.2";

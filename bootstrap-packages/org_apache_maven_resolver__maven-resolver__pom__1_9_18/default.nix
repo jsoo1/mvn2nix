@@ -5,7 +5,8 @@
 , org_apache_maven__maven-parent__pom__41
 }:
 patchMavenJar {
-  name = "org.apache.maven.resolver:maven-resolver:pom:1.9.18";
+  name = "maven-resolver";
+  coordinates = "org.apache.maven.resolver:maven-resolver:pom:1.9.18";
   groupId = "org.apache.maven.resolver";
   artifactId = "maven-resolver";
   version = "1.9.18";

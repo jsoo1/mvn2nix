@@ -5,7 +5,8 @@
 , org_sonatype_spice__spice-parent__pom__17
 }:
 patchMavenJar {
-  name = "org.codehaus.plexus:plexus:pom:3.3.1";
+  name = "plexus";
+  coordinates = "org.codehaus.plexus:plexus:pom:3.3.1";
   groupId = "org.codehaus.plexus";
   artifactId = "plexus";
   version = "3.3.1";
